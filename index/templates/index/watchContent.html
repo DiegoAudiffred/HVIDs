@@ -1,0 +1,49 @@
+{% extends 'layout/layout.html' %}
+{% load static %}
+{% block body %}
+
+<style>
+    .media-container {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%; /* 16:9 aspect ratio (Para videos) */
+        overflow: hidden;
+    }
+
+    .media-container video,
+    .media-container img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* Ajusta el contenido al contenedor sin deformar */
+    }
+</style>
+
+<div class="container">
+    <h1>{{ mediafile.title }}</h1>
+    <p>{{ mediafile.description }}</p>
+
+    <div class="media-container">
+        {% if mediafile.file.url|lower|slice:"-3:" == "mp4" %}
+            <video controls>
+                <source src="{{ mediafile.file.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% else %}
+            <img src="{{ mediafile.file.url }}" alt="{{ mediafile.title }}">
+        {% endif %}
+    </div>
+
+    <p><strong>Uploaded At:</strong> {{ mediafile.uploaded_at }}</p>
+    <p><strong>Tags:</strong>
+        {% for tag in mediafile.tags.all %}
+            <span class="badge bg-secondary">{{ tag.name }}</span>
+        {% endfor %}
+    </p>
+
+    <a href="{{ mediafile.file.url }}" class="btn btn-primary" download>Download</a>
+</div>
+
+{% endblock %}
