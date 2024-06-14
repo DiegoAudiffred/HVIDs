@@ -51,7 +51,7 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ mediafile.title }}</h5>
                         <p class="card-text"><strong>Type:</strong> {% if mediafile.thumbnail %} Video {% else %} Imagen {% endif %}</p>
-                        <p class="card-text"><strong>Uploaded At:</strong> {{ mediafile.uploaded_at }}</p>
+                        <p class="card-text"><strong>Artist: </strong> {{ mediafile.artist }}</p>
                         <p class="card-text"><strong>Tags:</strong>
                             {% for tag in mediafile.tags.all %}
                                 <span class="badge bg-secondary">{{ tag.name }}</span>
@@ -59,7 +59,7 @@
                         </p>
                     </div>
                     <div class="card-footer text-center">
-                        <a href="{{ mediafile.file }}" class="btn btn-primary text-white" download>Download</a>
+<a href="{{ mediafile.file }}" class="btn btn-primary text-white" target="_blank" rel="noopener noreferrer">Download</a>
                     </div>
                 </div>
             </div>
