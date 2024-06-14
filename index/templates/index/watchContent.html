@@ -6,10 +6,12 @@
     .media-container {
         position: relative;
         width: 100%;
-        padding-top: 56.25%; /* 16:9 aspect ratio (Para videos) */
+        padding-top: 56.25%; /* 16:9 aspect ratio */
         overflow: hidden;
+        margin-bottom: 20px;
     }
 
+    .media-container iframe,
     .media-container video,
     .media-container img {
         position: absolute;
@@ -17,7 +19,16 @@
         left: 0;
         width: 100%;
         height: 100%;
-        object-fit: contain; /* Ajusta el contenido al contenedor sin deformar */
+        object-fit: contain;
+    }
+
+    .custom-controls {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .custom-controls button {
+        margin: 0 5px;
     }
 </style>
 
@@ -26,15 +37,26 @@
     <p>{{ mediafile.description }}</p>
 
     <div class="media-container">
-        {% if mediafile.file.url|lower|slice:"-3:" == "mp4" %}
-            <video controls>
-                <source src="{{ mediafile.file.url }}" type="video/mp4">
+        {% if drive_preview_url %}
+            <!-- Utilizar iframe para videos de Google Drive -->
+            <iframe src="{{ drive_preview_url }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        {% elif mediafile.file|lower|slice:"-3:" == "mp4" %}
+            <video id="videoPlayer" controls>
+                <source src="{{ mediafile.file }}" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         {% else %}
-            <img src="{{ mediafile.file.url }}" alt="{{ mediafile.title }}">
+            <img src="{{ mediafile.file }}" alt="{{ mediafile.title }}">
         {% endif %}
     </div>
+
+    {% if mediafile.file|lower|slice:"-3:" == "mp4" %}
+    <!-- Controles personalizados para adelantar o retroceder video -->
+    <div class="custom-controls">
+        <button onclick="seekVideo(-10)" class="btn btn-secondary">Retroceder 10s</button>
+        <button onclick="seekVideo(10)" class="btn btn-secondary">Adelantar 10s</button>
+    </div>
+    {% endif %}
 
     <p><strong>Uploaded At:</strong> {{ mediafile.uploaded_at }}</p>
     <p><strong>Tags:</strong>
@@ -43,7 +65,16 @@
         {% endfor %}
     </p>
 
-    <a href="{{ mediafile.file.url }}" class="btn btn-primary" download>Download</a>
+    <a href="{{ mediafile.file }}" class="btn btn-primary" download>Download</a>
 </div>
+
+<script>
+    function seekVideo(seconds) {
+        var video = document.getElementById('videoPlayer');
+        if (video) {
+            video.currentTime += seconds;
+        }
+    }
+</script>
 
 {% endblock %}

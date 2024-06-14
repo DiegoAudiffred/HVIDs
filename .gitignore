@@ -10,3 +10,5 @@ _migrations/*
 !_migrations/__init__.py
 .env
 .sqlite3
+.mp4
+.jpg

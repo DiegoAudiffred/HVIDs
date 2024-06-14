@@ -73,48 +73,16 @@ class Artist(models.Model):
         return self.name
 
 class MediaFile(models.Model):
-    file = models.FileField(upload_to='media_files/%Y/%m/%d/')
-    thumbnail = models.ImageField(upload_to='media_files/thumbnails/%Y/%m/%d/', blank=True, null=True)
+    #file = models.FileField(upload_to='media_files/%Y/%m/%d/')
+    #thumbnail = models.ImageField(upload_to='media_files/thumbnails/%Y/%m/%d/', blank=True, null=True)
     title = models.CharField(max_length=255)
     artist= models.ForeignKey(Artist, on_delete=models.CASCADE,blank=True,null=True)
     tags = models.ManyToManyField(Tags, blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     character= models.ForeignKey(Character, on_delete=models.CASCADE,blank=True,null=True)
+    file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive
+    thumbnail = models.URLField(max_length=2000, blank=True, null=True)  # URL de la miniatura, si existe
 
 
     def __str__(self):
         return self.title
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        
-        if self.file and not self.thumbnail and self.file.name.lower().endswith(('.mp4', '.mov', '.avi', '.mkv')):
-            self.generate_video_thumbnail()
-            
-    def generate_video_thumbnail(self):
-        # Ruta al archivo de video
-        video_path = self.file.path
-
-        # Crear la ruta de la miniatura
-        thumbnail_dir = os.path.join(settings.MEDIA_ROOT, 'media_files/thumbnails', self.uploaded_at.strftime('%Y/%m/%d/'))
-        os.makedirs(thumbnail_dir, exist_ok=True)
-
-        # Nombre del archivo de miniatura
-        thumbnail_name = os.path.splitext(os.path.basename(self.file.name))[0] + '.jpg'
-        thumbnail_path = os.path.join(thumbnail_dir, thumbnail_name)
-
-        # Crear la miniatura usando moviepy
-        try:
-            clip = VideoFileClip(video_path)
-            # Captura un fotograma en el segundo 1 del video (puedes ajustar este valor)
-            clip.save_frame(thumbnail_path, t=1.0)
-            clip.close()
-            
-            # Actualiza el campo de miniatura en el modelo
-            relative_thumbnail_path = os.path.join('media_files/thumbnails', self.uploaded_at.strftime('%Y/%m/%d/'), thumbnail_name)
-            self.thumbnail = relative_thumbnail_path
-            # Guardar el modelo nuevamente para actualizar el campo thumbnail
-            super().save(update_fields=['thumbnail'])
-        except Exception as e:
-            print(f"Error generating thumbnail: {e}")
-        
