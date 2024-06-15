@@ -54,9 +54,15 @@ class Game(models.Model):
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
 
+    def __str__(self):
+        return self.title
+
 class Character(models.Model):
     name = models.CharField(max_length=255)    
     image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
+
+    def __str__(self):
+        return self.name
 
     
 class Tags(models.Model):
@@ -78,6 +84,8 @@ class MediaFile(models.Model):
     title = models.CharField(max_length=255)
     artist= models.ForeignKey(Artist, on_delete=models.CASCADE,blank=True,null=True)
     tags = models.ManyToManyField(Tags, blank=True, null=True)
+    game= models.ForeignKey(Game, on_delete=models.CASCADE,blank=True,null=True)
+
     uploaded_at = models.DateTimeField(auto_now_add=True)
     character= models.ForeignKey(Character, on_delete=models.CASCADE,blank=True,null=True)
     file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive
