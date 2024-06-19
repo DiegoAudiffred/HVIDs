@@ -1,34 +1,58 @@
-from django.http import HttpResponse
-from django.shortcuts import redirect, render, get_object_or_404
-from db.models import MediaFile, Tags
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import user_passes_test, login_required
-from django.contrib import messages
+from django.shortcuts import get_object_or_404, render
+from django.db.models import Count
+from db.models import *
+import random
 
+def get_sidebar_context():
+    popular_tags = Tags.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
+
+    popular_artists = Artist.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
+
+    popular_characters = Character.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
+    
+    
+
+    random_Tags = list(Tags.objects.all())
+
+    random_items = random.sample(random_Tags, 3)
+    #random_item = random.choice(items)
+
+    return {
+        'popular_tags': popular_tags,
+        'popular_artists': popular_artists,
+        'popular_characters':popular_characters,
+        'random_items':random_items
+        }
 
 def index(request):
-    # Obtener todos los archivos multimedia
-    media_files = MediaFile.objects.all()
-    
-    # Verificar los datos obtenidos
-    for media_file in media_files:
-        print(f"Title: {media_file.title}, Thumbnail: {media_file.thumbnail}, File: {media_file.file}")
+    media_files = MediaFile.objects.order_by('-uploaded_at').all()
+    sidebar_context = get_sidebar_context()
 
-    return render(request, 'index/index.html', {'media_files': media_files})
+    context = {
+        'media_files': media_files,
+        **sidebar_context  # Unir el contexto de la sidebar
+    }
+
+    return render(request, 'index/index.html', context)
+
 
 def watchContent(request, id):
     mediafile = get_object_or_404(MediaFile, id=id)
-
-    # Extraer el ID del archivo de Google Drive si es un enlace de Google Drive
     drive_preview_url = None
+    
+    # Lógica para obtener el enlace de vista previa de Google Drive si es necesario
     if mediafile.file and 'drive.google.com' in mediafile.file:
         try:
             file_id = mediafile.file.split('/d/')[1].split('/')[0]
             drive_preview_url = f"https://drive.google.com/file/d/{file_id}/preview"
         except IndexError:
             drive_preview_url = None
+    
+    # Obtener el contexto de la sidebar
+    sidebar_data = get_sidebar_context()
 
     return render(request, 'index/watchContent.html', {
         'mediafile': mediafile,
-        'drive_preview_url': drive_preview_url
+        'drive_preview_url': drive_preview_url,
+        **sidebar_data,  # Integrar datos de la sidebar en el contexto de la vista
     })

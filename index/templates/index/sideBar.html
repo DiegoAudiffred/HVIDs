@@ -1,0 +1,51 @@
+<div class="sidebar">
+  <h2>Tags</h2>
+  {% if popular_tags %}
+  {% for tag in popular_tags %}
+  <h4 class="px-3">
+    <a href="#">{{ tag.name }}</a>
+  </h4>
+  {% endfor %}
+  {% else %}
+  <p>No tags available.</p>
+  {% endif %}
+
+  <h2>Artistas</h2>
+  {% if popular_artists %}
+  {% for artist in popular_artists %}
+  <h4 class="px-3">
+    <a href="#">{{ artist.name }}</a>
+  </h4>
+  {% endfor %}
+  {% else %}
+  <p>No artists available.</p>
+  {% endif %}
+
+  <h2>Personajes</h2>
+  <!-- Añadir contenido adicional aquí -->
+  {% if popular_characters %}
+  {% for character in popular_characters %}
+  <h4 class="px-3">
+    <a href="#">{{ character.name }}</a>
+  </h4>
+  {% endfor %}
+  {% else %}
+  <p>No character available.</p>
+  {% endif %}
+
+  <h2>General</h2>
+
+  <!-- Añadir contenido adicional aquí -->
+  {% if random_items %}
+  {% for character in random_items %}
+  <h4 class="px-3">
+    <a href="#">{{ character.name }}</a>
+  </h4>
+  {% endfor %}
+  {% else %}
+  <p>No character available.</p>
+  {% endif %}
+
+
+  <!-- Añadir contenido adicional aquí -->
+</div>
