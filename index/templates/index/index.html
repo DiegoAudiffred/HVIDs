@@ -24,9 +24,21 @@
     }
 </style>
 <div class="container my-4">
-    <h1 class="mb-4">Subidos Recientemente</h1>
-    <button>Subir Archivo</button>
+<div class="row align-items-center">
+    <div class="col">
+        <h1 class="mb-4">Subidos Recientemente</h1>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary">Subir Archivo</button>
+    </div>
+</div>
+
+
     <div class="row">
+        {% if not media_files%}
+
+        <h1>Nada que mostrar</h1>
+        {% endif %}
         {% for mediafile in media_files %}
         <div class="col-md-4 my-2">
             <div class="card h-100">

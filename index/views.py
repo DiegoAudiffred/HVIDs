@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.db.models import Count
 from db.models import *
@@ -37,6 +38,12 @@ def index(request):
 
 
 def watchContent(request, id):
+    try:
+        # Decodificar el hash para obtener el ID original
+        id = hashids.decode(id)[0]
+    except IndexError:
+        raise Http404("No such content")
+
     mediafile = get_object_or_404(MediaFile, id=id)
     drive_preview_url = None
     
@@ -56,3 +63,35 @@ def watchContent(request, id):
         'drive_preview_url': drive_preview_url,
         **sidebar_data,  # Integrar datos de la sidebar en el contexto de la vista
     })
+
+
+def filteredByTag(request, string):
+    # Filtrar MediaFiles por el nombre del tag
+    if string == 'All':
+        media_files = MediaFile.objects.order_by('-uploaded_at').all()
+    else: 
+        media_files = MediaFile.objects.filter(tags__name__icontains=string).order_by('-uploaded_at')
+    # Obtener el contexto de la sidebar
+    sidebar_context = get_sidebar_context()
+
+    context = {
+        'media_files': media_files,
+        **sidebar_context  # Unir el contexto de la sidebar
+    }
+    return render(request, 'index/index.html', context)
+
+
+def filteredByArtist(request, string):
+    # Filtrar MediaFiles por el nombre del tag
+    if string == 'All':
+        media_files = MediaFile.objects.order_by('-uploaded_at').all()
+    else: 
+        media_files = MediaFile.objects.filter(artist__name__icontains=string).order_by('-uploaded_at')
+    # Obtener el contexto de la sidebar
+    sidebar_context = get_sidebar_context()
+
+    context = {
+        'media_files': media_files,
+        **sidebar_context  # Unir el contexto de la sidebar
+    }
+    return render(request, 'index/index.html', context)

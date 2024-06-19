@@ -77,6 +77,8 @@ class Artist(models.Model):
  
     def __str__(self):
         return self.name
+    
+
 
 class MediaFile(models.Model):
     #file = models.FileField(upload_to='media_files/%Y/%m/%d/')
@@ -94,3 +96,8 @@ class MediaFile(models.Model):
 
     def __str__(self):
         return self.title
+    
+class comicImages(models.Model):
+    mediaFile= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)
+    pagNum = models.IntegerField()
+    file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive
