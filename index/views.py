@@ -1,6 +1,6 @@
 import random
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
 from db.models import *
 from .forms import UploadElementForm
@@ -37,7 +37,15 @@ def index(request):
 
     return render(request, 'index/index.html', context)
 
+def show(request):
+    media_files = MediaFile.objects.all()
+    for med in media_files:
+        med.hide = False
+        med.save()  # Guardar cada instancia actualizada
+    
+    return redirect('index:index')  # Redirigir correctamente
 
+    
 def watchContent(request, id):
    
 

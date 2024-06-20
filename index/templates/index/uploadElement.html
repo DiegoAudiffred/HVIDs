@@ -1,9 +1,21 @@
 <!-- uploadElement.html -->
 {% extends 'layout/layout.html' %}
 {% block body %}
+
 <div class="container">
     <h1>Subir un Nuevo Elemento</h1>
-    <form method="post" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-4">
+            <button class="btn" id="comicBtn">Comic/Doujinshi</button>
+        </div>
+        <div class="col-4">
+            <button class="btn" id="videoBtn">Video</button>
+        </div>
+       
+    </div>
+
+    <!-- Formulario para Videos -->
+    <form method="post" enctype="multipart/form-data" id="videoForm" style="display:none">
         {% csrf_token %}
         <div class="form-group">
             <label for="id_title">Título</label>
@@ -33,7 +45,87 @@
             <label for="id_thumbnail">Miniatura</label>
             {{ form.thumbnail }}
         </div>
-        <button type="submit" class="btn btn-primary">Subir</button>
+        <button type="submit" class="btn btn-primary">Subir Video</button>
+    </form>
+
+    <!-- Formulario para Comics -->
+    <form method="post" enctype="multipart/form-data" id="comicForm" style="display:none">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_title">Título</label>
+            {{ form.title }}
+        </div>
+        <div class="form-group">
+            <label for="id_artist">Artista</label>
+            {{ form.artist }}
+        </div>
+        <div class="form-group">
+            <label for="id_tags">Etiquetas</label>
+            {{ form.tags }}
+        </div>
+        <div class="form-group">
+            <label for="id_game">Juego</label>
+            {{ form.game }}
+        </div>
+        <div class="form-group">
+            <label for="id_character">Personaje</label>
+            {{ form.character }}
+        </div>
+        <div class="form-group">
+            <label for="id_file">Archivo</label>
+            {{ form.file }}
+        </div>
+
+        <!-- Para subir múltiples imágenes para un comic -->
+      
+        <button type="submit" class="btn btn-primary">Subir Comic</button>
+    </form>
+
+  
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const comicBtn = document.getElementById('comicBtn');
+        const videoBtn = document.getElementById('videoBtn');
+
+        const comicForm = document.getElementById('comicForm');
+        const videoForm = document.getElementById('videoForm');
+
+        // Función para mostrar el formulario seleccionado y ocultar los demás
+        function showForm(formToShow) {
+            const forms = [comicForm, videoForm];
+            forms.forEach(form => {
+                form.style.display = (form === formToShow) ? 'block' : 'none';
+            });
+        }
+
+        // Eventos para los botones
+        comicBtn.addEventListener('click', function() {
+            showForm(comicForm);
+        });
+
+        videoBtn.addEventListener('click', function() {
+            showForm(videoForm);
+        });
+
+    
+    });
+
+    // Función para agregar campos de imagen dinámicamente para el formulario de Comic
+    function addComicImageField() {
+        const container = document.getElementById('comicImagesContainer');
+        const index = container.children.length + 1;
+
+        const newField = document.createElement('div');
+        newField.classList.add('form-group');
+        newField.innerHTML = `
+            <label for="comic_image_${index}">Imagen ${index}</label>
+            <input type="url" name="comic_image_${index}" class="form-control" placeholder="URL de la imagen">
+        `;
+        container.appendChild(newField);
+    }
+</script>
+
 {% endblock %}

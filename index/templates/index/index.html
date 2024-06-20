@@ -27,6 +27,7 @@
 <div class="row align-items-center">
     <div class="col">
         <h1 class="mb-4">Subidos Recientemente</h1>
+        <a href="{% url "index:show" %}">Show</a>
     </div>
     <div class="col-auto">
         <a class="btn btn-primary" href="{% url 'index:uploadElement' %}">Subir Archivo</a>
@@ -54,9 +55,8 @@
                         </div>
                     {% else %}
                         <!-- Mostrar la imagen del archivo si no hay miniatura -->
-                        <img src="{{ mediafile.file }}" alt="{{ mediafile.title }} Thumbnail" class="card-img-top" style="height: 200px; object-fit: cover;">
-                    {% endif %}
-                </a>
+ <img src="{{ mediafile.file }}" alt="{{ mediafile.title }} Thumbnail" class="card-img-top" style="height: 200px; object-fit: cover;">
+                    {% endif %}                </a>
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ mediafile.title }}</h5>
                     <p class="card-text"><strong>Tipo:</strong> {% if mediafile.thumbnail %} Video {% else %} Imagen {% endif %}</p>

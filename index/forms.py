@@ -19,7 +19,7 @@ class UploadElementForm(forms.ModelForm):
         self.fields['game'].required = False
         self.fields['game'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
 
-        self.fields['character'].required = True
+        self.fields['character'].required = False
         self.fields['character'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
 
         self.fields['file'].required = True
@@ -33,3 +33,15 @@ class UploadElementForm(forms.ModelForm):
         self.fields['tags'].required = False
         self.fields['tags'].widget = forms.CheckboxSelectMultiple()
         self.fields['tags'].queryset = Tags.objects.all()  # Obtén todas las opciones de tags disponibles
+        
+from django import forms
+from db.models import comicImages
+
+class ComicImageForm(forms.ModelForm):
+    class Meta:
+        model = comicImages
+        fields = ['pagNum', 'file']
+        widgets = {
+            'pagNum': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Número de página'}),
+            'file': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'URL de la imagen'}),
+        }

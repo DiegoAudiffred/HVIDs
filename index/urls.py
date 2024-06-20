@@ -8,6 +8,7 @@ urlpatterns = [
     path("filteredByTag/<str:string>", views.filteredByTag, name='filteredByTag'),
     path("filteredByArtist/<str:string>", views.filteredByArtist, name='filteredByArtist'),
     path("uploadElement/", views.uploadElement, name='uploadElement'),
+    path("show/", views.show, name='show'),
 
     path("watchContent/<int:id>/", views.watchContent, name='watchContent'),
 ]
