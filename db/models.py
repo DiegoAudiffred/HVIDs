@@ -87,7 +87,7 @@ class MediaFile(models.Model):
     artist= models.ForeignKey(Artist, on_delete=models.CASCADE,blank=True,null=True)
     tags = models.ManyToManyField(Tags, blank=True, null=True)
     game= models.ForeignKey(Game, on_delete=models.CASCADE,blank=True,null=True)
-
+    hide = models.BooleanField(default=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     character= models.ForeignKey(Character, on_delete=models.CASCADE,blank=True,null=True)
     file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive

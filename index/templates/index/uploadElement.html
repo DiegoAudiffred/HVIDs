@@ -1,0 +1,39 @@
+<!-- uploadElement.html -->
+{% extends 'layout/layout.html' %}
+{% block body %}
+<div class="container">
+    <h1>Subir un Nuevo Elemento</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_title">Título</label>
+            {{ form.title }}
+        </div>
+        <div class="form-group">
+            <label for="id_artist">Artista</label>
+            {{ form.artist }}
+        </div>
+        <div class="form-group">
+            <label for="id_tags">Etiquetas</label>
+            {{ form.tags }}
+        </div>
+        <div class="form-group">
+            <label for="id_game">Juego</label>
+            {{ form.game }}
+        </div>
+        <div class="form-group">
+            <label for="id_character">Personaje</label>
+            {{ form.character }}
+        </div>
+        <div class="form-group">
+            <label for="id_file">Archivo</label>
+            {{ form.file }}
+        </div>
+        <div class="form-group">
+            <label for="id_thumbnail">Miniatura</label>
+            {{ form.thumbnail }}
+        </div>
+        <button type="submit" class="btn btn-primary">Subir</button>
+    </form>
+</div>
+{% endblock %}

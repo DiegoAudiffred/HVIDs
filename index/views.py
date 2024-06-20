@@ -1,8 +1,9 @@
-from django.http import Http404
+import random
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.db.models import Count
 from db.models import *
-import random
+from .forms import UploadElementForm
 
 def get_sidebar_context():
     popular_tags = Tags.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
@@ -26,7 +27,7 @@ def get_sidebar_context():
         }
 
 def index(request):
-    media_files = MediaFile.objects.order_by('-uploaded_at').all()
+    media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
     sidebar_context = get_sidebar_context()
 
     context = {
@@ -38,11 +39,7 @@ def index(request):
 
 
 def watchContent(request, id):
-    try:
-        # Decodificar el hash para obtener el ID original
-        id = hashids.decode(id)[0]
-    except IndexError:
-        raise Http404("No such content")
+   
 
     mediafile = get_object_or_404(MediaFile, id=id)
     drive_preview_url = None
@@ -68,9 +65,9 @@ def watchContent(request, id):
 def filteredByTag(request, string):
     # Filtrar MediaFiles por el nombre del tag
     if string == 'All':
-        media_files = MediaFile.objects.order_by('-uploaded_at').all()
+        media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
     else: 
-        media_files = MediaFile.objects.filter(tags__name__icontains=string).order_by('-uploaded_at')
+        media_files = MediaFile.objects.filter(tags__name__icontains=string,hide=False).order_by('-uploaded_at')
     # Obtener el contexto de la sidebar
     sidebar_context = get_sidebar_context()
 
@@ -84,9 +81,9 @@ def filteredByTag(request, string):
 def filteredByArtist(request, string):
     # Filtrar MediaFiles por el nombre del tag
     if string == 'All':
-        media_files = MediaFile.objects.order_by('-uploaded_at').all()
+        media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
     else: 
-        media_files = MediaFile.objects.filter(artist__name__icontains=string).order_by('-uploaded_at')
+        media_files = MediaFile.objects.filter(artist__name__icontains=string, hide=False).order_by('-uploaded_at')
     # Obtener el contexto de la sidebar
     sidebar_context = get_sidebar_context()
 
@@ -95,3 +92,28 @@ def filteredByArtist(request, string):
         **sidebar_context  # Unir el contexto de la sidebar
     }
     return render(request, 'index/index.html', context)
+
+
+def uploadElement(request):
+    if request.method == 'POST':
+        # Si el formulario se ha enviado, procesar la subida del archivo
+        form = UploadElementForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()  # Guarda el archivo subido
+            return HttpResponseRedirect('/')  # Redirige después de guardar
+    else:
+        # Si es una solicitud GET, simplemente muestra el formulario vacío
+        form = UploadElementForm()
+    
+    # Filtrar los MediaFiles visibles
+    media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
+    sidebar_context = get_sidebar_context()
+
+    # Combinar los contextos
+    context = {
+        'form': form,
+        'media_files': media_files,
+        **sidebar_context  # Unir el contexto de la sidebar
+    }
+
+    return render(request, 'index/uploadElement.html', context)
