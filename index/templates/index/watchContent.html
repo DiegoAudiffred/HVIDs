@@ -6,7 +6,8 @@
     .media-container {
         position: relative;
         width: 100%;
-        padding-top: 56.25%; /* 16:9 aspect ratio */
+        padding-top: 56.25%;
+        /* 16:9 aspect ratio */
         overflow: hidden;
         margin-bottom: 20px;
     }
@@ -38,44 +39,69 @@
 
     <div class="media-container">
         {% if drive_preview_url %}
-            <!-- Utilizar iframe para videos de Google Drive -->
-            <iframe src="{{ drive_preview_url }}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <!-- Utilizar iframe para videos de Google Drive -->
+        <iframe src="{{ drive_preview_url }}" frameborder="0" allow="autoplay; encrypted-media"
+            allowfullscreen></iframe>
         {% elif mediafile.file|lower|slice:"-3:" == "mp4" %}
-            <video id="videoPlayer" controls>
-                <source src="{{ mediafile.file }}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
+        <video id="videoPlayer" controls>
+            <source src="{{ mediafile.file }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
         {% else %}
-            <img src="{{ mediafile.file }}" alt="{{ mediafile.title }}">
+
+        <img
+            src="https://lh3.googleusercontent.com/drive-viewer/AKGpihYJ1VUAC_-T-hDevQ--3WyzWyhvIpSMkERZlt-yZun75IL8byO7I_vuiqbloQ8a2o5B-7eD-MOdKIqXIMxXxPTnU7gsfB9YUg=s1600-rw-v1" />
         {% endif %}
     </div>
+    <div class="row">
 
-    {% if mediafile.file|lower|slice:"-3:" == "mp4" %}
-    <!-- Controles personalizados para adelantar o retroceder video -->
-    <div class="custom-controls">
-        <button onclick="seekVideo(-10)" class="btn btn-secondary">Retroceder 10s</button>
-        <button onclick="seekVideo(10)" class="btn btn-secondary">Adelantar 10s</button>
-    </div>
-    {% endif %}
-
-    <p><strong>Uploaded At:</strong> {{ mediafile.uploaded_at }}</p>
-    <p><strong>Tags:</strong>
-        {% for tag in mediafile.tags.all %}
-            <span class="badge bg-secondary">{{ tag.name }}</span>
+        {% for page in pages %}
+        <div class="col-6">
+            <button data-bs-toggle="modal" data-bs-target="#imageModal"> <img src="{{page.file}}"
+                    class="w-100" /></button>
+        </div>
         {% endfor %}
-    </p>
 
-    <a href="{{ mediafile.file }}" class="btn btn-primary" download>Download</a>
+
+
+    </div>
+    <div class="row">
+        <p><strong>Uploaded At:</strong> {{ mediafile.uploaded_at }}</p>
+        <p><strong>Tags:</strong>
+            {% for tag in mediafile.tags.all %}
+            <span class="badge bg-secondary">{{ tag.name }}</span>
+            {% endfor %}
+        </p>
+
+        <a href="{{ mediafile.file }}" class="btn btn-primary" download>Download</a>
+    </div>
 </div>
 
-<script>
-    function seekVideo(seconds) {
-        var video = document.getElementById('videoPlayer');
-        if (video) {
-            video.currentTime += seconds;
-        }
-    }
-</script>
+<div class="modal fade " id="imageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Carrusel -->
+
+
+
+                {% for page in pages %}
+                <img src="{{ page.file }}" class="d-block w-100" alt="Imagen">
+                {% if loop.first %} active {% endif %}
+
+                {% endfor %}
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 
 

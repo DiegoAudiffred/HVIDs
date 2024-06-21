@@ -100,4 +100,4 @@ class MediaFile(models.Model):
 class comicImages(models.Model):
     mediaFile= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)
     pagNum = models.IntegerField()
-    file = models.TextField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive
+    file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive

@@ -45,11 +45,20 @@ def show(request):
     
     return redirect('index:index')  # Redirigir correctamente
 
+def hide(request):
+    futa_tag = Tags.objects.get(name='Futa')  # Obtener el objeto Tag con el nombre 'futa'
+    media_files = MediaFile.objects.filter(tags=futa_tag)    
+    for med in media_files:
+        med.hide = True
+        med.save()  # Guardar cada instancia actualizada
     
+    return redirect('index:index')  # Redirigir correctamente
+
 def watchContent(request, id):
-   
 
     mediafile = get_object_or_404(MediaFile, id=id)
+    pages = comicImages.objects.filter(mediaFile = mediafile)
+
     drive_preview_url = None
     
     # Lógica para obtener el enlace de vista previa de Google Drive si es necesario
@@ -66,6 +75,7 @@ def watchContent(request, id):
     return render(request, 'index/watchContent.html', {
         'mediafile': mediafile,
         'drive_preview_url': drive_preview_url,
+        'pages':pages,
         **sidebar_data,  # Integrar datos de la sidebar en el contexto de la vista
     })
 
