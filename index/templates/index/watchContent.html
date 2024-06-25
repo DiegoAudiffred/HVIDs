@@ -37,7 +37,7 @@
 <div class="container">
     <h1>{{ mediafile.title }}</h1>
 
-    <div class="media-container">
+    <div class="media-container"> <!-- Video -->
         {% if drive_preview_url %}
         <!-- Utilizar iframe para videos de Google Drive -->
         <iframe src="{{ drive_preview_url }}" frameborder="0" allow="autoplay; encrypted-media"
@@ -53,7 +53,7 @@
             src="https://lh3.googleusercontent.com/drive-viewer/AKGpihYJ1VUAC_-T-hDevQ--3WyzWyhvIpSMkERZlt-yZun75IL8byO7I_vuiqbloQ8a2o5B-7eD-MOdKIqXIMxXxPTnU7gsfB9YUg=s1600-rw-v1" />
         {% endif %}
     </div>
-    <div class="row">
+    <div class="row"> <!-- Comic -->
 
         {% for page in pages %}
         <div class="col-6">
@@ -74,7 +74,36 @@
         </p>
 
         <a href="{{ mediafile.file }}" class="btn btn-primary" download>Download</a>
+
     </div>
+    <div class="row">
+        <div class="col-12">
+            <h2>Comentarios</h2>
+        </div>
+        <div class="col-12">
+            <p>Agregar comentario</p>
+        </div>
+        <form class="row" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="col-9">
+                {{ form.comentario }}
+            </div>
+            <div class="col-3">
+                <button class="btn btn-primary" type="submit">Enviar</button>
+            </div>
+        </form>
+        <div class="col-12">
+            {% for comentario in comentarios %}
+            <div class="py-3 border-bottom">
+                <a href="">
+                    <p>{{ comentario.usuario }}</p>
+                </a>
+                <p>{{ comentario.comentario }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
 </div>
 
 <div class="modal fade " id="imageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
@@ -101,6 +130,7 @@
         </div>
     </div>
 </div>
+
 
 
 

@@ -1,7 +1,6 @@
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-from moviepy.editor import VideoFileClip
 import os
 from django.conf import settings  # Importamos settings
 from django.utils.translation import gettext_lazy as _
@@ -79,7 +78,6 @@ class Artist(models.Model):
         return self.name
     
 
-
 class MediaFile(models.Model):
     #file = models.FileField(upload_to='media_files/%Y/%m/%d/')
     #thumbnail = models.ImageField(upload_to='media_files/thumbnails/%Y/%m/%d/', blank=True, null=True)
@@ -101,3 +99,10 @@ class comicImages(models.Model):
     mediaFile= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)
     pagNum = models.IntegerField()
     file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive
+
+class Comentario(models.Model):
+    mediaFile= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)
+
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE,blank=True,null=True)
+
+    comentario = models.CharField(max_length=400,blank=True, null=True)

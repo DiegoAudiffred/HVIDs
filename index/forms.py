@@ -1,6 +1,6 @@
 # forms.py
 from django import forms
-from db.models import MediaFile, Tags
+from db.models import Comentario, MediaFile, Tags
 
 class UploadElementForm(forms.ModelForm):
     class Meta:
@@ -45,3 +45,22 @@ class ComicImageForm(forms.ModelForm):
             'pagNum': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Número de página'}),
             'file': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'URL de la imagen'}),
         }
+        
+class addComentariosForm(forms.ModelForm):
+    class Meta:
+        model = Comentario
+        fields = ['comentario','usuario','mediaFile']
+
+    def __init__(self, *args, **kwargs):
+        super(addComentariosForm, self).__init__(*args, **kwargs)
+
+        self.fields['comentario'].required = True
+        self.fields['comentario'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': ' Introduce tu comentario', 'rows': '1'})
+
+        self.fields['usuario'].required = False
+        self.fields['usuario'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': 'Artista*', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
+
+        self.fields['mediaFile'].required = False
+        self.fields['mediaFile'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
+
+     

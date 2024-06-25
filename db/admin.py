@@ -10,4 +10,5 @@ admin.site.register(Artist)
 admin.site.register(Character)
 admin.site.register(Game)
 admin.site.register(comicImages)
+admin.site.register(Comentario)
 

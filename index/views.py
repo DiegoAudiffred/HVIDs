@@ -3,7 +3,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
 from db.models import *
-from .forms import UploadElementForm
+from .forms import UploadElementForm, addComentariosForm
 
 def get_sidebar_context():
     popular_tags = Tags.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
@@ -55,10 +55,29 @@ def hide(request):
     return redirect('index:index')  # Redirigir correctamente
 
 def watchContent(request, id):
+    mediafile = get_object_or_404(MediaFile, id=id)
 
+    if request.method == 'POST':
+        # Si el formulario se ha enviado, procesar la subida del archivo
+        form = addComentariosForm(request.POST, request.FILES)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            
+            # Asignar manualmente el usuario y el archivo mediaFile
+            comentario.usuario = request.user  # Suponiendo que el usuario está autenticado
+            comentario.mediaFile = mediafile  # Obtener el archivo subido
+
+            # Guardar el objeto Comentario con los campos adicionales
+            comentario.save()
+            return redirect('index:watchContent', mediafile.id)  # Redirigir correctamente
+
+    else:
+        form = addComentariosForm()
+    
+   
     mediafile = get_object_or_404(MediaFile, id=id)
     pages = comicImages.objects.filter(mediaFile = mediafile)
-
+    comentarios = Comentario.objects.filter(mediaFile = mediafile)
     drive_preview_url = None
     
     # Lógica para obtener el enlace de vista previa de Google Drive si es necesario
@@ -76,6 +95,8 @@ def watchContent(request, id):
         'mediafile': mediafile,
         'drive_preview_url': drive_preview_url,
         'pages':pages,
+        'comentarios':comentarios,
+        'form':form,
         **sidebar_data,  # Integrar datos de la sidebar en el contexto de la vista
     })
 
