@@ -87,11 +87,12 @@ class MediaFile(models.Model):
     game= models.ForeignKey(Game, on_delete=models.CASCADE,blank=True,null=True)
     hide = models.BooleanField(default=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    character= models.ForeignKey(Character, on_delete=models.CASCADE,blank=True,null=True)
+    character= models.ManyToManyField(Character, blank=True, null=True)
     file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive
     thumbnail = models.URLField(max_length=2000, blank=True, null=True)  # URL de la miniatura, si existe
-
-
+    #reproducciones = models.IntegerField(default=0)
+    
+    
     def __str__(self):
         return self.title
     
@@ -104,5 +105,6 @@ class Comentario(models.Model):
     mediaFile= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)
 
     usuario = models.ForeignKey(User, on_delete=models.CASCADE,blank=True,null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     comentario = models.CharField(max_length=400,blank=True, null=True)
