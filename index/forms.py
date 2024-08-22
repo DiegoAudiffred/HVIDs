@@ -11,22 +11,22 @@ class UploadElementForm(forms.ModelForm):
         super(UploadElementForm, self).__init__(*args, **kwargs)
 
         self.fields['title'].required = True
-        self.fields['title'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': ' Nombre que aparece en el menú*', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
+        self.fields['title'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
         self.fields['artist'].required = False
-        self.fields['artist'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': 'Artista*', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
+        self.fields['artist'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
         self.fields['game'].required = False
-        self.fields['game'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
+        self.fields['game'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
         self.fields['character'].required = False
-        self.fields['character'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
+        self.fields['character'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
         self.fields['file'].required = True
-        self.fields['file'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': ' Archivo*', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
+        self.fields['file'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Archivo*', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
         self.fields['thumbnail'].required = False
-        self.fields['thumbnail'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': ' Miniatura', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
+        self.fields['thumbnail'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Miniatura', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
         self.fields['thumbnail'].initial = 'https://drive.google.com/thumbnail?id='
 
         # Asegúrate de que el campo de tags está usando CheckboxSelectMultiple correctamente.

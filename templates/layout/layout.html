@@ -24,14 +24,14 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-2 bg-light">
+            <div class="col-md-2 bg-light d-none d-md-block">
                 {% block sidebar %}
                     {% include 'index/sideBar.html' %}
                 {% endblock %}
             </div>
 
             <!-- Main Content -->
-            <div class="col-md-10">
+            <div class="col-md-10 col-12">
                 <main class="bg-cuarto">
                     {% block body %}
                     <!-- Aquí se incluirá el contenido específico de cada página -->

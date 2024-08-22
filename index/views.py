@@ -14,16 +14,15 @@ def get_sidebar_context():
     
     
 
-    random_Tags = list(Tags.objects.all())
-
-    random_items = random.sample(random_Tags, 3)
+    #random_Tags = list(Tags.objects.all())
+    #random_items = random.sample(random_Tags, 3)
     #random_item = random.choice(items)
 
     return {
         'popular_tags': popular_tags,
         'popular_artists': popular_artists,
         'popular_characters':popular_characters,
-        'random_items':random_items
+        #'random_items':random_items
         }
 
 def index(request):
@@ -131,6 +130,24 @@ def filteredByArtist(request, string):
         **sidebar_context  # Unir el contexto de la sidebar
     }
     return render(request, 'index/index.html', context)
+
+
+def filteredBycharacter(request, string):
+
+    if string == 'All':
+        media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
+    else: 
+        media_files = MediaFile.objects.filter(character__name__icontains=string, hide=False).order_by('-uploaded_at')
+    print(media_files)
+    # Obtener el contexto de la sidebar
+    sidebar_context = get_sidebar_context()
+
+    context = {
+        'media_files': media_files,
+        **sidebar_context  # Unir el contexto de la sidebar
+    }
+    return render(request, 'index/index.html', context)
+
 
 
 def uploadElement(request):
