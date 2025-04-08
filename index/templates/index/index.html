@@ -33,12 +33,12 @@
         }
   
 </style>
-<div class="container my-4">
-<div class="row align-items-center">
+<div class="container ">
+<div class="row align-items-center ">
     <div class="col">
-        <h1 class="mb-4">Subidos Recientemente</h1>
-        <a href="{% url "index:show" %}">Show</a>
-                <a href="{% url "index:hide" %}">Hide</a>
+        <h1 class="mb-4 text-primary">Subidos Recientemente</h1>
+        <a class="d-none" href="{% url "index:show" %}">Show</a>
+                <a class="d-none" href="{% url "index:hide" %}">Hide</a>
 
     </div>
     <div class="col-auto">
@@ -47,7 +47,7 @@
 </div>
 
 
-    <div class="row">
+    <div class="row ">
         {% if not media_files%}
 
         <h1>Nada que mostrar</h1>

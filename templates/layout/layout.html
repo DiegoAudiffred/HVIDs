@@ -24,17 +24,18 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-2 bg-light d-none d-md-block">
+            <div class="col-md-2 bg-light d-none d-md-block my-4 px-4 border-end border-top border-bottom border-3 border-tercero min-vh-100">
                 {% block sidebar %}
                     {% include 'index/sideBar.html' %}
                 {% endblock %}
             </div>
+            
 
             <!-- Main Content -->
-            <div class="col-md-10 col-12">
+            <div class="col-md-10 col-12 my-4 px-4 ">
                 <main class="bg-cuarto">
                     {% block body %}
-                    <!-- Aquí se incluirá el contenido específico de cada página -->
+                    
                     {% endblock %}
                 </main>
             </div>
