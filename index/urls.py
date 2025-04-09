@@ -12,6 +12,8 @@ urlpatterns = [
     path("uploadElement/", views.uploadElement, name='uploadElement'),
     path("show/", views.show, name='show'),
     path("hide/", views.hide, name='hide'),
+    path("adminPage/", views.adminPage, name='adminPage'),
 
     path("watchContent/<int:id>/", views.watchContent, name='watchContent'),
+
 ]

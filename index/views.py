@@ -3,7 +3,11 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
 from db.models import *
-from .forms import UploadElementForm, addComentariosForm
+from .forms import *
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 def get_sidebar_context():
     popular_tags = Tags.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
@@ -43,6 +47,26 @@ def show(request):
         med.save()  # Guardar cada instancia actualizada
     
     return redirect('index:index')  # Redirigir correctamente
+
+def adminPage(request):
+    media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
+    sidebar_context = get_sidebar_context()
+    formTag = addTagsForm()
+    formArtist = addArtistForm()
+    formUser = addUserForm()
+    formChar = addCharsForm()
+    context = {
+        'formTag':formTag,
+        'formArtist':formArtist,
+        'formUser':formUser,
+        'formChar':formChar,
+        'media_files': media_files,
+        **sidebar_context  # Unir el contexto de la sidebar
+    }
+    return render(request, 'index/adminPage.html',context)
+
+
+
 
 def hide(request):
     futa_tag = Tags.objects.get(name='Futa')  # Obtener el objeto Tag con el nombre 'futa'

@@ -1,6 +1,6 @@
 # forms.py
 from django import forms
-from db.models import Comentario, MediaFile, Tags
+from db.models import *
 
 class UploadElementForm(forms.ModelForm):
     class Meta:
@@ -62,5 +62,45 @@ class addComentariosForm(forms.ModelForm):
 
         self.fields['mediaFile'].required = False
         self.fields['mediaFile'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
+class addTagsForm(forms.ModelForm):
+    class Meta:
+        model = Tags
+        fields = ['name']
+    def __init__(self, *args, **kwargs):
+            super(addTagsForm, self).__init__(*args, **kwargs)
 
-     
+            self.fields['name'].required = True
+            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce la tag', 'rows': '1'})
+
+class addArtistForm(forms.ModelForm):
+    class Meta:
+        model = Artist
+        fields = ['name','image']
+    def __init__(self, *args, **kwargs):
+            super(addArtistForm, self).__init__(*args, **kwargs)
+
+            self.fields['name'].required = True
+            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del artista', 'rows': '1'})
+
+class addCharsForm(forms.ModelForm):
+    class Meta:
+        model = Character
+        fields = ['name','image']
+    def __init__(self, *args, **kwargs):
+            super(addCharsForm, self).__init__(*args, **kwargs)
+
+            self.fields['name'].required = True
+            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del personaje', 'rows': '1'})
+
+class addUserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username']
+    def __init__(self, *args, **kwargs):
+            super(addUserForm, self).__init__(*args, **kwargs)
+
+            self.fields['username'].required = True
+            self.fields['username'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del usuario', 'rows': '1'})
+
+       
+          
