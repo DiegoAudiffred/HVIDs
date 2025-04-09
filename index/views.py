@@ -166,65 +166,92 @@ def filteredByTag(request, string):
     # Filtrar MediaFiles por el nombre del tag
     if string == 'All':
         media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
+        sidebar_context = get_sidebar_context()
+        context = {
+            'media_files': media_files,
+            **sidebar_context  # Unir el contexto de la sidebar
+        }   
+
+        return redirect('index:index')
+
     else: 
         media_files = MediaFile.objects.filter(tags__name__icontains=string,hide=False).order_by('-uploaded_at')
     # Obtener el contexto de la sidebar
-    sidebar_context = get_sidebar_context()
+        sidebar_context = get_sidebar_context()
 
-    context = {
-        'media_files': media_files,
-        **sidebar_context  # Unir el contexto de la sidebar
-    }
-    return render(request, 'index/index.html', context)
+        context = {
+            'media_files': media_files,
+            **sidebar_context  # Unir el contexto de la sidebar
+        }
+        return render(request, 'index/index.html', context)
 
 
 def filteredByArtist(request, string):
     # Filtrar MediaFiles por el nombre del tag
     if string == 'All':
         media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
+        sidebar_context = get_sidebar_context()
+        context = {
+            'media_files': media_files,
+            **sidebar_context  # Unir el contexto de la sidebar
+        }   
+
+        return redirect('index:index')    
     else: 
         media_files = MediaFile.objects.filter(artist__name__icontains=string, hide=False).order_by('-uploaded_at')
     # Obtener el contexto de la sidebar
-    sidebar_context = get_sidebar_context()
+        sidebar_context = get_sidebar_context()
 
-    context = {
-        'media_files': media_files,
-        **sidebar_context  # Unir el contexto de la sidebar
-    }
-    return render(request, 'index/index.html', context)
+        context = {
+            'media_files': media_files,
+            **sidebar_context  # Unir el contexto de la sidebar
+        }
+        return render(request, 'index/index.html', context)
 
 
 def filteredByCharacter(request, string):
 
     if string == 'All':
         media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
+        sidebar_context = get_sidebar_context()
+        context = {
+            'media_files': media_files,
+            **sidebar_context  # Unir el contexto de la sidebar
+        }   
+
+        return redirect('index:index')
     else: 
         media_files = MediaFile.objects.filter(character__name__icontains=string, hide=False).order_by('-uploaded_at')
-    print(media_files)
     # Obtener el contexto de la sidebar
-    sidebar_context = get_sidebar_context()
-
-    context = {
-        'media_files': media_files,
-        **sidebar_context  # Unir el contexto de la sidebar
-    }
-    return render(request, 'index/index.html', context)
+        sidebar_context = get_sidebar_context()
+        context = {
+            'media_files': media_files,
+            **sidebar_context  # Unir el contexto de la sidebar
+        }
+        return render(request, 'index/index.html', context)
 
 def filteredByGame(request, string):
 
     # Filtrar MediaFiles por el nombre del tag
     if string == 'All':
         media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
+        sidebar_context = get_sidebar_context()
+        context = {
+            'media_files': media_files,
+            **sidebar_context  # Unir el contexto de la sidebar
+        }   
+
+        return redirect('index:index')
     else: 
         media_files = MediaFile.objects.filter(game__title__icontains=string, hide=False).order_by('-uploaded_at')
     # Obtener el contexto de la sidebar
-    sidebar_context = get_sidebar_context()
+        sidebar_context = get_sidebar_context()
 
-    context = {
-        'media_files': media_files,
-        **sidebar_context  # Unir el contexto de la sidebar
-    }
-    return render(request, 'index/index.html', context)
+        context = {
+            'media_files': media_files,
+            **sidebar_context  # Unir el contexto de la sidebar
+        }
+        return render(request, 'index/index.html', context)
 
 
 def uploadElement(request):

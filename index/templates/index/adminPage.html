@@ -1,5 +1,6 @@
 {% extends 'layout/layout.html' %}
 {% load static %}
+
 {% block body %}
 <div class="container">
     <div class="row">
@@ -46,7 +47,7 @@
         <div class="row d-none my-5" id="artistForm">           
             <div class="col-4">
                 <input class="" type="file" name="image" id="imageInput" accept="image/*">
-                <img id="imagePreview" src="{% static '/img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-none" style="max-width: 300px;">                                       
+                <img id="imagePreview" src="{% static 'img/noImage.jpg' %}"  alt="Previsualización" class="img-thumbnail d-block" style="max-width: 300px;">                                       
             </div>                
             <div class="col-4">
                 {{ formArtist.name }}
@@ -63,7 +64,7 @@
         <div class="row d-none my-5" id="charForm">
             <div class="col-4">
                 <input class="" type="file" name="image" id="imageInput" accept="image/*">
-                <img id="imagePreview" src="{% static '/img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-none" style="max-width: 300px;">                      
+                <img id="imagePreview" src="{% static 'img/noImage.jpg' %}"  alt="Previsualización" class="img-thumbnail d-block" style="max-width: 300px;">                      
             </div>    
             <div class="col-4">
                 {{ formChar.name }}
