@@ -51,7 +51,7 @@ class User(AbstractUser):
     
 class Game(models.Model):
     title = models.CharField(max_length=255)
-    image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
+    #image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -59,7 +59,7 @@ class Game(models.Model):
 class Character(models.Model):
     name = models.CharField(max_length=255)    
     image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
-
+    game= models.ForeignKey(Game, on_delete=models.CASCADE,blank=True,null=True)
     def __str__(self):
         return self.name
 

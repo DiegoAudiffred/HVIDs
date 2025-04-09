@@ -16,7 +16,8 @@ def get_sidebar_context():
 
     popular_characters = Character.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
     
-    
+    popular_games = Game.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
+
 
     #random_Tags = list(Tags.objects.all())
     #random_items = random.sample(random_Tags, 3)
@@ -26,6 +27,8 @@ def get_sidebar_context():
         'popular_tags': popular_tags,
         'popular_artists': popular_artists,
         'popular_characters':popular_characters,
+        'popular_games':popular_games,
+
         #'random_items':random_items
         }
 
@@ -48,15 +51,17 @@ def show(request):
     
     return redirect('index:index')  # Redirigir correctamente
 
+from django.shortcuts import redirect
+
 def adminPage(request):
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
     sidebar_context = get_sidebar_context()
 
-    # Inicializar los formularios vacíos
     formTag = addTagsForm()
     formArtist = addArtistForm()
     formUser = addUserForm()
     formChar = addCharsForm()
+    formGame = addGameForm()
 
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
@@ -65,27 +70,36 @@ def adminPage(request):
             formTag = addTagsForm(request.POST, request.FILES)
             if formTag.is_valid():
                 formTag.save()
+                return redirect('index:adminPage')
 
         elif form_type == 'artist_form':
             formArtist = addArtistForm(request.POST, request.FILES)
             if formArtist.is_valid():
                 formArtist.save()
+                return redirect('index:adminPage')
 
         elif form_type == 'user_form':
             formUser = addUserForm(request.POST, request.FILES)
             if formUser.is_valid():
                 formUser.save()
-
+                return redirect('index:adminPage')
+        elif form_type == 'game_form':
+            formGame = addGameForm(request.POST, request.FILES)
+            if formGame.is_valid():
+                formGame.save()
+                return redirect('index:adminPage')
         elif form_type == 'char_form':
             formChar = addCharsForm(request.POST, request.FILES)
             if formChar.is_valid():
                 formChar.save()
+                return redirect('index:adminPage')
 
     context = {
         'formTag': formTag,
         'formArtist': formArtist,
         'formUser': formUser,
         'formChar': formChar,
+        'formGame':formGame,
         'media_files': media_files,
         **sidebar_context
     }
@@ -180,7 +194,7 @@ def filteredByArtist(request, string):
     return render(request, 'index/index.html', context)
 
 
-def filteredBycharacter(request, string):
+def filteredByCharacter(request, string):
 
     if string == 'All':
         media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
@@ -196,6 +210,21 @@ def filteredBycharacter(request, string):
     }
     return render(request, 'index/index.html', context)
 
+def filteredByGame(request, string):
+
+    # Filtrar MediaFiles por el nombre del tag
+    if string == 'All':
+        media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
+    else: 
+        media_files = MediaFile.objects.filter(game__title__icontains=string, hide=False).order_by('-uploaded_at')
+    # Obtener el contexto de la sidebar
+    sidebar_context = get_sidebar_context()
+
+    context = {
+        'media_files': media_files,
+        **sidebar_context  # Unir el contexto de la sidebar
+    }
+    return render(request, 'index/index.html', context)
 
 
 def uploadElement(request):

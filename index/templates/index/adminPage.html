@@ -6,20 +6,25 @@
             <div class="">
                 <h1>Sección de administrador </h1>
             </div>
-            <div class="col-3 text-center">
+            <div class="col-2 text-center">
                 <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold" id="tags">Add tags</a>
 
             </div>
-            <div class="col-3 text-center">
+            <div class="col-2 text-center">
                 <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold" id="artists">Add artistas</a>
 
             </div>
-            <div class="col-3 text-center">
+            <div class="col-2 text-center">
                 <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold" id="chars">Add chars</a>
 
             </div>
-            <div class="col-3 text-center">
+            <div class="col-2 text-center">
                 <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold" id="users">Add usuario</a>
+            
+            </div>
+            <div class="col-2 text-center">
+                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold" id="games">Add game</a>
+            
             </div>
     </div>
     <form method="post" enctype="multipart/form-data">
@@ -64,6 +69,9 @@
                 {{ formChar.name }}
             </div>
             <div class="col-4">
+                {{ formChar.game }}
+            </div>
+            <div class="col-4">
                 <button type="submit" class="btn">Agregar Personaje</button>
             </div>
         </div>
@@ -77,10 +85,27 @@
                 {{ formUser.username }}
             </div>
             <div class="col-4">
+                {{ formUser.password }}
+            </div>
+            <div class="col-4">
                 <button type="submit" class="btn">Agregar Usuario</button>
             </div> 
         </div>
-    </form>  
+    </form>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="game_form">
+        <div class="row d-none my-5" id="gameForm">
+            <div class="col-4">
+                {{ formGame.title }}
+            </div>
+        
+            <div class="col-4">
+                <button type="submit" class="btn">Agregar Juego</button>
+            </div> 
+        </div>
+    </form>
+    
     
 </div>
 
@@ -127,8 +152,12 @@ document.getElementById('chars').onclick = function() {
     toggleFormVisibility('#charForm');
 };
 
+document.getElementById('games').onclick = function() {
+    toggleFormVisibility('#gameForm');
+};
+
 function toggleFormVisibility(formId) {
-    const forms = ['#tagForm', '#artistForm', '#charForm', '#userForm'];
+    const forms = ['#tagForm', '#artistForm', '#charForm', '#userForm','#gameForm'];
     forms.forEach(function(form) {
         const formElement = document.querySelector(form);
         if (formElement && form !== formId) {

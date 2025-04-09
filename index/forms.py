@@ -85,22 +85,57 @@ class addArtistForm(forms.ModelForm):
 class addCharsForm(forms.ModelForm):
     class Meta:
         model = Character
-        fields = ['name','image']
+        fields = ['name','image','game']
     def __init__(self, *args, **kwargs):
             super(addCharsForm, self).__init__(*args, **kwargs)
 
             self.fields['name'].required = True
             self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del personaje', 'rows': '1'})
+            self.fields['game'].required = True
+            self.fields['game'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del personaje', 'rows': '1'})
+    
+from django import forms
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class addUserForm(forms.ModelForm):
+    password = forms.CharField(
+        label='Contraseña',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2',
+            'placeholder': 'Introduce una contraseña',
+        }),
+        required=True
+    )
+
     class Meta:
         model = User
-        fields = ['username']
+        fields = ['username', 'password']
+
     def __init__(self, *args, **kwargs):
-            super(addUserForm, self).__init__(*args, **kwargs)
+        super(addUserForm, self).__init__(*args, **kwargs)
+        self.fields['username'].required = True
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2',
+            'placeholder': 'Introduce el nombre del usuario',
+            'rows': '1'
+        })
 
-            self.fields['username'].required = True
-            self.fields['username'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del usuario', 'rows': '1'})
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data['password'])  # Hashea la contraseña
+        if commit:
+            user.save()
+        return user
 
-       
+class addGameForm(forms.ModelForm):
+    class Meta:
+        model = Game
+        fields = ['title']
+    def __init__(self, *args, **kwargs):
+            super(addGameForm, self).__init__(*args, **kwargs)
+
+            self.fields['title'].required = True
+            self.fields['title'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del juego', 'rows': '1'})
           
