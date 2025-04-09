@@ -49,25 +49,49 @@ def show(request):
     return redirect('index:index')  # Redirigir correctamente
 
 def adminPage(request):
-    media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
+    media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
     sidebar_context = get_sidebar_context()
+
+    # Inicializar los formularios vacíos
     formTag = addTagsForm()
     formArtist = addArtistForm()
     formUser = addUserForm()
     formChar = addCharsForm()
+
+    if request.method == 'POST':
+        form_type = request.POST.get('form_type')
+
+        if form_type == 'tag_form':
+            formTag = addTagsForm(request.POST, request.FILES)
+            if formTag.is_valid():
+                formTag.save()
+
+        elif form_type == 'artist_form':
+            formArtist = addArtistForm(request.POST, request.FILES)
+            if formArtist.is_valid():
+                formArtist.save()
+
+        elif form_type == 'user_form':
+            formUser = addUserForm(request.POST, request.FILES)
+            if formUser.is_valid():
+                formUser.save()
+
+        elif form_type == 'char_form':
+            formChar = addCharsForm(request.POST, request.FILES)
+            if formChar.is_valid():
+                formChar.save()
+
     context = {
-        'formTag':formTag,
-        'formArtist':formArtist,
-        'formUser':formUser,
-        'formChar':formChar,
+        'formTag': formTag,
+        'formArtist': formArtist,
+        'formUser': formUser,
+        'formChar': formChar,
         'media_files': media_files,
-        **sidebar_context  # Unir el contexto de la sidebar
+        **sidebar_context
     }
-    return render(request, 'index/adminPage.html',context)
 
-
-
-
+    return render(request, 'index/adminPage.html', context)
+    
 def hide(request):
     futa_tag = Tags.objects.get(name='Futa')  # Obtener el objeto Tag con el nombre 'futa'
     media_files = MediaFile.objects.filter(tags=futa_tag)    

@@ -24,63 +24,67 @@
     </div>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-    <div class="row d-none my-5" id="tagForm">          
-                <div class="col-4">
-                        {{formTag.name}}
-                </div>                                  
-                <div class="col-4">
-                    <button type="submit" class="btn">Agregar Tag</button>
-                </div>                
-    </div>
+        <input type="hidden" name="form_type" value="tag_form">
+        <div class="row d-none my-5" id="tagForm">          
+            <div class="col-4">
+                {{ formTag.name }}
+            </div>                                  
+            <div class="col-4">
+                <button type="submit" class="btn">Agregar Tag</button>
+            </div>                
+        </div>
     </form>  
     
-    <form method="post" enctype="multipart/form-data" >
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-    <div class="row d-none my-5" id="artistForm">           
-               <div class="col-4">
-                <input class="" type="file" id="imageInput" accept="image/*">
-
-                    <img id="imagePreview" src="{% static '/img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-none" style="max-width: 300px;">                                       
-               </div>                
-                <div class="col-4">
-                        {{formArtist.name}}
-                </div>
-                <div class="col-4">
-                    <button type="submit" class="btn">Agregar Artista</button>
-                </div>              
-    </div>
+        <input type="hidden" name="form_type" value="artist_form">
+        <div class="row d-none my-5" id="artistForm">           
+            <div class="col-4">
+                <input class="" type="file" name="image" id="imageInput" accept="image/*">
+                <img id="imagePreview" src="{% static '/img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-none" style="max-width: 300px;">                                       
+            </div>                
+            <div class="col-4">
+                {{ formArtist.name }}
+            </div>
+            <div class="col-4">
+                <button type="submit" class="btn">Agregar Artista</button>
+            </div>              
+        </div>
     </form> 
     
-    <form method="post" enctype="multipart/form-data" >
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-    <div class="row d-none my-5" id="charForm">
-               
-            
-        <div class="col-4">
-            <input class="" type="file" id="imageInput" accept="image/*">
-
+        <input type="hidden" name="form_type" value="char_form">
+        <div class="row d-none my-5" id="charForm">
+            <div class="col-4">
+                <input class="" type="file" name="image" id="imageInput" accept="image/*">
                 <img id="imagePreview" src="{% static '/img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-none" style="max-width: 300px;">                      
-           </div>    
-                <div class="col-4">
-                        {{formChar.name}}
-                </div>
-                <div class="col-4">
-                    <button type="submit" class="btn">Agregar Personaje</button>
-                </div>
-    </div>
+            </div>    
+            <div class="col-4">
+                {{ formChar.name }}
+            </div>
+            <div class="col-4">
+                <button type="submit" class="btn">Agregar Personaje</button>
+            </div>
+        </div>
     </form> 
-    <form method="post" enctype="multipart/form-data" >
+    
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-    <div class="row d-none my-5" id="userForm">
-                <div class="col-4">
-                        {{formUser.username}}
-                </div>
-                <div class="col-4">
-                    <button type="submit" class="btn">Agregar Usuario</button>
-                </div> 
-    </div>
-    </form> 
+        <input type="hidden" name="form_type" value="user_form">
+        <div class="row d-none my-5" id="userForm">
+            <div class="col-4">
+                {{ formUser.username }}
+            </div>
+            <div class="col-4">
+                <button type="submit" class="btn">Agregar Usuario</button>
+            </div> 
+        </div>
+    </form>  
+    
 </div>
+
+
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
