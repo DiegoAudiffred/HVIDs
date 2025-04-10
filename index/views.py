@@ -34,10 +34,12 @@ def get_sidebar_context():
         }
 
 def index(request):
+    user= request.user
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
     sidebar_context = get_sidebar_context()
 
     context = {
+        'user':user,
         'media_files': media_files,
         **sidebar_context  # Unir el contexto de la sidebar
     }

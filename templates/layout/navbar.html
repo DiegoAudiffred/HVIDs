@@ -1,8 +1,12 @@
 {% load static %}
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-tercero">
   <div class="container-fluid px-4">
   
-    <a class="navbar-brand text-center text-primary fw-bold"  href="" style="font-size: 36px;">HVID´s HUB</a>
+    <a class="navbar-brand text-center text-primary fw-bold"  href="" style="font-size: 24px;">
+      <img id="logo" src="{% static 'img/LogoHvids.png' %}" alt="Previsualización" class=" d-block imagePreview" style="max-width: 150px;" data-preview-id="2">
+
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -10,27 +14,27 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item  mx-2 px-4">
-          <a class="nav-link active text-primary fw-bold" style="font-size: 28px;" aria-current="page" href="{% url "index:index" %}">Inicio</a>
+          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" aria-current="page" href="{% url "index:index" %}">Inicio</a>
         </li>
         <li class="nav-item mx-2 px-4">
-          <a class="nav-link active text-primary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=artistas">Artistas</a>
+          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=artistas">Artistas</a>
         </li>
         <li class="nav-item mx-2 px-4">
-          <a class="nav-link active text-primary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=series">Series</a>
+          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=series">Series</a>
         </li>
         <li class="nav-item mx-2 px-4">
-          <a class="nav-link active text-primary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=personajes">Personajes</a>
+          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=personajes">Personajes</a>
         </li>
         <li class="nav-item mx-2 px-4">
-          <a class="nav-link active text-primary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=videos">Videos</a>
+          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=videos">Videos</a>
         </li>
         <li class="nav-item mx-2 px-4">
-          <a class="nav-link active text-primary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=comics">Comics</a>
+          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=comics">Comics</a>
         </li>
         
         {% if user.is_superuser %}
         <li class="nav-item mx-2 px-4">
-          <a class="nav-link active text-primary fw-bold" style="font-size: 28px;" href="{% url "index:adminPage" %}">Admin</a>
+          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" href="{% url "index:adminPage" %}">Admin</a>
         </li>
         {% endif %}
         
