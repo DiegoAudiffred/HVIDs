@@ -50,11 +50,11 @@ class User(AbstractUser):
         return str(self.username)
     
 class Game(models.Model):
-    title = models.CharField(max_length=255)
-    #image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
+    name = models.CharField(max_length=255)
+    image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
 
     def __str__(self):
-        return self.title
+        return self.name
 
 class Character(models.Model):
     name = models.CharField(max_length=255)    

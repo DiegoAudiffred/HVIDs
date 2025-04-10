@@ -15,5 +15,9 @@ urlpatterns = [
     path("hide/", views.hide, name='hide'),
     path('adminPage/', views.adminPage, name='adminPage'),
     path("watchContent/<int:id>/", views.watchContent, name='watchContent'),
+    path("navbarFilterHeader/", views.navbarFilterHeader, name='navbarFilterHeader'),
+    path('autocomplete/', views.autocomplete, name='autocomplete'),
+    path('buscar/', views.multi_search_results, name='multi_search_results'),
+    path('multi-search/', views.multi_search_results, name='multi_search_results'),
 
 ]
