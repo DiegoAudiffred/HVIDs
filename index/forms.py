@@ -70,7 +70,7 @@ class addTagsForm(forms.ModelForm):
             super(addTagsForm, self).__init__(*args, **kwargs)
 
             self.fields['name'].required = True
-            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce la tag', 'rows': '1'})
+            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce la tag', 'rows': '1'})
 
 class addArtistForm(forms.ModelForm):
     class Meta:
@@ -80,7 +80,7 @@ class addArtistForm(forms.ModelForm):
             super(addArtistForm, self).__init__(*args, **kwargs)
 
             self.fields['name'].required = True
-            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del artista', 'rows': '1'})
+            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del artista', 'rows': '1'})
 
 class addCharsForm(forms.ModelForm):
     class Meta:
@@ -90,9 +90,9 @@ class addCharsForm(forms.ModelForm):
             super(addCharsForm, self).__init__(*args, **kwargs)
 
             self.fields['name'].required = True
-            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del personaje', 'rows': '1'})
+            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del personaje', 'rows': '1'})
             self.fields['game'].required = True
-            self.fields['game'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del personaje', 'rows': '1'})
+            self.fields['game'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del personaje', 'rows': '1'})
     
 from django import forms
 from django.contrib.auth import get_user_model
@@ -103,7 +103,7 @@ class addUserForm(forms.ModelForm):
     password = forms.CharField(
         label='Contraseña',
         widget=forms.PasswordInput(attrs={
-            'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2',
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
             'placeholder': 'Introduce una contraseña',
         }),
         required=True
@@ -117,7 +117,7 @@ class addUserForm(forms.ModelForm):
         super(addUserForm, self).__init__(*args, **kwargs)
         self.fields['username'].required = True
         self.fields['username'].widget.attrs.update({
-            'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2',
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
             'placeholder': 'Introduce el nombre del usuario',
             'rows': '1'
         })
@@ -137,5 +137,5 @@ class addGameForm(forms.ModelForm):
             super(addGameForm, self).__init__(*args, **kwargs)
 
             self.fields['name'].required = True
-            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-cuarto text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del juego', 'rows': '1'})
+            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del juego', 'rows': '1'})
           

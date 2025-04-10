@@ -83,6 +83,8 @@
                     <h5 class="card-title">{{ mediafile.name }}</h5>
                     <p class="card-text"><strong>Tipo:</strong> {% if mediafile.file %} Video {% else %} Doujinshi {% endif %}</p>
                     <p class="card-text"><strong>Artista:</strong> {{ mediafile.artist }}</p>
+                    <p class="card-text"><strong>Serie:</strong> {{ mediafile.game }}</p>
+
                     <p class="card-text"><strong>Etiquetas:</strong>
                         {% for tag in mediafile.tags.all %}
                             <span class="badge bg-secondary">{{ tag.name }}</span>
