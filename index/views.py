@@ -116,9 +116,10 @@ def navbarFilterHeader(request):
         media_files = Game.objects.all
     elif thing_to_filter == "personajes":
         media_files = Character.objects.all
-    #     media_files = MediaFile.objects.filter(hide=False, tipo="video").order_by('-uploaded_at')
-    # elif thing_to_filter == "comics":
-    #     media_files = MediaFile.objects.filter(hide=False, tipo="comic").order_by('-uploaded_at')
+    elif thing_to_filter == "videos":
+         media_files = MediaFile.objects.filter(isVideo=True).order_by('-uploaded_at')
+    elif thing_to_filter == "comics":
+         media_files = MediaFile.objects.filter(isVideo=False).order_by('-uploaded_at')
     else:
         media_files = MediaFile.objects.filter().order_by('-uploaded_at')
 
@@ -186,7 +187,7 @@ def multi_search_results(request):
 
     for term in terms:
         results = results.filter(
-            Q(title__icontains=term) |
+            Q(name__icontains=term) |
             Q(artist__name__icontains=term) |
             Q(tags__name__icontains=term) |
             Q(game__name__icontains=term) |

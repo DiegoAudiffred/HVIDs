@@ -59,7 +59,7 @@
                 <a href="{% url 'index:watchContent' mediafile.id %}">
                     {% if mediafile.thumbnail %}
                     <div class="position-relative">
-                        <img src="{{ mediafile.thumbnail }}" alt="{{ mediafile.title }} Thumbnail"
+                        <img src="{{ mediafile.thumbnail }}" alt="{{ mediafile.name }} Thumbnail"
                              class="card-img-top blurred" style="height: 200px; object-fit: cover;">
                         <svg class="overlay-svg" width="64px" height="64px" viewBox="0 0 24 24" fill="none"
                              xmlns="http://www.w3.org/2000/svg">
@@ -78,7 +78,7 @@
                 {% endif %}
                              </a>
                 <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ mediafile.title }}</h5>
+                    <h5 class="card-title">{{ mediafile.name }}</h5>
                     <p class="card-text"><strong>Tipo:</strong> {% if mediafile.file %} Video {% else %} Doujinshi {% endif %}</p>
                     <p class="card-text"><strong>Artista:</strong> {{ mediafile.artist }}</p>
                     <p class="card-text"><strong>Etiquetas:</strong>

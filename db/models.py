@@ -81,7 +81,7 @@ class Artist(models.Model):
 class MediaFile(models.Model):
     #file = models.FileField(upload_to='media_files/%Y/%m/%d/')
     #thumbnail = models.ImageField(upload_to='media_files/thumbnails/%Y/%m/%d/', blank=True, null=True)
-    title = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
     artist= models.ForeignKey(Artist, on_delete=models.CASCADE,blank=True,null=True)
     tags = models.ManyToManyField(Tags, blank=True, null=True)
     game= models.ForeignKey(Game, on_delete=models.CASCADE,blank=True,null=True)
@@ -90,11 +90,12 @@ class MediaFile(models.Model):
     character= models.ManyToManyField(Character, blank=True, null=True)
     file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive
     thumbnail = models.URLField(max_length=2000, blank=True, null=True)  # URL de la miniatura, si existe
+    isVideo = models.BooleanField(default=True)
     #reproducciones = models.IntegerField(default=0)
     
     
     def __str__(self):
-        return self.title
+        return self.name
     
 class comicImages(models.Model):
     mediaFile= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)

@@ -23,7 +23,7 @@
                 Titulo del video
             </div>
             <div class="col-9 my-auto">
-                {{ form.title }}
+                {{ form.name }}
             </div>
         </div>
         <div class="row p-2">
@@ -101,7 +101,7 @@
     {% csrf_token %}
     <div class="form-group">
         <label for="id_title">Título del comic</label>
-        {{ form.title }}
+        {{ form.name }}
     </div>
     <div class="form-group">
         <label for="id_artist">Artista/Autor</label>

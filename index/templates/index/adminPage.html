@@ -7,24 +7,24 @@
             <div class="">
                 <h1>Sección de administrador </h1>
             </div>
-            <div class="col-2 text-center">
-                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold" id="tags">Add tags</a>
+            <div class="col-md-2 my-3 col-12 my-md-0 text-center">
+                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="tags">Add tags</a>
 
             </div>
-            <div class="col-2 text-center">
-                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold" id="artists">Add artistas</a>
+            <div class="col-md-2 my-3 col-12 my-md-0 text-center">
+                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="artists">Add artistas</a>
 
             </div>
-            <div class="col-2 text-center">
-                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold" id="chars">Add chars</a>
+            <div class="col-md-2 my-3 col-12 my-md-0 text-center">
+                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="chars">Add chars</a>
 
             </div>
-            <div class="col-2 text-center">
-                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold" id="users">Add usuario</a>
+            <div class="col-md-2 my-3 col-12 my-md-0 text-center">
+                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="users">Add usuario</a>
             
             </div>
-            <div class="col-2 text-center">
-                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold" id="games">Add game</a>
+            <div class="col-md-2 my-3 col-12 my-md-0 text-center">
+                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="games">Add game</a>
             
             </div>
     </div>
@@ -33,13 +33,13 @@
         <input type="hidden" name="form_type" value="tag_form">
         <div class="row d-none my-5 justify-content-center" id="tagForm">    
             <div class="my-3">
-                <h1 MY>Agregar una nueva Etiqueta/Tag</h1>
+                <h1>Agregar una nueva Etiqueta/Tag</h1>
             </div>      
-            <div class="col-3 mx-3">
+            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
                 {{ formTag.name }}
             </div>                                  
-            <div class="col-3 mx-3">
-                <button type="submit" class="btn border border-3 border-primary fw-bold px-3">Agregar Tag</button>
+            <div class="col-md-3 mx-md-3 col-12 text-center">
+                <button type="submit" class="btn border border-3 border-primary fw-bold w-100">Agregar Tag</button>
             </div>                
         </div>
     </form>  
@@ -51,13 +51,13 @@
             <div class="my-3">
                 <h1>Agregar un nuevo Artista</h1>
             </div>  
-            <div class="col-3 mx-3">
+            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
                 <label for="imageInput2" style="cursor: pointer;">
                     <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="2">
                   </label>
                   <input type="file" name="image2" id="imageInput2" accept="image/*" class="d-none imageInput" data-preview-id="2">
             </div>                
-            <div class="col-3 mx-3">
+            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
                 <div class="my-2">
                     {{ formArtist.name }}
                 </div>
@@ -77,7 +77,7 @@
             <div class="my-3">
                 <h1>Agregar un nuevo Personaje</h1>
             </div>  
-            <div class="col-3 mx-3">
+            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
               
                 <label for="imageInput1" style="cursor: pointer;">
                     <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="1">
@@ -87,7 +87,7 @@
                 
             </div>    
     
-            <div class="col-3 mx-3">
+            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
                 <div class="my-2">
                     {{ formChar.name }}
 
@@ -112,13 +112,13 @@
             <div class="my-3">
                 <h1>Agregar un nuevo Usuario</h1>
             </div>  
-            <div class="col-3 mx-3">
+            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
                 {{ formUser.username }}
             </div>
-            <div class="col-3 mx-3">
+            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
                 {{ formUser.password }}
             </div>
-            <div class="col-3 mx-3">
+            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
                 <button type="submit" class="btn border border-3 border-primary fw-bold px-3">Agregar Usuario</button>
             </div> 
         </div>
@@ -130,11 +130,11 @@
             <div class="my-3">
                 <h1>Agregar un nuevo Juego</h1>
             </div>  
-            <div class="col-3 mx-3">
+            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
                 {{ formGame.name }}
             </div>
         
-            <div class="col-3 mx-3">
+            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
                 <button type="submit" class="btn border border-3 border-primary fw-bold px-3">Agregar Juego</button>
             </div> 
         </div>

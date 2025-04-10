@@ -5,13 +5,13 @@ from db.models import *
 class UploadElementForm(forms.ModelForm):
     class Meta:
         model = MediaFile
-        fields = ['title', 'artist', 'tags', 'game', 'character', 'file', 'thumbnail']
+        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'thumbnail']
 
     def __init__(self, *args, **kwargs):
         super(UploadElementForm, self).__init__(*args, **kwargs)
 
-        self.fields['title'].required = True
-        self.fields['title'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+        self.fields['name'].required = True
+        self.fields['name'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
         self.fields['artist'].required = False
         self.fields['artist'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
