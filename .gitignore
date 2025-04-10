@@ -10,3 +10,4 @@ _migrations/*
 !_migrations/__init__.py
 .env
 .venv
+.sqlite3
