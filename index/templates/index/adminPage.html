@@ -31,12 +31,15 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="form_type" value="tag_form">
-        <div class="row d-none my-5" id="tagForm">          
-            <div class="col-4">
+        <div class="row d-none my-5 justify-content-center" id="tagForm">    
+            <div class="my-3">
+                <h1 MY>Agregar una nueva Etiqueta/Tag</h1>
+            </div>      
+            <div class="col-3 mx-3">
                 {{ formTag.name }}
             </div>                                  
-            <div class="col-4">
-                <button type="submit" class="btn">Agregar Tag</button>
+            <div class="col-3 mx-3">
+                <button type="submit" class="btn border border-3 border-primary fw-bold px-3">Agregar Tag</button>
             </div>                
         </div>
     </form>  
@@ -44,65 +47,95 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="form_type" value="artist_form">
-        <div class="row d-none my-5" id="artistForm">           
-            <div class="col-4">
-                <input class="" type="file" name="image" id="imageInput" accept="image/*">
-                <img id="imagePreview" src="{% static 'img/noImage.jpg' %}"  alt="Previsualización" class="img-thumbnail d-block" style="max-width: 300px;">                                       
+        <div class="row d-none my-5 justify-content-center" id="artistForm">           
+            <div class="my-3">
+                <h1>Agregar un nuevo Artista</h1>
+            </div>  
+            <div class="col-3 mx-3">
+                <label for="imageInput2" style="cursor: pointer;">
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="2">
+                  </label>
+                  <input type="file" name="image2" id="imageInput2" accept="image/*" class="d-none imageInput" data-preview-id="2">
             </div>                
-            <div class="col-4">
-                {{ formArtist.name }}
+            <div class="col-3 mx-3">
+                <div class="my-2">
+                    {{ formArtist.name }}
+                </div>
+                <div class="my-2">
+                    <button type="submit" class="btn border border-3 border-primary fw-bold px-3">Agregar Artista</button>
+                </div>
             </div>
-            <div class="col-4">
-                <button type="submit" class="btn">Agregar Artista</button>
-            </div>              
+            
+                       
         </div>
     </form> 
     
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="form_type" value="char_form">
-        <div class="row d-none my-5" id="charForm">
-            <div class="col-4">
-                <input class="" type="file" name="image" id="imageInput" accept="image/*">
-                <img id="imagePreview" src="{% static 'img/noImage.jpg' %}"  alt="Previsualización" class="img-thumbnail d-block" style="max-width: 300px;">                      
+        <div class="row d-none my-5 justify-content-center" id="charForm">
+            <div class="my-3">
+                <h1>Agregar un nuevo Personaje</h1>
+            </div>  
+            <div class="col-3 mx-3">
+              
+                <label for="imageInput1" style="cursor: pointer;">
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="1">
+                  </label>
+                  <input type="file" name="image" id="imageInput1" accept="image/*" class="d-none imageInput" data-preview-id="1">
+                  
+                
             </div>    
-            <div class="col-4">
-                {{ formChar.name }}
+    
+            <div class="col-3 mx-3">
+                <div class="my-2">
+                    {{ formChar.name }}
+
+                </div>
+                <div class="my-2">
+                    {{ formChar.game }}
+
+                </div>
+                <div class="my-2">
+                    <button type="submit" class="btn border border-3 border-primary fw-bold px-3">Agregar Personaje</button>
+
+                </div>
             </div>
-            <div class="col-4">
-                {{ formChar.game }}
-            </div>
-            <div class="col-4">
-                <button type="submit" class="btn">Agregar Personaje</button>
-            </div>
+          
         </div>
     </form> 
     
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="form_type" value="user_form">
-        <div class="row d-none my-5" id="userForm">
-            <div class="col-4">
+        <div class="row d-none my-5 justify-content-center" id="userForm">
+            <div class="my-3">
+                <h1>Agregar un nuevo Usuario</h1>
+            </div>  
+            <div class="col-3 mx-3">
                 {{ formUser.username }}
             </div>
-            <div class="col-4">
+            <div class="col-3 mx-3">
                 {{ formUser.password }}
             </div>
-            <div class="col-4">
-                <button type="submit" class="btn">Agregar Usuario</button>
+            <div class="col-3 mx-3">
+                <button type="submit" class="btn border border-3 border-primary fw-bold px-3">Agregar Usuario</button>
             </div> 
         </div>
     </form>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="form_type" value="game_form">
-        <div class="row d-none my-5" id="gameForm">
-            <div class="col-4">
-                {{ formGame.title }}
+        <div class="row d-none my-5 justify-content-center" id="gameForm">
+            <div class="my-3">
+                <h1>Agregar un nuevo Juego</h1>
+            </div>  
+            <div class="col-3 mx-3">
+                {{ formGame.name }}
             </div>
         
-            <div class="col-4">
-                <button type="submit" class="btn">Agregar Juego</button>
+            <div class="col-3 mx-3">
+                <button type="submit" class="btn border border-3 border-primary fw-bold px-3">Agregar Juego</button>
             </div> 
         </div>
     </form>
@@ -114,13 +147,15 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const imageInput = document.getElementById('imageInput');
-    const imagePreview = document.getElementById('imagePreview');
+  const imageInputs = document.querySelectorAll('.imageInput');
 
-    imageInput.addEventListener('change', function () {
+  imageInputs.forEach(input => {
+    input.addEventListener('change', function () {
+      const previewId = this.dataset.previewId;
+      const imagePreview = document.querySelector(`.imagePreview[data-preview-id="${previewId}"]`);
       const file = this.files[0];
 
-      if (file) {
+      if (file && imagePreview) {
         const reader = new FileReader();
 
         reader.onload = function (e) {
@@ -129,12 +164,14 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         reader.readAsDataURL(file);
-      } else {
+      } else if (imagePreview) {
         imagePreview.src = "#";
         imagePreview.classList.add('d-none');
       }
     });
   });
+});
+
 
 
 document.getElementById('tags').onclick = function() {

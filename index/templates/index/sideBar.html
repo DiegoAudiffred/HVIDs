@@ -1,10 +1,31 @@
+<style>
+   #autocompleteContainer div {
+     padding: 8px;
+     cursor: pointer;
+   }
+   #autocompleteContainer div:hover {
+     background-color: #f0f0f0;
+   }
+   </style>
+   
+   
 <div class="sidebar d-none d-md-block border-primary-3">
+
+   <form id="multiSearchForm" method="GET" action="{% url 'index:multi_search_results' %}" class="position-relative">
+      <div class="input-group">
+        <input type="text" id="multiSearchInput" name="q" class="form-control text-tercero border border-primary" placeholder="Buscar..." autocomplete="off">
+        <button class="btn btn-primary" type="submit">
+          🔍 
+        </button>
+      </div>
+      <div id="autocompleteContainer" class="border bg-white position-absolute z-3 w-100" style="display: none;"></div>
+    </form>
+    
+    
    <h2 class="text-primary">Tags</h2>
    {% if popular_tags %}
 
-   <h4 class="px-3">
-      <a class="text-tercero" style="text-decoration: none;" href="{% url 'index:filteredByTag' 'All' %}">All</a>
-   </h4>
+  
    {% for tag in popular_tags %}
    <h4 class="px-3">
       <a class="text-tercero" style="text-decoration: none;" href="{% url 'index:filteredByTag' tag.name %}">{{ tag.name }}</a>
@@ -16,9 +37,7 @@
 
    <h2 class="text-primary">Artistas</h2>
    {% if popular_artists %}
-   <h4 class="px-3">
-      <a class="text-tercero" style="text-decoration: none;" href="{% url 'index:filteredByArtist' 'All' %}">All</a>
-   </h4>
+  
    {% for artist in popular_artists %}
    <h4 class="px-3">
       <a class="text-tercero" style="text-decoration: none;" href="{% url 'index:filteredByArtist' artist.name %}">{{ artist.name }}</a>
@@ -32,9 +51,7 @@
    <h2 class="text-primary">Personajes</h2>
    <!-- Añadir contenido adicional aquí -->
    {% if popular_characters %}
-   <h4 class="px-3">
-      <a class="text-tercero" style="text-decoration: none;" href="{% url 'index:filteredByCharacter' 'All' %}">All</a>
-   </h4>
+ 
    {% for character in popular_characters %}
    <h4 class="px-3">
       <a class="text-tercero" style="text-decoration: none;" href="{% url 'index:filteredByCharacter' character.name %}">{{ character.name }}</a>
@@ -48,12 +65,10 @@
    <h2 class="text-primary">Juegos</h2>
    <!-- Añadir contenido adicional aquí -->
    {% if popular_games %}
-   <h4 class="px-3">
-      <a class="text-tercero" style="text-decoration: none;" href="{% url 'index:filteredByGame' 'All' %}">All</a>
-   </h4>
+  
    {% for game in popular_games %}
    <h4 class="px-3">
-      <a class="text-tercero" style="text-decoration: none;" href="{% url 'index:filteredByGame' game.title %}">{{ game.title }}</a>
+      <a class="text-tercero" style="text-decoration: none;" href="{% url 'index:filteredByGame' game.name %}">{{ game.name }}</a>
 
    </h4>
    {% endfor %}
@@ -65,3 +80,44 @@
 
    <!-- Añadir contenido adicional aquí -->
 </div>
+<script>
+   document.addEventListener('DOMContentLoaded', () => {
+     const input = document.getElementById('multiSearchInput');
+     const container = document.getElementById('autocompleteContainer');
+   
+     input.addEventListener('input', async () => {
+       const query = input.value.trim();
+       const terms = query.split(" ");
+       const lastTerm = terms[terms.length - 1];
+   
+       if (lastTerm.length < 1) {
+         container.style.display = 'none';
+         return;
+       }
+   
+       const response = await fetch(`/autocomplete/?term=${encodeURIComponent(lastTerm)}`);
+       const suggestions = await response.json();
+   
+       container.innerHTML = "";
+       suggestions.forEach(s => {
+         const div = document.createElement('div');
+         div.textContent = s;
+         div.addEventListener('click', () => {
+           terms[terms.length - 1] = s;
+           input.value = terms.join(" ") + " ";
+           container.style.display = 'none';
+         });
+         container.appendChild(div);
+       });
+   
+       container.style.display = suggestions.length ? 'block' : 'none';
+     });
+   
+     document.addEventListener('click', (e) => {
+       if (!container.contains(e.target) && e.target !== input) {
+         container.style.display = 'none';
+       }
+     });
+   });
+   </script>
+   
