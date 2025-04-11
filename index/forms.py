@@ -6,8 +6,8 @@ class UploadComicForm(forms.ModelForm):
     class Meta:
         model = Comic
         fields = ['name', 'artist', 'tags', 'game', 'character']
-        def __init__(self, *args, **kwargs):
-            super(UploadElementForm, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+            super(UploadComicForm, self).__init__(*args, **kwargs)
 
             self.fields['name'].required = True
             self.fields['name'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
@@ -25,7 +25,10 @@ class UploadComicForm(forms.ModelForm):
             self.fields['tags'].widget = forms.CheckboxSelectMultiple()
             self.fields['tags'].queryset = Tags.objects.all()  # Obtén todas las opciones de tags disponibles
         
-
+class ComicPageForm(forms.ModelForm):
+    class Meta:
+        model = ComicPage
+        fields = ['image', 'order']
 
 class UploadElementForm(forms.ModelForm):
     class Meta:

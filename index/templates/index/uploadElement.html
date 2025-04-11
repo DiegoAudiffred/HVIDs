@@ -97,68 +97,104 @@
 
 
 <!-- Formulario para Comics -->
+<!-- Formulario para Comics -->
 <form method="post" enctype="multipart/form-data" id="comicForm" style="display:none">
     {% csrf_token %}
     <div class="row p-2">
-        <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
-            Titulo del comic *
-        </div>
-        <div class="col-9 my-auto">
-            {{ formComic.name }}
-        </div>
+        <div class="col-3 my-auto">Nombre del Comic *</div>
+        <div class="col-9 my-auto">{{ formComic.name }}</div>
     </div>
-
     <div class="row p-2">
-        <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
-            Artista/Actor
-        </div>
-        <div class="col-9 my-auto">
-            {{ formComic.artist }}
-        </div>
+        <div class="col-3 my-auto">Artista</div>
+        <div class="col-9 my-auto">{{ formComic.artist }}</div>
     </div>
-
     <div class="row p-2">
-        <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
-            Etiquetas
-        </div>
-        <div class="col-9 my-auto">
-            {{ formComic.tags }}
-        </div>
+        <div class="col-3 my-auto">Etiquetas</div>
+        <div class="col-9 my-auto">{{ formComic.tags }}</div>
     </div>
-
     <div class="row p-2">
-        <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
-            Juego/Anime
-        </div>
-        <div class="col-9 my-auto">
-            {{ formComic.game }}
-        </div>
+        <div class="col-3 my-auto">Juego</div>
+        <div class="col-9 my-auto">{{ formComic.game }}</div>
     </div>
-
     <div class="row p-2">
-        <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
-            Personaje
-        </div>
-        <div class="col-9 my-auto">
-            {{ formComic.character }}
-        </div>
+        <div class="col-3 my-auto">Personajes</div>
+        <div class="col-9 my-auto">{{ formComic.character }}</div>
     </div>
-
     <div class="row p-2">
-        <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
-            Portada *
-        </div>
-        <div class="col-9 my-auto">
-            {{ formComic.file }}
+        <div class="col-3 my-auto">Ocultar</div>
+        <div class="col-9 my-auto">{{ formComic.hide }}</div>
+    </div>
+
+    <!-- Subida de imágenes -->
+    <div class="row p-2">
+        <div class="col-12">
+            <label>Agregar páginas:</label>
+            <div id="comicPagesPreview" class="d-flex flex-wrap gap-2"></div>
+            <input type="file" id="comicImageInput" accept="image/*" style="display:none" multiple>
+            <div id="uploadBox" class="border border-primary text-center py-5" style="cursor:pointer;">
+                <strong>+</strong><br>Agregar imagen
+            </div>
         </div>
     </div>
 
-      <div class="row p-2 justify-content-end">
-        <div class="col-2 my-auto text-center" style="font-size: 20pt; font-style:italic; font-weight: 500;">
-            <button type="button" class="btn btn-secondary py-2 px-4 w-100 fw-bold text-white">Subir Comic</button>
+    <div class="row p-2 justify-content-end">
+        <div class="col-2 text-center">
+            <button type="submit" class="btn btn-success w-100 fw-bold">Guardar Comic</button>
         </div>
     </div>
 </form>
+<script>
+    const uploadBox = document.getElementById("uploadBox");
+    const imageInput = document.getElementById("comicImageInput");
+    const previewContainer = document.getElementById("comicPagesPreview");
+
+    const selectedImages = [];
+
+    uploadBox.addEventListener("click", () => {
+        imageInput.click();
+    });
+
+    imageInput.addEventListener("change", function () {
+        for (let file of this.files) {
+            selectedImages.push(file);
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.createElement("img");
+                img.src = e.target.result;
+                img.style.width = "100px";
+                img.style.margin = "5px";
+                img.classList.add("border");
+                previewContainer.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById("comicForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        selectedImages.forEach((img, index) => {
+            formData.append(`images`, img);
+        });
+
+        fetch("{% url 'index:upload_comic' %}", {
+            method: "POST",
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        }).then(response => {
+            if (response.ok) {
+                alert("Comic subido con éxito");
+                location.reload();
+            } else {
+                alert("Error al subir el comic");
+            }
+        });
+    });
+</script>
 
 <!-- SCRIPT de mostrar formulario Comic/Video (opcional si manejas tabs) -->
 <script>
