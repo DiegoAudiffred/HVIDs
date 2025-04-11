@@ -6,3 +6,4 @@ Pillow
 moviepy
 ffmpeg 
 django-hashids
+yt-dlp

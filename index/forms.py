@@ -2,11 +2,38 @@
 from django import forms
 from db.models import *
 
+class UploadComicForm(forms.ModelForm):
+    class Meta:
+        model = Comic
+        fields = ['name', 'artist', 'tags', 'game', 'character']
+        def __init__(self, *args, **kwargs):
+            super(UploadElementForm, self).__init__(*args, **kwargs)
+
+            self.fields['name'].required = True
+            self.fields['name'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+
+            self.fields['artist'].required = False
+            self.fields['artist'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+
+            self.fields['game'].required = False
+            self.fields['game'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+
+            self.fields['character'].required = False
+            self.fields['character'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+
+            self.fields['tags'].required = False
+            self.fields['tags'].widget = forms.CheckboxSelectMultiple()
+            self.fields['tags'].queryset = Tags.objects.all()  # Obtén todas las opciones de tags disponibles
+        
+
+
 class UploadElementForm(forms.ModelForm):
     class Meta:
         model = MediaFile
         fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'thumbnail']
-
+        widgets = {
+            'file': forms.ClearableFileInput(attrs={'accept': 'video/*'}),
+        }
     def __init__(self, *args, **kwargs):
         super(UploadElementForm, self).__init__(*args, **kwargs)
 
@@ -23,28 +50,18 @@ class UploadElementForm(forms.ModelForm):
         self.fields['character'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
         self.fields['file'].required = True
-        self.fields['file'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Archivo*', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+        self.fields['file'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Archivo*', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1','type':'file', 'name':'file', 'accept':'video/*'})
 
         self.fields['thumbnail'].required = False
-        self.fields['thumbnail'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Miniatura', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
-        self.fields['thumbnail'].initial = 'https://drive.google.com/thumbnail?id='
+        self.fields['thumbnail'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2 from-control', 'placeholder': ' Miniatura', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+     
 
         # Asegúrate de que el campo de tags está usando CheckboxSelectMultiple correctamente.
         self.fields['tags'].required = False
         self.fields['tags'].widget = forms.CheckboxSelectMultiple()
         self.fields['tags'].queryset = Tags.objects.all()  # Obtén todas las opciones de tags disponibles
         
-from django import forms
-from db.models import comicImages
 
-class ComicImageForm(forms.ModelForm):
-    class Meta:
-        model = comicImages
-        fields = ['pagNum', 'file']
-        widgets = {
-            'pagNum': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Número de página'}),
-            'file': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'URL de la imagen'}),
-        }
         
 class addComentariosForm(forms.ModelForm):
     class Meta:
