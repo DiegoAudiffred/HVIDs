@@ -9,7 +9,13 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.db.models import Q
+from django.shortcuts import render
+from pytube import YouTube
+import os
+from django.conf import settings
+# views.py
 
+import mimetypes
 def get_sidebar_context():
     popular_tags = Tags.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
 
@@ -238,7 +244,7 @@ def watchContent(request, id):
     
    
     mediafile = get_object_or_404(MediaFile, id=id)
-    pages = comicImages.objects.filter(mediaFile = mediafile)
+    #pages = comicImages.objects.filter(mediaFile = mediafile)
     comentarios = Comentario.objects.filter(mediaFile = mediafile)
     drive_preview_url = None
     
@@ -256,7 +262,7 @@ def watchContent(request, id):
     return render(request, 'index/watchContent.html', {
         'mediafile': mediafile,
         'drive_preview_url': drive_preview_url,
-        'pages':pages,
+        #'pages':pages,
         'comentarios':comentarios,
         'form':form,
         **sidebar_data,  # Integrar datos de la sidebar en el contexto de la vista
@@ -354,27 +360,92 @@ def filteredByGame(request, string):
         }
         return render(request, 'index/index.html', context)
 
+import mimetypes
 
-def uploadElement(request):
+def uploadElement(request): 
     if request.method == 'POST':
-        # Si el formulario se ha enviado, procesar la subida del archivo
         form = UploadElementForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()  # Guarda el archivo subido
-            return HttpResponseRedirect('/')  # Redirige después de guardar
+            media = form.save(commit=False)  
+
+            uploaded_file = request.FILES.get('file')  
+            if uploaded_file:
+                mime_type, _ = mimetypes.guess_type(uploaded_file.name)
+                if mime_type and mime_type.startswith('video'):
+                    media.isVideo = True
+                else:
+                    media.isVideo = False
+                media.user=request.user
+            media.save()  
+            form.save_m2m()  
+
+            return HttpResponseRedirect('/')
     else:
-        # Si es una solicitud GET, simplemente muestra el formulario vacío
         form = UploadElementForm()
+        formComic=UploadComicForm()
     
-    # Filtrar los MediaFiles visibles
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
     sidebar_context = get_sidebar_context()
 
-    # Combinar los contextos
     context = {
         'form': form,
+        'formComic':formComic,
         'media_files': media_files,
-        **sidebar_context  # Unir el contexto de la sidebar
+        **sidebar_context
     }
 
     return render(request, 'index/uploadElement.html', context)
+
+
+
+
+
+
+from django.shortcuts import render
+import yt_dlp
+import imageio_ffmpeg
+import os
+
+from django.shortcuts import render
+import yt_dlp
+import imageio_ffmpeg
+import os
+
+def download_video(request):
+    context = {}
+
+    if request.method == 'POST':
+        url = request.POST.get('url')
+        if url:
+            try:
+                # Obtener la ruta al ejecutable de ffmpeg instalado vía imageio
+                ffmpeg_path = imageio_ffmpeg.get_ffmpeg_exe()
+
+                ydl_opts = {
+                    'format': 'bestvideo+bestaudio/best',
+                    'ffmpeg_location': ffmpeg_path,
+                    'merge_output_format': 'mp4',
+                    'outtmpl': 'media/%(title).100s.%(ext)s',
+                    'postprocessors': [
+                        {'key': 'FFmpegMerger'}  # ← sin argumentos adicionales
+                    ],
+                }
+
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    info = ydl.extract_info(url, download=True)
+                    filename = ydl.prepare_filename(info)
+                    final_filename = os.path.splitext(filename)[0] + '.mp4'
+
+                    context['title'] = info.get('title', 'Video descargado')
+                    context['filename'] = final_filename
+
+            except Exception as e:
+                context['error'] = f"⚠️ Ocurrió un error al descargar el video: {str(e)}"
+
+    return render(request, 'index/download.html', context)
+
+
+
+
+
+

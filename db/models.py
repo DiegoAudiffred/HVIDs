@@ -4,6 +4,12 @@ from django.db import models
 import os
 from django.conf import settings  # Importamos settings
 from django.utils.translation import gettext_lazy as _
+from django.db import models
+from django.core.files.base import ContentFile
+from moviepy import VideoFileClip
+from PIL import Image
+import os
+import tempfile
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with a username field instead of an email."""
@@ -78,46 +84,102 @@ class Artist(models.Model):
         return self.name
     
 
+#class MediaFile(models.Model):
+#    #file = models.FileField(upload_to='media_files/%Y/%m/%d/')
+#    #thumbnail = models.ImageField(upload_to='media_files/thumbnails/%Y/%m/%d/', blank=True, null=True)
+#    name = models.CharField(max_length=255)
+#    artist= models.ForeignKey(Artist, on_delete=models.CASCADE,blank=True,null=True)
+#    tags = models.ManyToManyField(Tags, blank=True, null=True)
+#    game= models.ForeignKey(Game, on_delete=models.CASCADE,blank=True,null=True)
+#    hide = models.BooleanField(default=False)
+#    uploaded_at = models.DateTimeField(auto_now_add=True)
+#    character= models.ManyToManyField(Character, blank=True, null=True)
+#    file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive
+#    thumbnail = models.URLField(max_length=2000, blank=True, null=True)  # URL de la miniatura, si existe
+#    #thumbnail = models.ImageField(upload_to="uploads/thumbnails/",blank=True, null=True)
+#    isVideo = models.BooleanField(default=True)
+#    
+#    
+#    def __str__(self):
+#        return self.name
+
+
 class MediaFile(models.Model):
-    #file = models.FileField(upload_to='media_files/%Y/%m/%d/')
-    #thumbnail = models.ImageField(upload_to='media_files/thumbnails/%Y/%m/%d/', blank=True, null=True)
     name = models.CharField(max_length=255)
-    artist= models.ForeignKey(Artist, on_delete=models.CASCADE,blank=True,null=True)
-    tags = models.ManyToManyField(Tags, blank=True, null=True)
-    game= models.ForeignKey(Game, on_delete=models.CASCADE,blank=True,null=True)
+    artist= models.ForeignKey(Artist, on_delete=models.CASCADE, blank=True, null=True)
+    tags = models.ManyToManyField(Tags, blank=True)
+    game= models.ForeignKey(Game, on_delete=models.CASCADE, blank=True, null=True)
     hide = models.BooleanField(default=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    character= models.ManyToManyField(Character, blank=True, null=True)
-    file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive
-    thumbnail = models.URLField(max_length=2000, blank=True, null=True)  # URL de la miniatura, si existe
-    #thumbnail = models.ImageField(upload_to="uploads/thumbnails/",blank=True, null=True)
+    character= models.ManyToManyField(Character, blank=True)
+
+    # Ahora se guarda el archivo localmente
+    file = models.FileField(upload_to='media_files/%Y/%m/%d/', blank=True, null=True)
+    user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
+    # Generación automática de thumbnail
+    thumbnail = models.ImageField(upload_to='media_files/thumbnails/%Y/%m/%d/', blank=True, null=True)
     isVideo = models.BooleanField(default=True)
-    
     
     def __str__(self):
         return self.name
-#class MediaFile(models.Model):
-#    name = models.CharField(max_length=255)
-#    artist = models.ForeignKey('Artist', on_delete=models.CASCADE, blank=True, null=True)
-#    tags = models.ManyToManyField('Tags', blank=True)
-#    game = models.ForeignKey('Game', on_delete=models.CASCADE, blank=True, null=True)
-#    hide = models.BooleanField(default=False)
-#    uploaded_at = models.DateTimeField(auto_now_add=True)
-#    character = models.ManyToManyField('Character', blank=True)
-#    
-#  
-#    file = models.FileField(upload_to='media_files/%Y/%m/%d/', blank=True, null=True)
-#    thumbnail = models.ImageField(upload_to='media_files/thumbnails/%Y/%m/%d/', blank=True, null=True)
-#    
-#    isVideo = models.BooleanField(default=False)
-#
-#    def __str__(self):
-#        return self.name
-#
-class comicImages(models.Model):
-    mediaFile= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)
-    pagNum = models.IntegerField()
-    file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.isVideo and self.file and not self.thumbnail:
+            self.generate_thumbnail()
+
+    def generate_thumbnail(self):
+        try:
+            clip = VideoFileClip(self.file.path)
+            frame = clip.get_frame(10)  # segundo 1 del video
+            image = Image.fromarray(frame)
+
+            # Crear archivo temporal para guardar el frame como imagen
+            temp_thumb = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+            temp_thumb_path = temp_thumb.name
+            temp_thumb.close()  # Muy importante: cerramos para evitar conflicto en Windows
+
+            # Guardar el frame como imagen JPEG
+            image.save(temp_thumb_path, "JPEG")
+
+            # Leer el archivo y guardar en el ImageField
+            with open(temp_thumb_path, 'rb') as f:
+                self.thumbnail.save(
+                    f"{os.path.splitext(os.path.basename(self.file.name))[0]}_thumb.jpg",
+                    ContentFile(f.read()),
+                    save=False
+                )
+
+            # Eliminar archivo temporal una vez terminado
+            os.unlink(temp_thumb_path)
+
+            # Guardar la instancia con el thumbnail actualizado
+            super().save()
+
+        except Exception as e:
+            print(f"Error al generar thumbnail: {e}")
+
+
+
+#class comicImages(models.Model):
+#    mediaFile= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)
+#    pagNum = models.IntegerField()
+#    file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive
+
+class Comic(models.Model):
+    name = models.CharField(max_length=100)
+    artist= models.ForeignKey(Artist, on_delete=models.CASCADE, blank=True, null=True)
+    tags = models.ManyToManyField(Tags, blank=True)
+    game= models.ForeignKey(Game, on_delete=models.CASCADE, blank=True, null=True)
+    hide = models.BooleanField(default=False)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    character= models.ManyToManyField(Character, blank=True)
+
+class ComicPage(models.Model):
+    comic = models.ForeignKey(Comic, related_name='pages', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='comics/pages/')
+    order = models.PositiveIntegerField(default=0)  # por si quieres ordenarlas
 
 class Comentario(models.Model):
     mediaFile= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)
