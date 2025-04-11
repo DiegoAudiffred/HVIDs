@@ -21,5 +21,6 @@ urlpatterns = [
     path('multi-search/', views.multi_search_results, name='multi_search_results'),
     path('descargar/', views.download_video, name='download_video'),
     #path('upload_comic/', views.upload_comic, name='upload_comic'),
+    path('upload/comic/', views.upload_comic, name='upload_comic'),
 
 ]

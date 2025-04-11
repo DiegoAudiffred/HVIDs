@@ -397,7 +397,24 @@ def uploadElement(request):
     return render(request, 'index/uploadElement.html', context)
 
 
+def upload_comic(request):
+    if request.method == 'POST':
+        form = UploadComicForm(request.POST)
+        images = request.FILES.getlist('images')  # nombre del input que sube las imágenes
 
+        if form.is_valid():
+            comic = form.save(commit=False)
+            comic.save()
+            form.save_m2m()
+
+            for idx, image in enumerate(images):
+                ComicPage.objects.create(comic=comic, image=image, order=idx)
+
+            return JsonResponse({'message': 'Comic subido con éxito'})
+        else:
+            return JsonResponse({'error': 'Formulario inválido', 'details': form.errors}, status=400)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
 

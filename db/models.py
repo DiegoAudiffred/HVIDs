@@ -176,10 +176,17 @@ class Comic(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     character= models.ManyToManyField(Character, blank=True)
 
+def comic_page_upload_to(instance, filename):
+    # Si el cómic aún no ha sido guardado y no tiene ID, usa un placeholder temporal
+    comic_id = instance.comic.id if instance.comic.id else 'temp'
+    filename = os.path.basename(filename)
+    return f'comics/pages/{comic_id}/{filename}'
+
 class ComicPage(models.Model):
     comic = models.ForeignKey(Comic, related_name='pages', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='comics/pages/')
-    order = models.PositiveIntegerField(default=0)  # por si quieres ordenarlas
+    image = models.ImageField(upload_to=comic_page_upload_to)
+    order = models.PositiveIntegerField(default=0)
+
 
 class Comentario(models.Model):
     mediaFile= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)
