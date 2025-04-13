@@ -2,56 +2,32 @@
 {% load static %}
 {% block body %}
 
-<style>
-    .media-container {
-        position: relative;
-        width: 100%;
-        padding-top: 56.25%;
-        /* 16:9 aspect ratio */
-        overflow: hidden;
-        margin-bottom: 20px;
-    }
-
-    .media-container iframe,
-    .media-container video,
-    .media-container img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
-
-    .custom-controls {
-        text-align: center;
-        margin-top: 10px;
-    }
-
-    .custom-controls button {
-        margin: 0 5px;
-    }
-</style>
 
 
 <div class="container">
     <h1>{{ mediafile.name }}</h1>
 
     <div class="media-container"> <!-- Video -->
-        {% if drive_preview_url %}
-        <!-- Utilizar iframe para videos de Google Drive -->
-        <iframe src="{{ drive_preview_url }}" frameborder="0" allow="autoplay; encrypted-media"
-            allowfullscreen></iframe>
-        {% elif mediafile.file|lower|slice:"-3:" == "mp4" %}
-        <video id="videoPlayer" controls>
-            <source src="{{ mediafile.file }}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        {% else %}
+ <!-- CSS -->
+<link href="https://vjs.zencdn.net/8.9.0/video-js.css" rel="stylesheet" />
 
-        <img
-            src="https://lh3.googleusercontent.com/drive-viewer/AKGpihYJ1VUAC_-T-hDevQ--3WyzWyhvIpSMkERZlt-yZun75IL8byO7I_vuiqbloQ8a2o5B-7eD-MOdKIqXIMxXxPTnU7gsfB9YUg=s1600-rw-v1" />
-        {% endif %}
+<!-- Video player -->
+<video
+  id="my-video"
+  class="video-js vjs-default-skin w-100"
+  controls
+  preload="auto"
+
+  data-setup='{}'>
+  <source src="{{ mediafile.file.url }}" type="video/mp4" />
+  Tu navegador no soporta la reproducción de video.
+</video>
+
+<!-- JS -->
+<script src="https://vjs.zencdn.net/8.9.0/video.min.js"></script>
+
+
+       
     </div>
     <div class="row"> <!-- Comic -->
 
