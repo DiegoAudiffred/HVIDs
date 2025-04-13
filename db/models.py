@@ -117,7 +117,7 @@ class MediaFile(models.Model):
     file = models.FileField(upload_to='media_files/%Y/%m/%d/', blank=True, null=True)
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
     # Generación automática de thumbnail
-    thumbnail = models.ImageField(upload_to='media_files/thumbnails/%Y/%m/%d/', blank=True, null=True)
+    image = models.ImageField(upload_to='media_files/thumbnails/%Y/%m/%d/', blank=True, null=True)
     isVideo = models.BooleanField(default=True)
     
     def __str__(self):
@@ -126,7 +126,7 @@ class MediaFile(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        if self.isVideo and self.file and not self.thumbnail:
+        if self.isVideo and self.file and not self.image:
             self.generate_thumbnail()
 
     def generate_thumbnail(self):
@@ -145,7 +145,7 @@ class MediaFile(models.Model):
 
             # Leer el archivo y guardar en el ImageField
             with open(temp_thumb_path, 'rb') as f:
-                self.thumbnail.save(
+                self.image.save(
                     f"{os.path.splitext(os.path.basename(self.file.name))[0]}_thumb.jpg",
                     ContentFile(f.read()),
                     save=False

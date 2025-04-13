@@ -39,15 +39,28 @@ def get_sidebar_context():
         #'random_items':random_items
         }
 
+from itertools import chain
+
 def index(request):
-    user= request.user
-    media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
+    user = request.user
+
+    # Obtener ambos tipos de archivos visibles
+    media_files = MediaFile.objects.filter(hide=False)
+    comics = Comic.objects.filter(hide=False)
+
+    # Combinar y ordenar todos por fecha de subida
+    combined_media = sorted(
+        chain(media_files, comics),
+        key=lambda x: x.uploaded_at,
+        reverse=True
+    )
+
     sidebar_context = get_sidebar_context()
 
     context = {
-        'user':user,
-        'media_files': media_files,
-        **sidebar_context  # Unir el contexto de la sidebar
+        'user': user,
+        'media_files': combined_media,
+        **sidebar_context
     }
 
     return render(request, 'index/index.html', context)
@@ -126,8 +139,9 @@ def navbarFilterHeader(request):
         media_files = Character.objects.all
     elif thing_to_filter == "videos":
          media_files = MediaFile.objects.filter(isVideo=True).order_by('-uploaded_at')
+         print("azqy")
     elif thing_to_filter == "comics":
-         media_files = MediaFile.objects.filter(isVideo=False).order_by('-uploaded_at')
+         media_files = Comic.objects.all
     else:
         media_files = MediaFile.objects.filter().order_by('-uploaded_at')
 
@@ -418,15 +432,10 @@ def upload_comic(request):
 
 
 
-from django.shortcuts import render
-import yt_dlp
-import imageio_ffmpeg
 import os
-
 from django.shortcuts import render
-import yt_dlp
+from yt_dlp import YoutubeDL
 import imageio_ffmpeg
-import os
 
 def download_video(request):
     context = {}
@@ -435,20 +444,25 @@ def download_video(request):
         url = request.POST.get('url')
         if url:
             try:
-                # Obtener la ruta al ejecutable de ffmpeg instalado vía imageio
+                output_dir = 'media'
+                if not os.path.exists(output_dir):
+                    os.makedirs(output_dir)
+
                 ffmpeg_path = imageio_ffmpeg.get_ffmpeg_exe()
 
                 ydl_opts = {
                     'format': 'bestvideo+bestaudio/best',
                     'ffmpeg_location': ffmpeg_path,
-                    'merge_output_format': 'mp4',
-                    'outtmpl': 'media/%(title).100s.%(ext)s',
+                    'outtmpl': os.path.join(output_dir, '%(title).100s.%(ext)s'),
                     'postprocessors': [
-                        {'key': 'FFmpegMerger'}  # ← sin argumentos adicionales
+                        {
+                            'key': 'FFmpegVideoConvertor',
+                            'preferedformat': 'mp4'
+                        }
                     ],
                 }
 
-                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                with YoutubeDL(ydl_opts) as ydl:
                     info = ydl.extract_info(url, download=True)
                     filename = ydl.prepare_filename(info)
                     final_filename = os.path.splitext(filename)[0] + '.mp4'

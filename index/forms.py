@@ -33,7 +33,7 @@ class ComicPageForm(forms.ModelForm):
 class UploadElementForm(forms.ModelForm):
     class Meta:
         model = MediaFile
-        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'thumbnail']
+        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image']
         widgets = {
             'file': forms.ClearableFileInput(attrs={'accept': 'video/*'}),
         }
@@ -55,8 +55,8 @@ class UploadElementForm(forms.ModelForm):
         self.fields['file'].required = True
         self.fields['file'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Archivo*', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1','type':'file', 'name':'file', 'accept':'video/*'})
 
-        self.fields['thumbnail'].required = False
-        self.fields['thumbnail'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2 from-control', 'placeholder': ' Miniatura', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+        self.fields['image'].required = False
+        self.fields['image'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2 from-control', 'placeholder': ' Miniatura', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
      
 
         # Asegúrate de que el campo de tags está usando CheckboxSelectMultiple correctamente.

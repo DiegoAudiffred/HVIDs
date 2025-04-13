@@ -1,10 +1,16 @@
 {% load static %}
+<style>
+  .nav-link:hover {
+    color: #fff !important;           /* text-white */
+    background-color: #8B0000 !important;  /* bg-secondary */
+  }
+</style>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-tercero">
   <div class="container-fluid px-4">
   
     <a class="navbar-brand text-center text-primary fw-bold"  href="" style="font-size: 24px;">
-      <img id="logo" src="{% static 'img/LogoHvids.png' %}" alt="Previsualización" class=" d-block imagePreview" style="max-width: 150px;" data-preview-id="2">
+      <img id="logo" src="{% static 'img/LogoHvids.png' %}" alt="Previsualización" class=" d-block" style="max-width: 150px;" data-preview-id="2">
 
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
