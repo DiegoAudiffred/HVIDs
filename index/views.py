@@ -237,14 +237,29 @@ def hide(request):
 
 def watchComic(request, id):
     comic = get_object_or_404(Comic, id=id)
-    #comentarios = Comentario.objects.filter(mediaFile=comic)  # Si quieres ligarlos igual
+    comentarios = Comentario.objects.filter(comicID = comic)
     form = addComentariosForm()
     comic_pages = ComicPage.objects.filter(comic=comic)
     sidebar_data = get_sidebar_context()
+    if request.method == 'POST':
+        # Si el formulario se ha enviado, procesar la subida del archivo
+        form = addComentariosForm(request.POST, request.FILES)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            
+            # Asignar manualmente el usuario y el archivo mediaFile
+            comentario.usuario = request.user  # Suponiendo que el usuario está autenticado
+            comentario.comicID = comic  # Obtener el archivo subido
 
+            # Guardar el objeto Comentario con los campos adicionales
+            comentario.save()
+            return redirect('index:watchComic', comic.id)  # Redirigir correctamente
+
+    else:
+        form = addComentariosForm()
     return render(request, 'index/watchComic.html', {
         'mediafile': comic,
-    #    'comentarios': comentarios,
+        'comentarios': comentarios,
         'comic_pages':comic_pages,
         'form': form,
         **sidebar_data
@@ -261,7 +276,7 @@ def watchContent(request, id):
             
             # Asignar manualmente el usuario y el archivo mediaFile
             comentario.usuario = request.user  # Suponiendo que el usuario está autenticado
-            comentario.mediaFile = mediafile  # Obtener el archivo subido
+            comentario.mediaFileID = mediafile  # Obtener el archivo subido
 
             # Guardar el objeto Comentario con los campos adicionales
             comentario.save()
@@ -273,7 +288,7 @@ def watchContent(request, id):
    
     mediafile = get_object_or_404(MediaFile, id=id)
     #pages = comicImages.objects.filter(mediaFile = mediafile)
-    comentarios = Comentario.objects.filter(mediaFile = mediafile)
+    comentarios = Comentario.objects.filter(mediaFileID = mediafile)
     
    
     
@@ -338,21 +353,21 @@ def filteredByArtist(request, string):
 
 def filteredByCharacter(request, string):
 
-    if string == 'All':
-        media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
-        sidebar_context = get_sidebar_context()
-        context = {
-            'media_files': media_files,
-            **sidebar_context  # Unir el contexto de la sidebar
-        }   
-
-        return redirect('index:index')
-    else: 
+  
         media_files = MediaFile.objects.filter(character__name__icontains=string, hide=False).order_by('-uploaded_at')
+        
+        comics = Comic.objects.filter(character__name__icontains=string, hide=False).order_by('-uploaded_at')
+
+    # Combinar y ordenar todos por fecha de subida
+        combined_media = sorted(
+        chain(media_files, comics),
+        key=lambda x: x.uploaded_at,
+        reverse=True
+    )
     # Obtener el contexto de la sidebar
         sidebar_context = get_sidebar_context()
         context = {
-            'media_files': media_files,
+            'media_files': combined_media,
             **sidebar_context  # Unir el contexto de la sidebar
         }
         return render(request, 'index/index.html', context)
