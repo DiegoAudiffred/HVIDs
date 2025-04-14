@@ -2,6 +2,66 @@
 {% load static %}
 
 {% block body %}
+<style>
+    .card-img-top {
+        width: 100%;
+        height: 200px; /* Ajusta la altura según tus necesidades */
+        object-fit: cover; /* Para asegurar que la imagen se ajuste sin deformarse */
+    }
+    .card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .card-body {
+        flex: 1;
+    }
+    .overlay-svg {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10; /* Asegura que el SVG esté sobre la imagen */
+    }
+       
+        .blurred {
+            filter: blur(15px); 
+            transition: filter 1.0s; 
+        }
+
+        .blurred:hover {
+            filter: none;
+        }
+  
+</style>
+<style>
+    .card {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+  
+    .card.animate {
+      animation: zoomIn 1.5s ease forwards;
+    }
+  
+    @keyframes zoomIn {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
+  
+
+  
+  <style>
+    .card:hover {
+  box-shadow: 0 0 15px #ff69b4, 0 0 30px #ff69b4;
+  border: 2px solid #ff69b4;
+  transition: all 0.4s ease;
+}
+
+  </style>
 <h2>Resultados para: "{{ search_terms }}"</h2>
 
 <div class="row ">
@@ -22,13 +82,13 @@
             {% if mediafile.image %}
                 <div class="position-relative">
                     <img src="{{ mediafile.image.url }}" alt="{{ mediafile.name }} Thumbnail"
-                        class="card-img-top blurred" style="height: 200px; object-fit: cover;">
+                        class="card-img-top " style="height: 200px; object-fit: cover;">
                     <svg class="overlay-svg" ...> ... </svg>
                 </div>
             {% else %}
                 <div class="position-relative">
                     <img src="{% static 'img/noImage.jpg' %}" alt="Sin imagen"
-                        class="card-img-top blurred" style="height: 200px; object-fit: cover;">
+                        class="card-img-top " style="height: 200px; object-fit: cover;">
                     <svg class="overlay-svg" ...> ... </svg>
                 </div>
             {% endif %}
@@ -61,5 +121,22 @@
     </div>
 {% endfor %}
 </div>
-
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const cards = document.querySelectorAll(".card");
+  
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("animate");
+            observer.unobserve(entry.target); // Solo una vez
+          }
+        });
+      }, {
+        threshold: 0.1,
+      });
+  
+      cards.forEach(card => observer.observe(card));
+    });
+  </script>
 {% endblock %}

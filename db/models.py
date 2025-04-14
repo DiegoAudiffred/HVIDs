@@ -198,8 +198,9 @@ class ComicPage(models.Model):
 
 
 class Comentario(models.Model):
-    mediaFile= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)
-
+    mediaFileID= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)
+    comicID= models.ForeignKey(Comic, on_delete=models.CASCADE,blank=True,null=True)
+    
     usuario = models.ForeignKey(User, on_delete=models.CASCADE,blank=True,null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 

@@ -69,7 +69,7 @@ class UploadElementForm(forms.ModelForm):
 class addComentariosForm(forms.ModelForm):
     class Meta:
         model = Comentario
-        fields = ['comentario','usuario','mediaFile']
+        fields = ['comentario','usuario','mediaFileID',]
 
     def __init__(self, *args, **kwargs):
         super(addComentariosForm, self).__init__(*args, **kwargs)
@@ -80,8 +80,8 @@ class addComentariosForm(forms.ModelForm):
         self.fields['usuario'].required = False
         self.fields['usuario'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': 'Artista*', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
 
-        self.fields['mediaFile'].required = False
-        self.fields['mediaFile'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
+        self.fields['mediaFileID'].required = False
+        self.fields['mediaFileID'].widget.attrs.update({'class': 'form-control shadow-none bg-corporateTan200 px-2 py-1', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1', 'style': 'border-left:none'})
 class addTagsForm(forms.ModelForm):
     class Meta:
         model = Tags
@@ -111,7 +111,7 @@ class addCharsForm(forms.ModelForm):
 
             self.fields['name'].required = True
             self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del personaje', 'rows': '1'})
-            self.fields['game'].required = True
+            self.fields['game'].required = False
             self.fields['game'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del personaje', 'rows': '1'})
     
 from django import forms
