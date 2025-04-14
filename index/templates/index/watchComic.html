@@ -1,0 +1,163 @@
+{% extends 'layout/layout.html' %}
+{% load static %}
+{% block body %}
+
+
+
+<div class="container">
+    <h1>{{ mediafile.name }}</h1>
+
+    <div class="media-container"> <!-- Video -->
+ <!-- CSS -->
+<link href="https://vjs.zencdn.net/8.9.0/video-js.css" rel="stylesheet" />
+
+
+
+<!-- JS -->
+<script src="https://vjs.zencdn.net/8.9.0/video.min.js"></script>
+
+
+       
+    </div>
+    <div class="row"> <!-- Comic --> 
+        {% for page in comic_pages %}
+            <div class="col-12 col-sm-6 col-md-4 mb-4 d-flex justify-content-center">
+                <button class="border-0 bg-transparent w-100" data-bs-toggle="modal" data-bs-target="#imageModal">
+                    <div class="ratio w-100" style="--bs-aspect-ratio: 133%;">
+                        <img src="{{ page.image.url }}" class="img-fluid rounded shadow object-fit-cover" />
+                    </div>
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+    
+
+    
+    <div class="row">
+        <p><strong>Uploaded At:</strong> {{ mediafile.uploaded_at }}</p>
+        <p><strong>Tags:</strong>
+            {% for tag in mediafile.tags.all %}
+            <span class="badge bg-secondary">{{ tag.name }}</span>
+            {% endfor %}
+        </p>
+
+        <a href="{{ mediafile.file.url }}" class="btn btn-primary" download>Download</a>
+
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h2>Comentarios</h2>
+        </div>
+        <div class="col-12">
+            <p>Agregar comentario</p>
+        </div>
+        <form class="row" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="col-9">
+                {{ form.comentario }}
+            </div>
+            <div class="col-3">
+                <button class="btn btn-primary" type="submit">Enviar</button>
+            </div>
+        </form>
+        <div class="col-12">
+            {% for comentario in comentarios %}
+            <div class="py-3 border-bottom">
+
+                <p><a href="">{{ comentario.usuario }}</a> {{comentario.uploaded_at}}</p>
+{% for comentario in comentarios %}
+  <p><strong>{{ comentario.usuario }}:</strong> {{ comentario.comentario }}</p>
+{% endfor %}
+
+
+                <p>{{ comentario.comentario }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+<style>
+    .comic-frame {
+  aspect-ratio: 4 / 3;
+  max-width: 900px;
+  width: 100%;
+  background-color: #fff;
+  border: 8px double #000;
+  padding: 10px;
+  box-shadow: 0 0 0 6px #fdfd96, 0 0 0 12px #000;
+  transition: transform 0.3s ease;
+}
+
+.comic-frame:hover {
+  transform: scale(1.01);
+}
+
+.thumbnail-selector {
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: transform 0.2s, border 0.2s;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  width: 100%;
+}
+
+.thumbnail-selector:hover {
+  border: 3px solid #ffcc00;
+  transform: scale(1.05);
+}
+
+</style>
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content bg-light">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel">  {{ mediafile.name }}          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+  
+        <div class="modal-body">
+          <!-- Carrusel principal -->
+          <div id="comicCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              {% for page in comic_pages %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                  <div class="d-flex justify-content-center">
+                    <div class="comic-frame">
+                      <img src="{{ page.image.url }}" class="img-fluid w-100 h-100 rounded" alt="Página del cómic">
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+  
+            <!-- Controles -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#comicCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon"></span>
+              <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#comicCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon"></span>
+              <span class="visually-hidden">Siguiente</span>
+            </button>
+          </div>
+  
+          <!-- Miniaturas -->
+          <div class="row g-2 justify-content-center">
+            {% for page in comic_pages %}
+              <div class="col-2">
+                <img src="{{ page.image.url }}" class="img-thumbnail thumbnail-selector" data-bs-target="#comicCarousel" data-bs-slide-to="{{ forloop.counter0 }}" aria-current="{% if forloop.first %}true{% endif %}" alt="Miniatura {{ forloop.counter }}">
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+
+
+
+
+{% endblock %}

@@ -14,7 +14,7 @@ urlpatterns = [
     path("show/", views.show, name='show'),
     path("hide/", views.hide, name='hide'),
     path('adminPage/', views.adminPage, name='adminPage'),
-    path("watchContent/<int:id>/", views.watchContent, name='watchContent'),
+    path("video/<int:id>/", views.watchContent, name='watchContent'),
     path("navbarFilterHeader/", views.navbarFilterHeader, name='navbarFilterHeader'),
     path('autocomplete/', views.autocomplete, name='autocomplete'),
     path('buscar/', views.multi_search_results, name='multi_search_results'),
@@ -22,5 +22,6 @@ urlpatterns = [
     path('descargar/', views.download_video, name='download_video'),
     #path('upload_comic/', views.upload_comic, name='upload_comic'),
     path('upload/comic/', views.upload_comic, name='upload_comic'),
+    path('comic/<int:id>/', views.watchComic, name='watchComic'),
 
 ]

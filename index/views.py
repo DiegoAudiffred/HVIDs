@@ -139,7 +139,6 @@ def navbarFilterHeader(request):
         media_files = Character.objects.all
     elif thing_to_filter == "videos":
          media_files = MediaFile.objects.filter(isVideo=True).order_by('-uploaded_at')
-         print("azqy")
     elif thing_to_filter == "comics":
          media_files = Comic.objects.all
     else:
@@ -236,6 +235,21 @@ def hide(request):
     
     return redirect('index:index')  # Redirigir correctamente
 
+def watchComic(request, id):
+    comic = get_object_or_404(Comic, id=id)
+    #comentarios = Comentario.objects.filter(mediaFile=comic)  # Si quieres ligarlos igual
+    form = addComentariosForm()
+    comic_pages = ComicPage.objects.filter(comic=comic)
+    sidebar_data = get_sidebar_context()
+
+    return render(request, 'index/watchComic.html', {
+        'mediafile': comic,
+    #    'comentarios': comentarios,
+        'comic_pages':comic_pages,
+        'form': form,
+        **sidebar_data
+    })
+
 def watchContent(request, id):
     mediafile = get_object_or_404(MediaFile, id=id)
 
@@ -260,22 +274,14 @@ def watchContent(request, id):
     mediafile = get_object_or_404(MediaFile, id=id)
     #pages = comicImages.objects.filter(mediaFile = mediafile)
     comentarios = Comentario.objects.filter(mediaFile = mediafile)
-    drive_preview_url = None
     
-    # Lógica para obtener el enlace de vista previa de Google Drive si es necesario
-    if mediafile.file and 'drive.google.com' in mediafile.file:
-        try:
-            file_id = mediafile.file.split('/d/')[1].split('/')[0]
-            drive_preview_url = f"https://drive.google.com/file/d/{file_id}/preview"
-        except IndexError:
-            drive_preview_url = None
+   
     
     # Obtener el contexto de la sidebar
     sidebar_data = get_sidebar_context()
 
     return render(request, 'index/watchContent.html', {
         'mediafile': mediafile,
-        'drive_preview_url': drive_preview_url,
         #'pages':pages,
         'comentarios':comentarios,
         'form':form,
@@ -380,24 +386,19 @@ def uploadElement(request):
     if request.method == 'POST':
         form = UploadElementForm(request.POST, request.FILES)
         if form.is_valid():
-            media = form.save(commit=False)  
+            media = form 
 
-            uploaded_file = request.FILES.get('file')  
-            if uploaded_file:
-                mime_type, _ = mimetypes.guess_type(uploaded_file.name)
-                if mime_type and mime_type.startswith('video'):
-                    media.isVideo = True
-                else:
-                    media.isVideo = False
-                media.user=request.user
+       
             media.save()  
-            form.save_m2m()  
-
+            
             return HttpResponseRedirect('/')
+        else:
+            print("Errores del formulario:", form.errors)
+
     else:
         form = UploadElementForm()
-        formComic=UploadComicForm()
-    
+    formComic=UploadComicForm()
+
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
     sidebar_context = get_sidebar_context()
 
@@ -418,6 +419,7 @@ def upload_comic(request):
 
         if form.is_valid():
             comic = form.save(commit=False)
+            comic.image = images[0]
             comic.save()
             form.save_m2m()
 

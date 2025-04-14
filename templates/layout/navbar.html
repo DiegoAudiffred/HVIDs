@@ -48,27 +48,37 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item mx-1 px-3">
-          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" aria-current="page" href="{% url "index:index" %}">Inicio</a>
+          <a class="nav-link active text-sexto fw-bold" style="font-size: 28px;" aria-current="page" href="{% url "index:index" %}">Inicio</a>
         </li>
         <li class="nav-item mx-1 px-3">
-          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=artistas">Artistas</a>
+          <a class="nav-link active text-sexto fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=artistas">Artistas</a>
         </li>
         <li class="nav-item mx-1 px-3">
-          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=series">Series</a>
+          <a class="nav-link active text-sexto fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=series">Series</a>
         </li>
         <li class="nav-item mx-1 px-3">
-          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=personajes">Personajes</a>
+          <a class="nav-link active text-sexto fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=personajes">Personajes</a>
         </li>
         <li class="nav-item mx-1 px-3">
-          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=videos">Videos</a>
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center" style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=videos">
+           
+          
+          <img src="{% static 'img/YoutubeLogo.png' %}" class="img-fluid mb-1" style="max-width: 50px; height: auto;">
+          Videos
+        </a>
         </li>
         <li class="nav-item mx-1 px-3">
-          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=comics">Comics</a>
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center" style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=comics">
+            <img src="{% static 'img/ImageLogo.png' %}"  class="img-fluid mb-1" style="max-width: 50px; height: auto;">
+            Imagenes
+          </a>
         </li>
+        
+
 <li class="nav-item mx-1 px-3">
-  <a class="nav-link active text-secondary fw-bold d-flex flex-column align-items-center" style="font-size: 25px;" href="{% url 'index:download_video' %}">
-    <img src="{% static 'img/YoutubeKawaii.png' %}" alt="Previsualización" class="img-fluid mb-1" style="max-width: 50px; height: auto;">
-    Descargar YT
+  <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center" style="font-size: 25px;" href="{% url 'index:download_video' %}">
+    <img src="{% static 'img/DownloadLogo.png' %}" class="img-fluid mb-1" style="max-width: 50px; height: auto;">
+    Descargar
   </a>
 </li>
 
@@ -76,7 +86,10 @@
         
         {% if user.is_superuser %}
         <li class="nav-item mx-1 px-3">
-          <a class="nav-link active text-secondary fw-bold" style="font-size: 28px;" href="{% url "index:adminPage" %}">Admin</a>
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center" style="font-size: 25px;" href="{% url 'index:adminPage' %}">
+            <img src="{% static 'img/configurationLogo.png' %}" class="img-fluid mb-1" style="max-width: 50px; height: auto;">
+            Configuración
+          </a>
         </li>
         {% endif %}
         
