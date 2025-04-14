@@ -114,7 +114,7 @@ class MediaFile(models.Model):
     character= models.ManyToManyField(Character, blank=True)
 
     # Ahora se guarda el archivo localmente
-    file = models.FileField(upload_to='media_files/%Y/%m/%d/', blank=True, null=True)
+    file = models.FileField(upload_to='media_files/%Y/%m/%d/', blank=True, null=True,max_length=255)
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
     # Generación automática de thumbnail
     image = models.ImageField(upload_to='media_files/thumbnails/%Y/%m/%d/', blank=True, null=True)
@@ -128,6 +128,9 @@ class MediaFile(models.Model):
 
         if self.isVideo and self.file and not self.image:
             self.generate_thumbnail()
+    @property
+    def tipo_objeto(self):
+        return "mediafile"
 
     def generate_thumbnail(self):
         try:
@@ -175,6 +178,12 @@ class Comic(models.Model):
     hide = models.BooleanField(default=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     character= models.ManyToManyField(Character, blank=True)
+    image = models.ImageField(upload_to='media_files/comicPortraits/', blank=True, null=True)
+    isVideo = models.BooleanField(default=False)
+    
+    @property
+    def tipo_objeto(self):
+        return "comic"
 
 def comic_page_upload_to(instance, filename):
     # Si el cómic aún no ha sido guardado y no tiene ID, usa un placeholder temporal

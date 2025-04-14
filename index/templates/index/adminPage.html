@@ -2,29 +2,56 @@
 {% load static %}
 
 {% block body %}
+<style>
+      .adminLink:hover {
+    color: #fff !important;
+    background-color: #8B0000 !important;
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+  }
+</style>
+<style>
+ @keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-20px); }
+}
+.slide-down {
+  animation: slideDown 0.5s ease forwards;
+}
+.slide-up {
+  animation: slideUp 0.5s ease forwards;
+}
+
+</style>
+
+
 <div class="container">
     <div class="row">
             <div class="">
                 <h1>Sección de administrador </h1>
             </div>
-            <div class="col-md-2 my-3 col-12 my-md-0 text-center">
-                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="tags">Add tags</a>
+            <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
+                <button href="" class="btn adminLink border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="tags">Add tags</a>
 
             </div>
-            <div class="col-md-2 my-3 col-12 my-md-0 text-center">
-                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="artists">Add artistas</a>
+            <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
+                <button href="" class="btn adminLink border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="artists">Add artistas</a>
 
             </div>
-            <div class="col-md-2 my-3 col-12 my-md-0 text-center">
-                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="chars">Add chars</a>
+            <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
+                <button href="" class="btn adminLink border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="chars">Add chars</a>
 
             </div>
-            <div class="col-md-2 my-3 col-12 my-md-0 text-center">
-                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="users">Add usuario</a>
+            <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
+                <button href="" class="btn adminLink border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="users">Add usuario</a>
             
             </div>
-            <div class="col-md-2 my-3 col-12 my-md-0 text-center">
-                <button href="" class="btn border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="games">Add game</a>
+            <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
+                <button href="" class="btn adminLink border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="games">Add game</a>
             
             </div>
     </div>
@@ -195,19 +222,28 @@ document.getElementById('games').onclick = function() {
 };
 
 function toggleFormVisibility(formId) {
-    const forms = ['#tagForm', '#artistForm', '#charForm', '#userForm','#gameForm'];
+    const forms = ['#tagForm', '#artistForm', '#charForm', '#userForm', '#gameForm'];
     forms.forEach(function(form) {
         const formElement = document.querySelector(form);
         if (formElement && form !== formId) {
             formElement.classList.add('d-none');
+            formElement.classList.remove('slide-down', 'slide-up');
         }
     });
+
     const selectedForm = document.querySelector(formId);
     if (selectedForm.classList.contains('d-none')) {
         selectedForm.classList.remove('d-none');
+        selectedForm.classList.remove('slide-up');
+        selectedForm.classList.add('slide-down');
     } else {
-        selectedForm.classList.add('d-none');
+        selectedForm.classList.remove('slide-down');
+        selectedForm.classList.add('slide-up');
+        setTimeout(() => {
+            selectedForm.classList.add('d-none');
+        }, 500);
     }
 }
+
 </script>
 {% endblock %}
