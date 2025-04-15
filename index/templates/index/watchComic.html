@@ -1,35 +1,56 @@
 {% extends 'layout/layout.html' %}
 {% load static %}
 {% block body %}
+<style>
+  /* Animación de borde multicolor para el hover */
+  @keyframes rainbow-glow {
+    0% { box-shadow: 0 0 10px red; }
+    20% { box-shadow: 0 0 10px orange; }
+    40% { box-shadow: 0 0 10px yellow; }
+    60% { box-shadow: 0 0 10px green; }
+    80% { box-shadow: 0 0 10px blue; }
+    100% { box-shadow: 0 0 10px violet; }
+  }
 
 
+  .zoom-hover {
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    display: inline-block;
+    border-radius: 1rem;
+  }
+
+  .zoom-hover:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px red; 
+    animation: rainbow-glow 1.5s infinite alternate;
+  }
+
+  .zoom-hover img {
+    display: block;
+    width: 100%;
+    border-radius: 1rem;
+  }
+</style>
+
+
+  
 
 <div class="container">
-    <h1>{{ mediafile.name }}</h1>
+  <div class="row border-bottom border-primary mb-4">
+    <h1 class="">{{ mediafile.name }}</h1>
 
-    <div class="media-container"> <!-- Video -->
- <!-- CSS -->
-<link href="https://vjs.zencdn.net/8.9.0/video-js.css" rel="stylesheet" />
-
-
-
-<!-- JS -->
-<script src="https://vjs.zencdn.net/8.9.0/video.min.js"></script>
-
-
-       
-    </div>
-    <div class="row"> <!-- Comic --> 
-        {% for page in comic_pages %}
-            <div class="col-12 col-sm-6 col-md-4 mb-4 d-flex justify-content-center">
-                <button class="border-0 bg-transparent w-100" data-bs-toggle="modal" data-bs-target="#imageModal">
-                    <div class="ratio w-100" style="--bs-aspect-ratio: 133%;">
-                        <img src="{{ page.image.url }}" class="img-fluid rounded shadow object-fit-cover" />
-                    </div>
-                </button>
-            </div>
-        {% endfor %}
-    </div>
+  </div>
+  <div class="row">
+    {% for page in comic_pages %}
+      <div class="col-12 col-sm-6 col-md-4 mb-4 d-flex justify-content-center">
+        <button class="but zoom-hover border-0 bg-transparent w-100 p-0 " data-bs-toggle="modal" data-bs-target="#imageModal">
+          <div class="ratio w-100" style="--bs-aspect-ratio: 133%;">
+            <img src="{{ page.image.url }}" class="img-fluid shadow" />
+          </div>
+        </button>
+      </div>
+    {% endfor %}
+  </div>
     
 
     
@@ -75,87 +96,97 @@
     </div>
 
 </div>
-<style>
-    .comic-frame {
-  aspect-ratio: 4 / 3;
-  max-width: 900px;
-  width: 100%;
-  background-color: #fff;
-  border: 8px double #000;
-  padding: 10px;
-  box-shadow: 0 0 0 6px #fdfd96, 0 0 0 12px #000;
-  transition: transform 0.3s ease;
-}
-
-.comic-frame:hover {
-  transform: scale(1.01);
-}
-
-.thumbnail-selector {
-  cursor: pointer;
-  border: 3px solid transparent;
-  transition: transform 0.2s, border 0.2s;
-  aspect-ratio: 4/3;
-  object-fit: cover;
-  width: 100%;
-}
-
-.thumbnail-selector:hover {
-  border: 3px solid #ffcc00;
-  transform: scale(1.05);
-}
-
-</style>
+<!-- Modal -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-      <div class="modal-content bg-light">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalLabel">  {{ mediafile.name }}          </h5>
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-cuarto comic-modal m-auto">
+      <div class="modal-header">
+        <h5 class="modal-title fnBadComicTitle" id="modalLabel">{{ mediafile.name }}</h5>
+
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-  
-        <div class="modal-body">
-          <!-- Carrusel principal -->
-          <div id="comicCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              {% for page in comic_pages %}
-                <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                  <div class="d-flex justify-content-center">
-                    <div class="comic-frame">
-                      <img src="{{ page.image.url }}" class="img-fluid w-100 h-100 rounded" alt="Página del cómic">
-                    </div>
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
-  
-            <!-- Controles -->
-            <button class="carousel-control-prev" type="button" data-bs-target="#comicCarousel" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon"></span>
-              <span class="visually-hidden">Anterior</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#comicCarousel" data-bs-slide="next">
-              <span class="carousel-control-next-icon"></span>
-              <span class="visually-hidden">Siguiente</span>
-            </button>
-          </div>
-  
-          <!-- Miniaturas -->
-          <div class="row g-2 justify-content-center">
+        
+      </div>
+
+      <div class="modal-body p-0 h-100 d-flex flex-column justify-content-center">
+        <!-- Carrusel -->
+        <div id="comicCarousel" class="carousel slide" data-bs-ride="false">
+          <div class="carousel-inner">
             {% for page in comic_pages %}
-              <div class="col-2">
-                <img src="{{ page.image.url }}" class="img-thumbnail thumbnail-selector" data-bs-target="#comicCarousel" data-bs-slide-to="{{ forloop.counter0 }}" aria-current="{% if forloop.first %}true{% endif %}" alt="Miniatura {{ forloop.counter }}">
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+                  <img src="{{ page.image.url }}" class="comic-img img-fluid mx-auto d-block shadow rounded" alt="Página del cómic">
+                </div>
               </div>
             {% endfor %}
           </div>
+
+          <!-- Controles -->
+          <button class="carousel-control-prev" type="button" data-bs-target="#comicCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+            <span class="visually-hidden">Anterior</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#comicCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+            <span class="visually-hidden">Siguiente</span>
+          </button>
+        </div>
+
+        <!-- Miniaturas -->
+        <div class="row g-2 justify-content-center mt-3 px-3">
+          {% for page in comic_pages %}
+            <div class="col-2 mx-2">
+              <img src="{{ page.image.url }}" class="img-thumbnail thumbnail-selector p-0" data-bs-target="#comicCarousel" data-bs-slide-to="{{ forloop.counter0 }}" aria-current="{% if forloop.first %}true{% endif %}" alt="Miniatura {{ forloop.counter }}">
+            </div>
+          {% endfor %}
         </div>
       </div>
     </div>
   </div>
-  
+</div>
 
+<style>
+  .carousel-item {
+    transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+  }
 
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 70px;
+    height: 70px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #F5EDE3;
+    border-radius: 50%;
+    z-index: 10;
+  }
 
+  .carousel-control-prev {
+    left: -90px;
+  }
 
+  .carousel-control-next {
+    right: -90px;
+  }
+
+  .thumbnail-selector {
+    cursor: pointer;
+    transition: transform 0.2s, border 0.2s;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .thumbnail-selector:hover {
+    transform: scale(1.05);
+    animation: rainbow-glow 1.5s infinite alternate;
+
+  }
+
+  .comic-img {
+    max-width: 95vw;
+    max-height: 80vh;
+    object-fit: contain;
+  }
+</style>
 
 {% endblock %}

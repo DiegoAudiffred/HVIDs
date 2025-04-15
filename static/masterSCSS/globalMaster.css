@@ -3,12 +3,69 @@
   box-shadow: 0px 2px 4px rgba(246, 135, 31, 0.13), 0px 12px 24px rgba(246, 135, 31, 0.33);
 }
 
-.fnTexto_Salsa {
-  font-family: "Salsa-Regular", sans-serif;
+@font-face {
+  font-family: "BadComic";
+  src: url("/static/fonts/BadComic-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+.fnBadComicRegular {
+  font-family: "BadComic", sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 15px;
   line-height: 20px;
+}
+
+.fnBadComicLight {
+  font-family: "BadComic", sans-serif;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.fnBadComicBold {
+  font-family: "BadComic", sans-serif;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.fnBadComicItalic {
+  font-family: "BadComic", sans-serif;
+  font-style: italic;
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.fnBadComicTitle {
+  font-family: "BadComic", sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 36px;
+  letter-spacing: 1px;
+}
+
+.fnBadComicButton {
+  font-family: "BadComic", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.fnBadComicSmall {
+  font-family: "BadComic", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 14px;
+  color: #555;
 }
 
 .fnTexto_Ravioli {

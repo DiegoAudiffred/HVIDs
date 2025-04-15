@@ -44,11 +44,19 @@ from itertools import chain
 def index(request):
     user = request.user
 
-    # Obtener ambos tipos de archivos visibles
-    media_files = MediaFile.objects.filter(hide=False)
-    comics = Comic.objects.filter(hide=False)
+    # Verifica si se quiere mostrar todo
+    show_all = request.GET.get('show_all') == 'true'
 
-    # Combinar y ordenar todos por fecha de subida
+    if show_all:
+        # Obtener TODO, sin importar si está oculto
+        media_files = MediaFile.objects.all()
+        comics = Comic.objects.all()
+    else:
+        # Solo mostrar los que no están ocultos
+        media_files = MediaFile.objects.filter(hide=False)
+        comics = Comic.objects.filter(hide=False)
+
+    # Combinar y ordenar
     combined_media = sorted(
         chain(media_files, comics),
         key=lambda x: x.uploaded_at,
@@ -64,6 +72,7 @@ def index(request):
     }
 
     return render(request, 'index/index.html', context)
+
 
 def show(request):
     media_files = MediaFile.objects.all()
@@ -450,9 +459,29 @@ def upload_comic(request):
 
 
 import os
+import re
+import shutil
 from django.shortcuts import render
 from yt_dlp import YoutubeDL
-import imageio_ffmpeg
+
+# 🔐 Función para limpiar nombres de archivo (evita errores en Windows)
+def safe_filename(name):
+    # Elimina caracteres no seguros
+    name = re.sub(r'[^\w\s-]', '', name)
+    # Reemplaza espacios con guiones bajos
+    name = re.sub(r'[\s]+', '_', name)
+    return name.strip('_')
+
+
+import os
+import re
+from django.shortcuts import render
+from yt_dlp import YoutubeDL
+
+def safe_filename(name):
+    name = re.sub(r'[^\w\s-]', '', name)
+    name = re.sub(r'[\s]+', '_', name)
+    return name.strip('_')
 
 def download_video(request):
     context = {}
@@ -465,35 +494,76 @@ def download_video(request):
                 if not os.path.exists(output_dir):
                     os.makedirs(output_dir)
 
-                ffmpeg_path = imageio_ffmpeg.get_ffmpeg_exe()
+                # Verificar si ffmpeg está en PATH del sistema
+                ffmpeg_path = shutil.which('ffmpeg')
+                has_ffmpeg = ffmpeg_path is not None
 
+                # Obtener título y extensión sin descargar
+                with YoutubeDL({'quiet': True}) as ydl:
+                    info = ydl.extract_info(url, download=False)
+                    title = info.get('title', 'video')
+                    ext = info.get('ext', 'mp4')
+                    clean_title = safe_filename(title)
+                    final_filename = f"{clean_title}.{ext}"
+                    full_path = os.path.join(output_dir, final_filename)
+
+                # Si el archivo ya existe, no lo descarga de nuevo
+                if os.path.exists(full_path):
+                    context.update({
+                        'title': title,
+                        'filename': final_filename,
+                        'already_downloaded': True
+                    })
+                    return render(request, 'index/download.html', context)
+
+                # Opciones con ffmpeg
                 ydl_opts = {
                     'format': 'bestvideo+bestaudio/best',
-                    'ffmpeg_location': ffmpeg_path,
+                    'noplaylist': True,
                     'outtmpl': os.path.join(output_dir, '%(title).100s.%(ext)s'),
-                    'postprocessors': [
-                        {
-                            'key': 'FFmpegVideoConvertor',
-                            'preferedformat': 'mp4'
-                        }
-                    ],
+                    'quiet': True,
+                    'nooverwrites': True,
+                    'nopart': True,
                 }
 
-                with YoutubeDL(ydl_opts) as ydl:
-                    info = ydl.extract_info(url, download=True)
-                    filename = ydl.prepare_filename(info)
-                    final_filename = os.path.splitext(filename)[0] + '.mp4'
+                if has_ffmpeg:
+                    ydl_opts['ffmpeg_location'] = ffmpeg_path
 
-                    context['title'] = info.get('title', 'Video descargado')
-                    context['filename'] = final_filename
+                try:
+                    with YoutubeDL(ydl_opts) as ydl:
+                        info = ydl.extract_info(url, download=True)
+                        downloaded_file = ydl.prepare_filename(info)
+
+                        if os.path.exists(downloaded_file) and downloaded_file != full_path:
+                            os.rename(downloaded_file, full_path)
+
+                        context['title'] = title
+                        context['filename'] = final_filename
+
+                except Exception as e:
+                    # Si falla (por ffmpeg u otro), intenta con solo 'best'
+                    fallback_opts = {
+                        'format': 'best',
+                        'noplaylist': True,
+                        'quiet': True,
+                        'outtmpl': os.path.join(output_dir, '%(title).100s.%(ext)s'),
+                        'nooverwrites': True,
+                        'nopart': True,
+                    }
+                    with YoutubeDL(fallback_opts) as ydl:
+                        info = ydl.extract_info(url, download=True)
+                        downloaded_file = ydl.prepare_filename(info)
+
+                        if os.path.exists(downloaded_file) and downloaded_file != full_path:
+                            os.rename(downloaded_file, full_path)
+
+                        context.update({
+                            'title': title,
+                            'filename': final_filename,
+                            'used_fallback': True,
+                        })
 
             except Exception as e:
-                context['error'] = f"⚠️ Ocurrió un error al descargar el video: {str(e)}"
+                context['error'] = f"⚠️ Error al descargar: {str(e)}"
 
     return render(request, 'index/download.html', context)
-
-
-
-
-
-

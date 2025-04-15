@@ -45,22 +45,8 @@
     .card-body {
         flex: 1;
     }
-    .overlay-svg {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10; /* Asegura que el SVG esté sobre la imagen */
-    }
-       
-        .blurred {
-            filter: blur(15px); 
-            transition: filter 1.0s; 
-        }
 
-        .blurred:hover {
-            filter: none;
-        }
+    
   
 </style>
 <div class="container ">
@@ -98,7 +84,6 @@
                 <div class="position-relative">
                     <img src="{{ mediafile.image.url }}" alt="{{ mediafile.name }} Thumbnail"
                         class="card-img-top" style="height: 200px; object-fit: cover;">
-                    <svg class="overlay-svg" ...> ... </svg>
                 </div>
             {% else %}
                 <div class="position-relative">

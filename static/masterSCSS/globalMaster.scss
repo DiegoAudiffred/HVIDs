@@ -111,13 +111,85 @@ $theme-colors: (
 //Typography
 
 //Titles
-.fnTexto_Salsa {
-    font-family: 'Salsa-Regular', sans-serif;
+
+
+
+// ====== FONT IMPORT ====== 
+@font-face {
+    font-family: 'BadComic';
+    src: url('/static/fonts/BadComic-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  // ====== TIPOGRAFÍA ======
+  
+  // Estilo regular con peso fuerte (bold visual)
+  .fnBadComicRegular {
+    font-family: 'BadComic', sans-serif;
     font-style: normal;
     font-weight: 700;
     font-size: 15px;
     line-height: 20px;
-}
+  }
+  
+  // Estilo ligero (puede que se vea igual si la fuente no tiene variante light)
+  .fnBadComicLight {
+    font-family: 'BadComic', sans-serif;
+    font-style: normal;
+    font-weight: 300; // Puede no cambiar si la fuente no tiene pesos definidos
+    font-size: 15px;
+    line-height: 20px;
+  }
+  
+  // Estilo en negrita
+  .fnBadComicBold {
+    font-family: 'BadComic', sans-serif;
+    font-style: normal;
+    font-weight: 900;
+    font-size: 15px;
+    line-height: 20px;
+  }
+  
+  // Estilo cursiva
+  .fnBadComicItalic {
+    font-family: 'BadComic', sans-serif;
+    font-style: italic;
+    font-weight: normal;
+    font-size: 15px;
+    line-height: 20px;
+  }
+  
+  // Variante grande para títulos
+  .fnBadComicTitle {
+    font-family: 'BadComic', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 36px;
+    letter-spacing: 1px;
+  }
+  
+  // Variante para botones o llamados a la acción
+  .fnBadComicButton {
+    font-family: 'BadComic', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  
+  // Variante pequeña para notas o etiquetas
+  .fnBadComicSmall {
+    font-family: 'BadComic', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 14px;
+    color: #555;
+  }
+  
 
 .fnTexto_Ravioli {
     font-family: 'VanillaRavioli_Demo', ;
