@@ -4,7 +4,7 @@
 {% block body %}
   <div class="container">
     <h1>Descargar Video de YouTube</h1>
-    <form method="post">
+    <form method="post" id="download-form">
       <div class="row"> 
         <div class="col-12 my-2">
           <label for="url" class="fw-bold ">URL del video de YouTube:</label>
@@ -20,22 +20,108 @@
             </div>
            
           </div>
-        <div class="col-12 my-2">
-          <button type="submit" class="btn btn-primary py-2 px-4  fw-bold">Descargar</button>
-
-        </div>
+          <div class="col-6 my-2">
+            <button id="download-btn" type="submit" class="btn btn-primary py-2 px-4 fw-bold">
+              Descargar
+            </button>
+            <button type="button" id="cancel-btn" class="btn btn-danger py-2 px-4 fw-bold ms-2" style="display: none;">
+              Cancelar
+            </button>
+          </div>
+          
+     
       </div>    
+      <div class="col-3">
+        <div id="loading-bar" style="display: none;" class="my-3">
+          <p>⏳ Descargando video, por favor espera...</p>
+          <div class="progress">
+            <div id="progress-bar" 
+                 class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                 role="progressbar" 
+                 style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
     </form>
-      {% if title %}
-      <p>✅ Video descargado: <strong>{{ title }}</strong></p>
-      <p><a href="/media/{{ filename|cut:'media/' }}" download>📥 Descargar archivo</a></p>
-    {% elif error %}
+    {% if already_downloaded %}
+    <p>✅ El archivo ya estaba disponible: <a href="/media/{{ filename }}">{{ filename }}</a></p>
+  {% elif used_fallback %}
+    <p>⚠️ Se descargó sin combinar audio y video porque ffmpeg no está disponible.</p>
+  {% elif filename %}
+    <p>✅ Archivo descargado: <a href="/media/{{ filename }}">{{ filename }}</a></p>
+  {% elif error %}
       <p style="color:red;">⚠️ {{ error }}</p>
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const downloadBtn = document.getElementById("download-btn");
+          const cancelBtn = document.getElementById("cancel-btn");
+          const loadingBar = document.getElementById("loading-bar");
+    
+          if (downloadBtn && cancelBtn && loadingBar) {
+            downloadBtn.disabled = false;
+            downloadBtn.innerText = "Descargar";
+            cancelBtn.style.display = "none";
+            loadingBar.style.display = "none";
+          }
+        });
+      </script>
     {% endif %}
+    
+   
   </div>
-
-
-      
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("download-form");
+      const loadingBar = document.getElementById("loading-bar");
+      const downloadBtn = document.getElementById("download-btn");
+      const cancelBtn = document.getElementById("cancel-btn");
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  
+      if (form && loadingBar && downloadBtn && cancelBtn) {
+        form.addEventListener("submit", async function (e) {
+          e.preventDefault();
+  
+          loadingBar.style.display = "block";
+          downloadBtn.disabled = true;
+          downloadBtn.innerText = "Descargando...";
+          cancelBtn.style.display = "inline-block";
+  
+          const url = form.querySelector('input[name="url"]').value;
+  
+          try {
+            const response = await fetch("", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": csrfToken,
+              },
+              body: new URLSearchParams({ url })
+            });
+  
+            const html = await response.text();
+  
+            // Reemplaza el contenido actual por la nueva respuesta
+            const parser = new DOMParser();
+            const newDoc = parser.parseFromString(html, "text/html");
+            const newBody = newDoc.querySelector(".container");
+  
+            document.querySelector(".container").innerHTML = newBody.innerHTML;
+          } catch (err) {
+            alert("❌ Error inesperado. Verifica tu conexión o el video.");
+            loadingBar.style.display = "none";
+            downloadBtn.disabled = false;
+            downloadBtn.innerText = "Descargar";
+            cancelBtn.style.display = "none";
+          }
+        });
+  
+        cancelBtn.addEventListener("click", function () {
+          location.reload(); // simplemente recarga para cancelar
+        });
+      }
+    });
+  </script>
+  
     
     
 {% endblock %}

@@ -97,13 +97,11 @@
                 <div class="position-relative">
                     <img src="{{ mediafile.image.url }}" alt="{{ mediafile.name }} Thumbnail"
                         class="card-img-top " style="height: 200px; object-fit: cover;">
-                    <svg class="overlay-svg" ...> ... </svg>
                 </div>
             {% else %}
                 <div class="position-relative">
                     <img src="{% static 'img/noImage.jpg' %}" alt="Sin imagen"
                         class="card-img-top " style="height: 200px; object-fit: cover;">
-                    <svg class="overlay-svg" ...> ... </svg>
                 </div>
             {% endif %}
             </a>
