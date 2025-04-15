@@ -483,56 +483,72 @@ def safe_filename(name):
     name = re.sub(r'[\s]+', '_', name)
     return name.strip('_')
 
+
+
 def download_video(request):
     context = {}
 
     if request.method == 'POST':
         url = request.POST.get('url')
+        download_type = request.POST.get('download_type', 'video')
+
         if url:
             try:
                 output_dir = 'media'
                 if not os.path.exists(output_dir):
                     os.makedirs(output_dir)
 
-                # Verificar si ffmpeg está en PATH del sistema
-                ffmpeg_path = shutil.which('ffmpeg')
-                has_ffmpeg = ffmpeg_path is not None
+                ffmpeg_path = r'C:\ffmpeg\bin\ffmpeg.exe'  # Ajusta si usas Linux o macOS
 
-                # Obtener título y extensión sin descargar
+                # Obtener información del video sin descargar
                 with YoutubeDL({'quiet': True}) as ydl:
                     info = ydl.extract_info(url, download=False)
                     title = info.get('title', 'video')
-                    ext = info.get('ext', 'mp4')
+                    ext = 'mp3' if download_type == 'audio' else info.get('ext', 'mp4')
                     clean_title = safe_filename(title)
-                    final_filename = f"{clean_title}.{ext}"
+                    final_filename = f"{clean_title}_{download_type}.{ext}"
                     full_path = os.path.join(output_dir, final_filename)
 
-                # Si el archivo ya existe, no lo descarga de nuevo
+                # Si ya existe el archivo, no lo descargamos de nuevo
                 if os.path.exists(full_path):
-                    context.update({
-                        'title': title,
-                        'filename': final_filename,
-                        'already_downloaded': True
-                    })
+                    context['title'] = title
+                    context['filename'] = final_filename
+                    context['already_downloaded'] = True
                     return render(request, 'index/download.html', context)
 
-                # Opciones con ffmpeg
+                # Configuración base
                 ydl_opts = {
-                    'format': 'bestvideo+bestaudio/best',
+                    'ffmpeg_location': ffmpeg_path,
                     'noplaylist': True,
-                    'outtmpl': os.path.join(output_dir, '%(title).100s.%(ext)s'),
                     'quiet': True,
                     'nooverwrites': True,
                     'nopart': True,
+                    'outtmpl': os.path.join(output_dir, '%(title).100s.%(ext)s'),
                 }
 
-                if has_ffmpeg:
-                    ydl_opts['ffmpeg_location'] = ffmpeg_path
+                if download_type == 'audio':
+                    ydl_opts.update({
+                        'format': 'bestaudio',
+                        'postprocessors': [{
+                            'key': 'FFmpegExtractAudio',
+                            'preferredcodec': 'mp3',
+                            'preferredquality': '192',
+                        }]
+                    })
+                else:
+                    ydl_opts.update({
+                        'format': 'bestvideo+bestaudio/best',
+                    })
 
+                # Intentar descargar
                 try:
                     with YoutubeDL(ydl_opts) as ydl:
                         info = ydl.extract_info(url, download=True)
                         downloaded_file = ydl.prepare_filename(info)
+
+                        # Si es audio, cambiar nombre manualmente a .mp3
+                        if download_type == 'audio':
+                            downloaded_file = os.path.splitext(downloaded_file)[0] + '.mp3'
 
                         if os.path.exists(downloaded_file) and downloaded_file != full_path:
                             os.rename(downloaded_file, full_path)
@@ -541,27 +557,28 @@ def download_video(request):
                         context['filename'] = final_filename
 
                 except Exception as e:
-                    # Si falla (por ffmpeg u otro), intenta con solo 'best'
+                    # Fallback sin ffmpeg o sin mezcla
                     fallback_opts = {
-                        'format': 'best',
+                        'format': 'bestaudio' if download_type == 'audio' else 'best',
                         'noplaylist': True,
                         'quiet': True,
                         'outtmpl': os.path.join(output_dir, '%(title).100s.%(ext)s'),
                         'nooverwrites': True,
                         'nopart': True,
                     }
+
                     with YoutubeDL(fallback_opts) as ydl:
                         info = ydl.extract_info(url, download=True)
                         downloaded_file = ydl.prepare_filename(info)
 
+                        if download_type == 'audio':
+                            downloaded_file = os.path.splitext(downloaded_file)[0] + '.mp3'
+
                         if os.path.exists(downloaded_file) and downloaded_file != full_path:
                             os.rename(downloaded_file, full_path)
 
-                        context.update({
-                            'title': title,
-                            'filename': final_filename,
-                            'used_fallback': True,
-                        })
+                        context['title'] = title
+                        context['filename'] = final_filename
 
             except Exception as e:
                 context['error'] = f"⚠️ Error al descargar: {str(e)}"
