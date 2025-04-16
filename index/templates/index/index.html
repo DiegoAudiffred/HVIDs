@@ -96,6 +96,8 @@
 
             <div class="card-body d-flex flex-column">
                 <h5 class="card-title">{{ mediafile.name }}</h5>
+                {% if mediafile.tipo_objeto == 'comic' or mediafile.tipo_objeto == 'mediafile' %}
+
                 <p class="card-text"><strong>Tipo:</strong> 
                     {% if mediafile.tipo_objeto == 'mediafile' %}
                         {% if mediafile.file %} Video {% else %} Imagen {% endif %}
@@ -110,6 +112,9 @@
                         <span class="badge bg-secondary">{{ tag.name }}</span>
                     {% endfor %}
                 </p>
+                {% else %}
+                asd
+                {% endif %}
             </div>
 
             {% if mediafile.tipo_objeto == 'mediafile' and mediafile.file %}

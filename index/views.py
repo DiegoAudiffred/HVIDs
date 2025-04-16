@@ -140,15 +140,15 @@ def adminPage(request):
 def navbarFilterHeader(request):
     thing_to_filter = request.GET.get('filter')
 
-    if thing_to_filter == "artistas":
+    if thing_to_filter == "Artistas":
         media_files = Artist.objects.all
-    elif thing_to_filter == "series":
+    elif thing_to_filter == "Series":
         media_files = Game.objects.all
-    elif thing_to_filter == "personajes":
+    elif thing_to_filter == "Personajes":
         media_files = Character.objects.all
-    elif thing_to_filter == "videos":
+    elif thing_to_filter == "Videos":
          media_files = MediaFile.objects.filter(isVideo=True).order_by('-uploaded_at')
-    elif thing_to_filter == "comics":
+    elif thing_to_filter == "Comics":
          media_files = Comic.objects.all
     else:
         media_files = MediaFile.objects.filter().order_by('-uploaded_at')
@@ -210,27 +210,36 @@ def autocomplete(request):
 
 def multi_search_results(request):
     query = request.GET.get("q", "").strip()
-    terms = query.split()  # Divide por espacios
-    media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
+    terms = query.split()
+    
     sidebar_context = get_sidebar_context()
-    results = MediaFile.objects.all()
+    media_files_all = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
+
+    media_results = MediaFile.objects.filter(hide=False)
+    comic_results = Comic.objects.filter(hide=False)
 
     for term in terms:
-        results = results.filter(
+        filters = (
             Q(name__icontains=term) |
             Q(artist__name__icontains=term) |
             Q(tags__name__icontains=term) |
             Q(game__name__icontains=term) |
             Q(character__name__icontains=term)
         )
+        media_results = media_results.filter(filters)
+        comic_results = comic_results.filter(filters)
 
-    results = results.distinct().order_by('-uploaded_at')
+    combined_results = sorted(
+        chain(media_results.distinct(), comic_results.distinct()),
+        key=lambda x: x.uploaded_at,
+        reverse=True
+    )
 
     context = {
-        'results': results,
+        'results': combined_results,
         'search_terms': terms,
-        'media_files': media_files,
-        **sidebar_context  
+        'media_files': media_files_all,  # si esto es solo para sidebar, puedes renombrarlo
+        **sidebar_context
     }
     return render(request, 'index/multi_search_results.html', context)
 
@@ -313,96 +322,39 @@ def watchContent(request, id):
     })
 
 
-def filteredByTag(request, string):
-    # Filtrar MediaFiles por el nombre del tag
-    if string == 'All':
-        media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
-        sidebar_context = get_sidebar_context()
-        context = {
-            'media_files': media_files,
-            **sidebar_context  # Unir el contexto de la sidebar
-        }   
+def filtered_media(request, filter_type, string):
+    sidebar_context = get_sidebar_context()
+    
+ 
 
-        return redirect('index:index')
+    filter_map = {
+        'tag': ('tags__name__icontains',),
+        'artist': ('artist__name__icontains',),
+        'character': ('character__name__icontains',),
+        'game': ('game__name__icontains',)
+    }
 
-    else: 
-        media_files = MediaFile.objects.filter(tags__name__icontains=string,hide=False).order_by('-uploaded_at')
-    # Obtener el contexto de la sidebar
-        sidebar_context = get_sidebar_context()
+    filters = filter_map.get(filter_type)
 
-        context = {
-            'media_files': media_files,
-            **sidebar_context  # Unir el contexto de la sidebar
-        }
-        return render(request, 'index/index.html', context)
+    if not filters:
+        return redirect('index:index')  # fallback por si el tipo es inválido
 
+    media_query = {filters[0]: string, 'hide': False}
+    media_files = MediaFile.objects.filter(**media_query).order_by('-uploaded_at')
+    comics = Comic.objects.filter(**media_query).order_by('-uploaded_at')
 
-def filteredByArtist(request, string):
-    # Filtrar MediaFiles por el nombre del tag
-    if string == 'All':
-        media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
-        sidebar_context = get_sidebar_context()
-        context = {
-            'media_files': media_files,
-            **sidebar_context  # Unir el contexto de la sidebar
-        }   
-
-        return redirect('index:index')    
-    else: 
-        media_files = MediaFile.objects.filter(artist__name__icontains=string, hide=False).order_by('-uploaded_at')
-    # Obtener el contexto de la sidebar
-        sidebar_context = get_sidebar_context()
-
-        context = {
-            'media_files': media_files,
-            **sidebar_context  # Unir el contexto de la sidebar
-        }
-        return render(request, 'index/index.html', context)
-
-
-def filteredByCharacter(request, string):
-
-  
-        media_files = MediaFile.objects.filter(character__name__icontains=string, hide=False).order_by('-uploaded_at')
-        
-        comics = Comic.objects.filter(character__name__icontains=string, hide=False).order_by('-uploaded_at')
-
-    # Combinar y ordenar todos por fecha de subida
-        combined_media = sorted(
+    combined_media = sorted(
         chain(media_files, comics),
         key=lambda x: x.uploaded_at,
         reverse=True
     )
-    # Obtener el contexto de la sidebar
-        sidebar_context = get_sidebar_context()
-        context = {
-            'media_files': combined_media,
-            **sidebar_context  # Unir el contexto de la sidebar
-        }
-        return render(request, 'index/index.html', context)
 
-def filteredByGame(request, string):
+    context = {
+        'media_files': combined_media,
+        **sidebar_context
+    }
+    return render(request, 'index/index.html', context)
 
-    # Filtrar MediaFiles por el nombre del tag
-    if string == 'All':
-        media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
-        sidebar_context = get_sidebar_context()
-        context = {
-            'media_files': media_files,
-            **sidebar_context  # Unir el contexto de la sidebar
-        }   
-
-        return redirect('index:index')
-    else: 
-        media_files = MediaFile.objects.filter(game__name__icontains=string, hide=False).order_by('-uploaded_at')
-    # Obtener el contexto de la sidebar
-        sidebar_context = get_sidebar_context()
-
-        context = {
-            'media_files': media_files,
-            **sidebar_context  # Unir el contexto de la sidebar
-        }
-        return render(request, 'index/index.html', context)
 
 import mimetypes
 
@@ -458,19 +410,6 @@ def upload_comic(request):
 
 
 
-import os
-import re
-import shutil
-from django.shortcuts import render
-from yt_dlp import YoutubeDL
-
-# 🔐 Función para limpiar nombres de archivo (evita errores en Windows)
-def safe_filename(name):
-    # Elimina caracteres no seguros
-    name = re.sub(r'[^\w\s-]', '', name)
-    # Reemplaza espacios con guiones bajos
-    name = re.sub(r'[\s]+', '_', name)
-    return name.strip('_')
 
 
 import os

@@ -82,7 +82,7 @@
                 <label for="imageInput2" style="cursor: pointer;">
                     <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="2">
                   </label>
-                  <input type="file" name="image2" id="imageInput2" accept="image/*" class="d-none imageInput" data-preview-id="2">
+                  <input type="file" name="image" id="imageInput2" accept="image/*" class="d-none imageInput" data-preview-id="2">
             </div>                
             <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
                 <div class="my-2">
@@ -158,12 +158,27 @@
                 <h1>Agregar un nuevo Juego</h1>
             </div>  
             <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
-                {{ formGame.name }}
+              
+                <label for="imageInput3" style="cursor: pointer;">
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="3">
+                  </label>
+                  <input type="file" name="image" id="imageInput3" accept="image/*" class="d-none imageInput" data-preview-id="3">
+
+                                
+                
             </div>
-        
             <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
-                <button type="submit" class="btn  fw-bold w-100 bg-primary text-cuarto">Agregar Juego</button>
-            </div> 
+                <div class="my-2">
+                    {{ formGame.name }}
+
+                </div>
+                    <div class="my-2">
+                        <button type="submit" class="btn  fw-bold w-100 bg-primary text-cuarto">Agregar Juego</button>
+
+                    </div>
+            </div>
+             
+             
         </div>
     </form>
     

@@ -121,10 +121,24 @@ $theme-colors: (
     font-weight: normal;
     font-style: normal;
   }
+  @font-face {
+    font-family: 'BubbleSans';
+    src: url('/static/fonts/BubbleSans-Regular.otf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
   
   // ====== TIPOGRAFÍA ======
   
   // Estilo regular con peso fuerte (bold visual)
+  .fnBubbleSansRegular {
+    font-family: 'BubbleSans', sans-serif;
+    font-style: normal;
+    font-weight: 700; 
+    font-size: 15px;
+    line-height: 20px;
+  }
+
   .fnBadComicRegular {
     font-family: 'BadComic', sans-serif;
     font-style: normal;
@@ -190,184 +204,9 @@ $theme-colors: (
     color: #555;
   }
   
-
-.fnTexto_Ravioli {
-    font-family: 'VanillaRavioli_Demo', ;
-    font-style: italic;
-    font-weight: 700;
-    font-size: 15px;
-    line-height: 20px;
-}
-
-.fnTexto_Bold_Encabezado_005 {
-    font-family: 'Manrope-Bold', sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 11px;
-    line-height: 15px;
-}
-
-.fnTexto_Bold_Encabezado_003 {
-    font-family: 'Manrope-Bold', sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 25px;
-}
-
-.fnTexto_Bold_Encabezado_004 {
-    font-family: 'Manrope-Bold', sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 14px;
-    line-height: 19px;
-}
-
-.fnTexto_ExtraBold_Encabezados_001 {
-    font-family: 'Manrope-ExtraBold', sans-serif;
-    font-style: normal;
-    font-weight: 800;
-    font-size: 17px;
-    line-height: 23px;
-}
-
-.fnTexto_Regular_Encabezado {
-    font-family: 'Manrope-Regular', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 17px;
-    line-height: 23px;
-}
-
-.fnTexto_Bold_Encabezado_006 {
-    font-family: 'Manrope-Bold', sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 23px;
-    line-height: 20px;
-}
-
-.fnTexto_Bold_Encabezado_002 {
-    font-family: 'Manrope-Bold', sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 29px;
-    line-height: 20px;
-}
-
-.fnTexto_Medium_Encabezado_004 {
-    font-family: 'Manrope-Medium', sans-serif;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 29px;
-    line-height: 20px;
-}
-
-.fnTexto_Bold_Encabezado_007 {
-    font-family: 'Manrope-Bold', sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 38px;
-    line-height: 40px;
-}
-
-.fnTexto_Extrabold_Encabezado_002 {
-    font-family: 'Manrope-ExtraBold', sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 38px;
-    line-height: 40px;
-}
-
-.fnTexto_Bold_Encabezado_001 {
-    font-family: 'Manrope-Bold', sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 48px;
-    line-height: 66px;
-}
-
-.fnTexto_Bold_Gigante_001 {
-    font-family: 'Manrope-Bold', sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 96px;
-    line-height: 131px;
-}
-
-//Texts
-.fnTexto_Medium_Cuerpo_003 {
-    font-family: 'Manrope-Medium', sans-serif;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 10px;
-    line-height: 14px;
-}
-
-.fnTexto_Medium_Cuerpo_002 {
-    font-family: 'Manrope-Medium', sans-serif;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 11px;
-    line-height: 15px;
-}
-
-.fnTexto_Light_Dinamico_001 {
-    font-family: 'Manrope-Light', sans-serif;
-    font-style: normal;
-    font-weight: 200;
-    font-size: 11px;
-    line-height: 17px;
-}
-
-.fnTexto_Light_Dinamico_004 {
-    font-family: 'Manrope-Light', sans-serif;
-    font-style: normal;
-    font-weight: 200;
-    font-size: 11px;
-    line-height: 15px;
-}
-
-.fnTexto_Light_Dinamico_003 {
-    font-family: 'Manrope-Light', sans-serif;
-    font-style: normal;
-    font-weight: 200;
-    font-size: 12px;
-    line-height: 16px;
-}
-
-.fnTexto_Medium_Cuerpo_004 {
-    font-family: 'Manrope-Medium', sans-serif;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 20px;
-}
-
-.fnTexto_SemiBold_Dinamico_001 {
-    font-family: 'Manrope-SemiBold', sans-serif;
-    font-style: normal;
-    font-weight: 600;
-    font-size: 23px;
-    line-height: 20px;
-}
-
-.fnTexto_Light_Dinamico_002 {
-    font-family: 'Manrope-Light', sans-serif;
-    font-style: normal;
-    font-weight: 200;
-    font-size: 29px;
-    line-height: 40px;
-}
-
-.fnTexto_Medium_Cuerpo_001 {
-    font-family: 'Manrope-Medium', sans-serif;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 38px;
-    line-height: 40px;
-}
-
+ 
+  
+ 
 // Add custom code before this
 
 $form-select-color: $corporateGray900;

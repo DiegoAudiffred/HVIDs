@@ -62,14 +62,13 @@
 }
 
   </style>
-<h2>Resultados para: "{{ search_terms }}"</h2>
 
 <div class="row ">
     {% if not results%}
 
     <h1>Nada que mostrar</h1>
     {% endif %}
-    {% for mediafile in media_files %}
+    {% for mediafile in results %}
     <div class="col-md-4 my-2">
         <div class="card h-100">
 
