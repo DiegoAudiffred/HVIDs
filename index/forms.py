@@ -152,10 +152,10 @@ class addUserForm(forms.ModelForm):
 class addGameForm(forms.ModelForm):
     class Meta:
         model = Game
-        fields = ['name']
+        fields = ['name','image']
     def __init__(self, *args, **kwargs):
             super(addGameForm, self).__init__(*args, **kwargs)
 
             self.fields['name'].required = True
             self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del juego', 'rows': '1'})
-          
+         

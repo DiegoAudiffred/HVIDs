@@ -19,12 +19,12 @@
     <!-- Aquí puedes añadir estilos específicos de la página -->
     {% endblock %}
 </head>
-<body class="d-flex flex-column min-vh-100 bg-cuarto">
+<body class="d-flex flex-column min-vh-100 bg-cuarto fnBubbleSansRegular">
     {% include 'layout/navbar.html' %}
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-2 bg-light d-none d-md-block my-0 px-4 py-4 border-end border-bottom border-3 border-tercero min-vh-100">
+            <div class="col-md-3 bg-light d-none d-md-block my-0 px-4 py-4 border-end border-bottom border-3 border-tercero min-vh-100">
                 {% block sidebar %}
                     {% include 'index/sideBar.html' %}
                 {% endblock %}
@@ -32,7 +32,7 @@
             
 
             <!-- Main Content -->
-            <div class="col-md-10 col-12 my-4 px-4 ">
+            <div class="col-md-9 col-12 my-4 px-4 ">
                 <main class="bg-cuarto">
                     {% block body %}
                     

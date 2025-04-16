@@ -10,10 +10,8 @@ app_name = "index"
 
 urlpatterns = [
     path("", views.index, name='index'),
-    path("filteredByTag/<str:string>", views.filteredByTag, name='filteredByTag'),
-    path("filteredByArtist/<str:string>", views.filteredByArtist, name='filteredByArtist'),
-    path("filteredByCharacter/<str:string>", views.filteredByCharacter, name='filteredByCharacter'),
-    path("filteredByGame/<str:string>", views.filteredByGame, name='filteredByGame'),
+    path('filtrar/<str:filter_type>/<str:string>/', views.filtered_media, name='filtered_media'),
+
 
     path("uploadElement/", views.uploadElement, name='uploadElement'),
     path("show/", views.show, name='show'),
