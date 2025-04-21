@@ -429,8 +429,9 @@ def uploadElement(request):
             form.save_m2m()
 
             # Procesar tags
+            
             tags_raw = request.POST.get('tags_selected', '')
-            tag_names = [t.strip() for t in tags_raw.split(',') if t.strip()]
+            tag_names = [t.strip().upper() for t in tags_raw.split(',') if t.strip()]
             for tag_name in tag_names:
                 tag_obj, _ = Tags.objects.get_or_create(name=tag_name)
                 media.tags.add(tag_obj)

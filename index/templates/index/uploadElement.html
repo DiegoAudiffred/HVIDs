@@ -215,6 +215,7 @@
             }
         });
     });
+
 </script>
 
 <!-- SCRIPT de mostrar formulario Comic/Video (opcional si manejas tabs) -->
@@ -316,6 +317,34 @@
         updateTagsUI();
         updateHiddenInput();
     }
+
+    function addTag(tag) {
+        tag = tag.trim();
+        if (tag === "" || selectedTags.includes(tag)) return;
+
+        selectedTags.push(tag);
+
+        const tagEl = document.createElement("span");
+        tagEl.className = "badge bg-primary px-3 py-2 rounded-pill d-flex align-items-center gap-1";
+        tagEl.innerHTML = `
+            ${tag}
+            <button type="button" class="btn-close btn-sm" aria-label="Eliminar"></button>
+        `;
+
+        tagEl.querySelector("button").addEventListener("click", () => {
+            tagEl.remove();
+            selectedTags = selectedTags.filter(t => t !== tag);
+            updateTagsSelectedInput();
+        });
+
+        tagContainer.appendChild(tagEl);
+        updateTagsSelectedInput();
+    }
+
+    function updateTagsSelectedInput() {
+        tagsSelectedInput.value = selectedTags.join(",");
+    }
+
 
     function updateTagsUI() {
         tagContainer.innerHTML = "";
