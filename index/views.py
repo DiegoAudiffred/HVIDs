@@ -362,8 +362,10 @@ def uploadElement(request):
     if request.method == 'POST':
         form = UploadElementForm(request.POST, request.FILES)
         if form.is_valid():
-            media = form 
-
+            media = form.save(commit=False)
+            media.user = request.user
+            media.save()
+            form.save_m2m()
        
             media.save()  
             
@@ -389,6 +391,7 @@ def uploadElement(request):
 
 
 def upload_comic(request):
+    print("jalowween")
     if request.method == 'POST':
         form = UploadComicForm(request.POST)
         images = request.FILES.getlist('images')  # nombre del input que sube las imágenes
@@ -396,6 +399,7 @@ def upload_comic(request):
         if form.is_valid():
             comic = form.save(commit=False)
             comic.image = images[0]
+            comic.user = request.user
             comic.save()
             form.save_m2m()
 

@@ -180,7 +180,8 @@ class Comic(models.Model):
     character= models.ManyToManyField(Character, blank=True)
     image = models.ImageField(upload_to='media_files/comicPortraits/', blank=True, null=True)
     isVideo = models.BooleanField(default=False)
-    
+    user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
+
     @property
     def tipo_objeto(self):
         return "comic"
