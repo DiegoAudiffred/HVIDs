@@ -13,7 +13,8 @@ urlpatterns = [
     path('filtrar/<str:filter_type>/<str:string>/', views.filtered_media, name='filtered_media'),
     path('media-stream/<str:filename>/', views.stream_video, name='media_stream'),
     path('tags-suggest/', views.tags_suggest, name='tags_suggest'),
-
+    path('get-items/<str:type>/', views.get_items, name='get_items'),
+    path('delete-item/<str:type>/<int:id>/', views.delete_item, name='delete_item'),
 
     path("uploadElement/", views.uploadElement, name='uploadElement'),
     path("show/", views.show, name='show'),
