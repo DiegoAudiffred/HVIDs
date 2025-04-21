@@ -540,6 +540,7 @@ def safe_filename(name):
 @login_required(login_url='/login/')  # ruta de la vista login
 def download_video(request):
     context = {}
+    sidebar_context = get_sidebar_context()
 
     if request.method == 'POST':
         url = request.POST.get('url')
@@ -635,5 +636,11 @@ def download_video(request):
 
             except Exception as e:
                 context['error'] = f"⚠️ Error al descargar: {str(e)}"
+            sidebar_context = get_sidebar_context()
 
+    context = {
+                 
+                 'context': context,
+                 **sidebar_context
+             }
     return render(request, 'index/download.html', context)
