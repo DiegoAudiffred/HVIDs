@@ -10,16 +10,16 @@ class UploadComicForm(forms.ModelForm):
             super(UploadComicForm, self).__init__(*args, **kwargs)
 
             self.fields['name'].required = True
-            self.fields['name'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+            self.fields['name'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
             self.fields['artist'].required = False
-            self.fields['artist'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+            self.fields['artist'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
             self.fields['game'].required = False
-            self.fields['game'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+            self.fields['game'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
             self.fields['character'].required = False
-            self.fields['character'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+            self.fields['character'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
             self.fields['tags'].required = False
             self.fields['tags'].widget = forms.CheckboxSelectMultiple()
@@ -31,9 +31,18 @@ class ComicPageForm(forms.ModelForm):
         fields = ['image', 'order']
 
 class UploadElementForm(forms.ModelForm):
+    tags = forms.ModelMultipleChoiceField(
+    queryset=Tags.objects.all(),
+    required=False,
+    widget=forms.SelectMultiple(attrs={
+            'class': 'form-control d-none',  # ocultamos el select
+            'id': 'id_tags_real'
+        })
+    )
     class Meta:
         model = MediaFile
         fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image']
+        
         widgets = {
             'file': forms.ClearableFileInput(attrs={'accept': 'video/*'}),
         }
@@ -41,22 +50,22 @@ class UploadElementForm(forms.ModelForm):
         super(UploadElementForm, self).__init__(*args, **kwargs)
 
         self.fields['name'].required = True
-        self.fields['name'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+        self.fields['name'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
         self.fields['artist'].required = False
-        self.fields['artist'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+        self.fields['artist'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
         self.fields['game'].required = False
-        self.fields['game'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+        self.fields['game'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
         self.fields['character'].required = False
-        self.fields['character'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+        self.fields['character'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
         self.fields['file'].required = True
-        self.fields['file'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2', 'placeholder': ' Archivo*', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1','type':'file', 'name':'file', 'accept':'video/*'})
+        self.fields['file'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Archivo*', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1','type':'file', 'name':'file', 'accept':'video/*'})
 
         self.fields['image'].required = False
-        self.fields['image'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-75 py-2 from-control', 'placeholder': ' Miniatura', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+        self.fields['image'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2 from-control', 'placeholder': ' Miniatura', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
      
 
         # Asegúrate de que el campo de tags está usando CheckboxSelectMultiple correctamente.
@@ -100,7 +109,7 @@ class addArtistForm(forms.ModelForm):
             super(addArtistForm, self).__init__(*args, **kwargs)
 
             self.fields['name'].required = True
-            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del artista', 'rows': '1'})
+            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2 ', 'placeholder': ' Introduce el nombre del artista', 'rows': '1'})
 
 class addCharsForm(forms.ModelForm):
     class Meta:
@@ -131,7 +140,7 @@ class addUserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'password']
+        fields = ['username', 'password','is_staff','is_superuser']
 
     def __init__(self, *args, **kwargs):
         super(addUserForm, self).__init__(*args, **kwargs)

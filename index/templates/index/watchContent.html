@@ -1,6 +1,8 @@
 {% extends 'layout/layout.html' %}
 {% load static %}
+{% load extras %}
 {% block body %}
+
 
 
 
@@ -8,32 +10,19 @@
     <h1>{{ mediafile.name }}</h1>
 
     <div class="media-container"> <!-- Video -->
- <!-- CSS -->
-<link href="https://vjs.zencdn.net/8.9.0/video-js.css" rel="stylesheet" />
+        <!-- CSS -->
+        <link href="https://vjs.zencdn.net/8.9.0/video-js.css" rel="stylesheet" />
 
-<video
-  id="my-video"
-  class="video-js vjs-default-skin w-100"
-  controls
-  preload="auto"
-  crossorigin="anonymous"
-  data-setup='{}'>
-  <source src="{{ mediafile.file.url }}" type="video/mp4" />
-  Tu navegador no soporta la reproducción de video.
-</video>
-
-<script>
-  const player = document.getElementById("my-video");
-  player.volume = 1.0;
-</script>
-
-<!-- JS -->
-<script src="https://vjs.zencdn.net/8.9.0/video.min.js"></script>
+        <video id="my-video" class="video-js vjs-default-skin w-100" controls preload="auto" crossorigin="anonymous"
+            data-setup='{}'>
+            <source src="{% url 'index:media_stream' mediafile.file.name|basename %}" type="video/mp4" />
+            Tu navegador no soporta la reproducción de video.
+        </video>
 
 
-       
+
     </div>
-   
+
     <div class="row">
         <p><strong>Uploaded At:</strong> {{ mediafile.uploaded_at }}</p>
         <p><strong>Tags:</strong>

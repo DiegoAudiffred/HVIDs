@@ -32,7 +32,7 @@
           <label for="download_type" class="fw-bold">Tipo de descarga:</label>
           <select name="download_type" id="download_type" class="form-select" required>
             <option value="video" selected>Video</option>
-            <option value="audio">Solo audio</option>
+            <option value="audio">Audio</option>
           </select>
         </div>
         
@@ -96,41 +96,42 @@
   
       if (form && loadingBar && downloadBtn && cancelBtn) {
         form.addEventListener("submit", async function (e) {
-          e.preventDefault();
-  
-          loadingBar.style.display = "block";
-          downloadBtn.disabled = true;
-          downloadBtn.innerText = "Descargando...";
-          cancelBtn.style.display = "inline-block";
-  
-          const url = form.querySelector('input[name="url"]').value;
-  
-          try {
-            const response = await fetch("", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "X-CSRFToken": csrfToken,
-              },
-              body: new URLSearchParams({ url })
-            });
-  
-            const html = await response.text();
-  
-            // Reemplaza el contenido actual por la nueva respuesta
-            const parser = new DOMParser();
-            const newDoc = parser.parseFromString(html, "text/html");
-            const newBody = newDoc.querySelector(".container");
-  
-            document.querySelector(".container").innerHTML = newBody.innerHTML;
-          } catch (err) {
-            alert("❌ Error inesperado. Verifica tu conexión o el video.");
-            loadingBar.style.display = "none";
-            downloadBtn.disabled = false;
-            downloadBtn.innerText = "Descargar";
-            cancelBtn.style.display = "none";
-          }
-        });
+  e.preventDefault();
+
+  loadingBar.style.display = "block";
+  downloadBtn.disabled = true;
+  downloadBtn.innerText = "Descargando...";
+  cancelBtn.style.display = "inline-block";
+
+  const url = form.querySelector('input[name="url"]').value;
+  const downloadType = form.querySelector('select[name="download_type"]').value;
+
+  try {
+    const response = await fetch("", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRFToken": csrfToken,
+      },
+      body: new URLSearchParams({ url, download_type: downloadType })
+    });
+
+    const html = await response.text();
+
+    const parser = new DOMParser();
+    const newDoc = parser.parseFromString(html, "text/html");
+    const newBody = newDoc.querySelector(".container");
+
+    document.querySelector(".container").innerHTML = newBody.innerHTML;
+  } catch (err) {
+    alert("❌ Error inesperado. Verifica tu conexión o el video.");
+    loadingBar.style.display = "none";
+    downloadBtn.disabled = false;
+    downloadBtn.innerText = "Descargar";
+    cancelBtn.style.display = "none";
+  }
+});
+
   
         cancelBtn.addEventListener("click", function () {
           location.reload(); // simplemente recarga para cancelar

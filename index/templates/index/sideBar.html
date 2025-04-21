@@ -1,22 +1,24 @@
 <style>
-   #autocompleteContainer div {
-     padding: 8px;
-     cursor: pointer;
-   }
-   #autocompleteContainer div:hover {
-     background-color: #f0f0f0;
-   }
-</style>
-<style>.shine-underline {
-  position: relative;
-  display: inline-block;
-  color: #000;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
+  #autocompleteContainer div {
+    padding: 8px;
+    cursor: pointer;
+  }
 
-/* Underline base (invisible hasta hover) */
-/*.shine-underline::after {
+  #autocompleteContainer div:hover {
+    background-color: #f0f0f0;
+  }
+</style>
+<style>
+  .shine-underline {
+    position: relative;
+    display: inline-block;
+    color: #000;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  /* Underline base (invisible hasta hover) */
+  /*.shine-underline::after {
   content: "";
   position: absolute;
   width: 100%;
@@ -38,151 +40,190 @@
   transition: transform 0.3s ease-out;
 }*/
 
-/* Efecto en hover: texto en arcoíris + underline animado */
-.shine-underline:hover {
-  background: linear-gradient(
-    to right,
-    #8B0000,  /* Rojo oscuro */
-    #ffd700   /* Amarillo */
-  );
-  background-size: 200% auto;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  animation: shine 3s linear infinite;
-  
-  
-}
-/* Underline animado cuando hay hover */
-.shine-underline:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
-}
+  /* Efecto en hover: texto en arcoíris + underline animado */
+  .shine-underline:hover {
+    background: linear-gradient(to right,
+        #8B0000,
+        /* Rojo oscuro */
+        #ffd700
+        /* Amarillo */
+      );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s linear infinite;
 
-/* Shine keyframes */
-@keyframes shine {
-  0% {
-    background-position: 200% center;
+
   }
-  100% {
-    background-position: -200% center;
+
+  /* Underline animado cuando hay hover */
+  .shine-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
   }
-}
+
+  /* Shine keyframes */
+  @keyframes shine {
+    0% {
+      background-position: 200% center;
+    }
+
+    100% {
+      background-position: -200% center;
+    }
+  }
 </style>
 
 
-   
-   
+
+
 <div class="sidebar d-none d-md-block border-primary-3">
 
-   <form id="multiSearchForm" method="GET" action="{% url 'index:multi_search_results' %}" class="position-relative my-3">
-      <div class="input-group">
-        <input type="text" id="multiSearchInput" name="q" class="form-control text-tercero border border-primary" placeholder="Buscar..." autocomplete="off">
-        <button class="btn btn-primary" type="submit">
-          🔍 
-        </button>
-      </div>
-      <div id="autocompleteContainer" class="border bg-white position-absolute z-3 w-100" style="display: none;"></div>
-    </form>
-    
-    
-   <h2 class="text-primary">Tags</h2>
-   {% if popular_tags %}
-
-  
-   {% for tag in popular_tags %}
-   <h4 class="px-3">
-      <a class="text-tercero shine-underline"  href="{% url 'index:filtered_media' 'tag' tag.name %}">{{ tag.name }}</a>
-   </h4>
-   {% endfor %}
-   {% else %}
-   <p class="text-tercero" style="font-size: 22px;"> No tags available.</p>
-   {% endif %}
-
-   <h2 class="text-primary">Artistas</h2>
-   {% if popular_artists %}
-  
-   {% for artist in popular_artists %}
-   <h4 class="px-3">
-      <a class="text-tercero shine-underline"  href="{% url 'index:filtered_media' 'artist' artist.name %}">{{ artist.name }}</a>
-
-   </h4>
-   {% endfor %}
-   {% else %}
-   <p class="text-tercero" style="font-size: 22px;"> No Artists available.</p>
-   {% endif %}
-
-   <h2 class="text-primary">Personajes</h2>
-   <!-- Añadir contenido adicional aquí -->
-   {% if popular_characters %}
- 
-   {% for character in popular_characters %}
-   <h4 class="px-3">
-      <a class="text-tercero shine-underline"  href="{% url 'index:filtered_media' 'character' character.name %}">{{ character.name }}</a>
-
-   </h4>
-   {% endfor %}
-   {% else %}
-   <p class="text-tercero" style="font-size: 22px;"> No characters available.</p>
-   {% endif %}
-
-   <h2 class="text-primary">Juegos</h2>
-   <!-- Añadir contenido adicional aquí -->
-   {% if popular_games %}
-  
-   {% for game in popular_games %}
-   <h4 class="px-3">
-      <a class="text-tercero shine-underline"  href="{% url 'index:filtered_media' 'game' game.name %}">{{ game.name }}</a>
-
-   </h4>
-   {% endfor %}
-   {% else %}
-   <p class="text-tercero" style="font-size: 22px;"> No characters available.</p>
-   {% endif %}
+  <form id="multiSearchForm" method="GET" action="{% url 'index:multi_search_results' %}"
+    class="position-relative mb-4">
+    <div class="input-group">
+      <input type="text" id="multiSearchInput" name="q" class="form-control text-tercero border border-primary"
+        placeholder="Buscar..." autocomplete="off">
+      <button class="btn btn-primary" type="submit">
+        🔍
+      </button>
+    </div>
+    <div id="autocompleteContainer" class="border bg-white position-absolute z-3 w-100" style="display: none;"></div>
+  </form>
 
 
+  <h2 class="text-primary">Tags</h2>
+  {% if popular_tags %}
 
-   <!-- Añadir contenido adicional aquí -->
+
+  {% for tag in popular_tags %}
+  <h4 class="px-3">
+    <a class="text-tercero shine-underline" href="{% url 'index:filtered_media' 'tag' tag.name %}">{{ tag.name }}</a>
+  </h4>
+  {% endfor %}
+  {% else %}
+  <p class="text-tercero" style="font-size: 22px;"> No tags available.</p>
+  {% endif %}
+
+  <h2 class="text-primary">Artistas</h2>
+  {% if popular_artists %}
+
+  {% for artist in popular_artists %}
+  <h4 class="px-3">
+    <a class="text-tercero shine-underline" href="{% url 'index:filtered_media' 'artist' artist.name %}">
+      {{ artist.name }}</a>
+
+  </h4>
+  {% endfor %}
+  {% else %}
+  <p class="text-tercero" style="font-size: 22px;"> No Artists available.</p>
+  {% endif %}
+
+  <h2 class="text-primary">Personajes</h2>
+  <!-- Añadir contenido adicional aquí -->
+  {% if popular_characters %}
+
+  {% for character in popular_characters %}
+  <h4 class="px-3">
+    <a class="text-tercero shine-underline" href="{% url 'index:filtered_media' 'character' character.name %}">{{
+      character.name }}</a>
+
+  </h4>
+  {% endfor %}
+  {% else %}
+  <p class="text-tercero" style="font-size: 22px;"> No characters available.</p>
+  {% endif %}
+
+  <h2 class="text-primary">Juegos</h2>
+  <!-- Añadir contenido adicional aquí -->
+  {% if popular_games %}
+
+  {% for game in popular_games %}
+  <h4 class="px-3">
+    <a class="text-tercero shine-underline" href="{% url 'index:filtered_media' 'game' game.name %}">{{ game.name }}</a>
+
+  </h4>
+  {% endfor %}
+  {% else %}
+  <p class="text-tercero" style="font-size: 22px;"> No characters available.</p>
+  {% endif %}
+
+
+
+  <!-- Añadir contenido adicional aquí -->
 </div>
 <script>
-   document.addEventListener('DOMContentLoaded', () => {
-     const input = document.getElementById('multiSearchInput');
-     const container = document.getElementById('autocompleteContainer');
-   
-     input.addEventListener('input', async () => {
-       const query = input.value.trim();
-       const terms = query.split(" ");
-       const lastTerm = terms[terms.length - 1];
-   
-       if (lastTerm.length < 1) {
-         container.style.display = 'none';
-         return;
-       }
-   
-       const response = await fetch(`/autocomplete/?term=${encodeURIComponent(lastTerm)}`);
-       const suggestions = await response.json();
-   
-       container.innerHTML = "";
-       suggestions.forEach(s => {
-         const div = document.createElement('div');
-         div.textContent = s;
-         div.addEventListener('click', () => {
-           terms[terms.length - 1] = s;
-           input.value = terms.join(" ") + " ";
-           container.style.display = 'none';
-         });
-         container.appendChild(div);
-       });
-   
-       container.style.display = suggestions.length ? 'block' : 'none';
-     });
-   
-     document.addEventListener('click', (e) => {
-       if (!container.contains(e.target) && e.target !== input) {
-         container.style.display = 'none';
-       }
-     });
-   });
-   </script>
-   
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('multiSearchInput');
+    const container = document.getElementById('autocompleteContainer');
+    let suggestions = [];
+    let selectedIndex = -1;
+
+    input.addEventListener('input', async () => {
+      const query = input.value.trim();
+      const terms = query.split(" ");
+      const lastTerm = terms[terms.length - 1];
+
+      if (lastTerm.length < 1) {
+        container.style.display = 'none';
+        return;
+      }
+
+      const response = await fetch(`/autocomplete/?term=${encodeURIComponent(lastTerm)}`);
+      suggestions = await response.json();
+
+      container.innerHTML = "";
+      selectedIndex = -1;
+
+      suggestions.forEach((s, index) => {
+        const div = document.createElement('div');
+        div.textContent = s;
+        div.tabIndex = 0;
+        div.addEventListener('click', () => {
+          terms[terms.length - 1] = s;
+          input.value = terms.join(" ") + " ";
+          container.style.display = 'none';
+          input.focus(); // Volver al input
+        });
+        container.appendChild(div);
+      });
+
+      container.style.display = suggestions.length ? 'block' : 'none';
+    });
+
+    input.addEventListener('keydown', (e) => {
+      const items = container.querySelectorAll('div');
+      if (e.key === 'Tab' && suggestions.length > 0) {
+        e.preventDefault();
+        if (selectedIndex === -1) selectedIndex = 0;
+        const terms = input.value.trim().split(" ");
+        terms[terms.length - 1] = suggestions[selectedIndex];
+        input.value = terms.join(" ") + " ";
+        container.style.display = 'none';
+        input.focus();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedIndex = (selectedIndex + 1) % suggestions.length;
+        highlight(items, selectedIndex);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedIndex = (selectedIndex - 1 + suggestions.length) % suggestions.length;
+        highlight(items, selectedIndex);
+      }
+    });
+
+    function highlight(items, index) {
+      items.forEach((item, i) => {
+        item.style.backgroundColor = i === index ? '#e0e0e0' : '';
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!container.contains(e.target) && e.target !== input) {
+        container.style.display = 'none';
+      }
+    });
+  });
+</script>

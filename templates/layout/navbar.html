@@ -8,7 +8,6 @@
     transition: transform 0.3s ease;
   }
 
-  /* Animación al cargar */
   .navbar-nav .nav-item {
     opacity: 0;
     transform: translateY(-30px);
@@ -16,14 +15,45 @@
   }
 
   /* Aparece uno tras otro */
-  .navbar-nav .nav-item:nth-child(1) { animation-delay: 0.1s; }
-  .navbar-nav .nav-item:nth-child(2) { animation-delay: 0.2s; }
-  .navbar-nav .nav-item:nth-child(3) { animation-delay: 0.3s; }
-  .navbar-nav .nav-item:nth-child(4) { animation-delay: 0.4s; }
-  .navbar-nav .nav-item:nth-child(5) { animation-delay: 0.5s; }
-  .navbar-nav .nav-item:nth-child(6) { animation-delay: 0.6s; }
-  .navbar-nav .nav-item:nth-child(7) { animation-delay: 0.7s; }
-  .navbar-nav .nav-item:nth-child(8) { animation-delay: 0.8s; }
+  .navbar-nav .nav-item:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+
+  .navbar-nav .nav-item:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .navbar-nav .nav-item:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  .navbar-nav .nav-item:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+
+  .navbar-nav .nav-item:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+
+  .navbar-nav .nav-item:nth-child(6) {
+    animation-delay: 0.6s;
+  }
+
+  .navbar-nav .nav-item:nth-child(7) {
+    animation-delay: 0.7s;
+  }
+
+  .navbar-nav .nav-item:nth-child(8) {
+    animation-delay: 0.8s;
+  }
+
+  .navbar-nav .nav-item:nth-child(9) {
+    animation-delay: 0.9s;
+  }
+
+  .navbar-nav .nav-item:nth-child(10) {
+    animation-delay: 1.0s;
+  }
 
   @keyframes slideDown {
     to {
@@ -34,83 +64,230 @@
 </style>
 
 
-<nav class="navbar navbar-expand-xxl navbar-dark bg-tercero">
+<nav class="navbar navbar-expand-xxl navbar-dark bg-tercero d-none d-lg-block">
   <div class="container-fluid px-4">
-    <a class="navbar-brand text-center text-primary fw-bold"  
-    href="{% url 'index:index' %}?show_all=true" 
-    style="font-size: 24px;">
-   <img id="logo" src="{% static 'img/LogoHvids.png' %}" 
-        alt="Previsualización" class="d-block" 
+    <a class="navbar-brand text-center text-primary fw-bold" href="{% url 'index:index' %}?show_all=true"
+      style="font-size: 24px;">
+      <img id="logo" src="{% static 'img/LogoHvids.png' %}" alt="Previsualización" class="d-block"
         style="max-width: 175px;" data-preview-id="2">
- </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item mx-1 px-3">
 
-            <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular" style="font-size: 25px;" href="{% url "index:index" %}">
-          <img src="{% static 'img/InicioLogo.png' %}" class="img-fluid mb-1" style="max-width: 75px; height:75px;">
-      Inicio</a>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item mx-1 ">
+
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            style="font-size: 25px;" href="{% url 'index:index' %}">
+            <img src="{% static 'img/InicioLogo.png' %}" class="img-fluid mb-1" style="max-width: 75px; height:75px;">
+            Inicio</a>
         </li>
 
-        <li class="nav-item mx-1 px-3">
-                      <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular" style="font-size: 25px;"href="{% url 'index:navbarFilterHeader' %}?filter=Artistas">
+        <li class="nav-item mx-1 ">
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Artistas">
 
             <img src="{% static 'img/AristLogo.png' %}" class="img-fluid mb-1" style="max-width: 75px; height: 75px;">
 
             Artistas</a>
         </li>
-        <li class="nav-item mx-1 px-3">
-          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=Series">
-                        <img src="{% static 'img/SeriesLogo.png' %}" class="img-fluid mb-1" style="max-width: 75px; height: 75px;">
-Series</a>
+        <li class="nav-item mx-1 ">
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=Series">
+            <img src="{% static 'img/SeriesLogo.png' %}" class="img-fluid mb-1" style="max-width: 75px; height: 75px;">
+            Series</a>
         </li>
-        <li class="nav-item mx-1 px-3">
-          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular" style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=Personajes">
-            <img src="{% static 'img/CharacterLogo.png' %}" class="img-fluid mb-1" style="max-width: 75px; height: 75px;">
+        <li class="nav-item mx-1 ">
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=Personajes">
+            <img src="{% static 'img/CharacterLogo.png' %}" class="img-fluid mb-1"
+              style="max-width: 75px; height: 75px;">
 
             Personajes</a>
         </li>
-        <li class="nav-item mx-1 px-3">
-          <a class="nav-link active text-sexto fw-bold fnBadComicRegular d-flex flex-column align-items-center" style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Videos">
-           
-          
-          <img src="{% static 'img/YoutubeLogo.png' %}" class="img-fluid mb-1" style="max-width: 75px; height: 75px;">
-          Videos
-        </a>
+        <li class="nav-item mx-1 ">
+          <a class="nav-link active text-sexto fw-bold fnBadComicRegular d-flex flex-column align-items-center"
+            style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Videos">
+
+
+            <img src="{% static 'img/videosLogoNew.png' %}" class="img-fluid mb-1"
+              style="max-width: 75px; height: 75px;">
+            Videos
+          </a>
         </li>
-        <li class="nav-item mx-1 px-3">
-          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular" style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Comics">
-            <img src="{% static 'img/ImageLogo.png' %}"  class="img-fluid mb-1" style="max-width: 75px; height: 75px;">
+        <li class="nav-item mx-1 ">
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Comics">
+            <img src="{% static 'img/ImageLogoNew.png' %}" class="img-fluid mb-1"
+              style="max-width: 75px; height: 75px;">
             Imagenes
           </a>
         </li>
-        
+        <li class="nav-item mx-1 ">
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            style="font-size: 25px;" href="{% url 'index:download_video' %}">
+            <img src="{% static 'img/YoutubeLogoNew.png' %}" class="img-fluid mb-1"
+              style="max-width: 75px; height: 75px;">
+            Descargar
+          </a>
+        </li>
+        <li class="nav-item mx-1 ">
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            style="font-size: 25px;" href="{% url 'index:uploadElement' %}">
+            <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid mb-1"
+              style="max-width: 75px; height: 75px;">
+            Subir
+          </a>
+        </li>
 
-<li class="nav-item mx-1 px-3">
-  <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular" style="font-size: 25px;" href="{% url 'index:download_video' %}">
-    <img src="{% static 'img/DownloadLogo.png' %}" class="img-fluid mb-1" style="max-width: 75px; height: 75px;">
-    Descargar
-  </a>
-</li>
-
-
-        
-        {% if user.is_superuser %}
-        <li class="nav-item mx-1 px-3">
-          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular" style="font-size: 25px;" href="{% url 'index:adminPage' %}">
-            <img src="{% static 'img/configurationLogo.png' %}" class="img-fluid mb-1" style="max-width: 75px; height: 75px;">
+        {% if user.is_superuser and user.is_staff %}
+        <li class="nav-item mx-1 ">
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            style="font-size: 25px;" href="{% url 'index:adminPage' %}">
+            <img src="{% static 'img/settingsLogoNew2.png' %}" class="img-fluid mb-1"
+              style="max-width: 75px; height: 75px;">
             Configuración
           </a>
         </li>
         {% endif %}
-        
+        {% if request.user.is_authenticated %}
+        <li class="nav-item mx-1 ">
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            style="font-size: 25px;" href="{% url 'login:logout' %}">
+            <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid mb-1" style="max-width: 75px; height: 75px;">
+            Salir
+          </a>
+        </li>
+        {% endif %}
+
+      </ul>
+
+    </div>
+  </div>
+</nav>
 
 
-      
+
+
+<nav class="navbar navbar-expand-xxl navbar-dark bg-tercero d-block d-lg-none">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand mx-auto text-center text-primary fw-bold" href="{% url 'index:index' %}?show_all=true"
+      style="font-size: 24px;">
+      <img id="logo" src="{% static 'img/LogoHvids.png' %}" alt="Previsualización" class="d-block"
+        style="max-width: 175px;" data-preview-id="2">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+        <ul class="navbar-nav row g-0">
+          <div class="row w-100 mx-0">
+            <li class="col-6 nav-item">
+              <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+                style="font-size: 25px;" href="{% url 'index:index' %}">
+                <img src="{% static 'img/InicioLogo.png' %}" class="img-fluid mb-1"
+                  style="max-width: 75px; height:75px;">
+                Inicio
+              </a>
+            </li>
+
+            <li class="col-6 nav-item">
+              <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+                style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Artistas">
+                <img src="{% static 'img/AristLogo.png' %}" class="img-fluid mb-1"
+                  style="max-width: 75px; height: 75px;">
+                Artistas
+              </a>
+            </li>
+
+            <li class="col-6 nav-item">
+              <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+                style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=Series">
+                <img src="{% static 'img/SeriesLogo.png' %}" class="img-fluid mb-1"
+                  style="max-width: 75px; height: 75px;">
+                Series
+              </a>
+            </li>
+
+            <li class="col-6 nav-item">
+              <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+                style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=Personajes">
+                <img src="{% static 'img/CharacterLogo.png' %}" class="img-fluid mb-1"
+                  style="max-width: 75px; height: 75px;">
+                Personajes
+              </a>
+            </li>
+
+            <li class="col-6 nav-item">
+              <a class="nav-link active text-sexto fw-bold fnBadComicRegular d-flex flex-column align-items-center"
+                style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Videos">
+                <img src="{% static 'img/videosLogoNew.png' %}" class="img-fluid mb-1"
+                  style="max-width: 75px; height: 75px;">
+                Videos
+              </a>
+            </li>
+
+            <li class="col-6 nav-item">
+              <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+                style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Comics">
+                <img src="{% static 'img/ImageLogoNew.png' %}" class="img-fluid mb-1"
+                  style="max-width: 75px; height: 75px;">
+                Imagenes
+              </a>
+            </li>
+
+            <li class="col-6 nav-item">
+              <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+                style="font-size: 25px;" href="{% url 'index:download_video' %}">
+                <img src="{% static 'img/YoutubeLogoNew.png' %}" class="img-fluid mb-1"
+                  style="max-width: 75px; height: 75px;">
+                Descargar
+              </a>
+            </li>
+
+            <li class="col-6 nav-item">
+              <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+                style="font-size: 25px;" href="{% url 'index:uploadElement' %}">
+                <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid mb-1"
+                  style="max-width: 75px; height: 75px;">
+                Subir
+              </a>
+            </li>
+
+            {% if user.is_superuser and user.is_staff %}
+            <li class="col-6 nav-item">
+              <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+                style="font-size: 25px;" href="{% url 'index:adminPage' %}">
+                <img src="{% static 'img/settingsLogoNew2.png' %}" class="img-fluid mb-1"
+                  style="max-width: 75px; height: 75px;">
+                Configuración
+              </a>
+            </li>
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+            <li class="col-6 nav-item">
+              <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+                style="font-size: 25px;" href="{% url 'login:logout' %}">
+                <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid mb-1"
+                  style="max-width: 75px; height: 75px;">
+                Salir
+              </a>
+            </li>
+            {% endif %}
+          </div>
+        </ul>
+
+      </div>
+
     </div>
   </div>
 </nav>

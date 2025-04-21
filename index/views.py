@@ -14,16 +14,45 @@ from pytube import YouTube
 import os
 from django.conf import settings
 # views.py
+from django.contrib.auth.decorators import login_required
 
 import mimetypes
+import os
+from django.http import FileResponse, HttpResponse, HttpResponseNotFound
+from django.conf import settings
+
+def stream_video(request, filename):
+    path = os.path.join(settings.MEDIA_ROOT, filename)
+
+    if not os.path.exists(path):
+        return HttpResponseNotFound("Archivo no encontrado")
+
+    range_header = request.headers.get('Range', '')
+    if range_header:
+        start, end = range_header.replace('bytes=', '').split('-')
+        start = int(start)
+        end = int(end) if end else os.path.getsize(path) - 1
+        length = end - start + 1
+
+        f = open(path, 'rb')
+        f.seek(start)
+        data = f.read(length)
+        response = HttpResponse(data, status=206, content_type='video/mp4')
+        response['Content-Range'] = f'bytes {start}-{end}/{os.path.getsize(path)}'
+        response['Accept-Ranges'] = 'bytes'
+        response['Content-Length'] = str(length)
+        return response
+
+    return FileResponse(open(path, 'rb'), content_type='video/mp4')
+
 def get_sidebar_context():
-    popular_tags = Tags.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
+    popular_tags = Tags.objects.annotate(num_mediafiles=Count('mediafile')+Count('comic')).order_by('-num_mediafiles')[:5]
 
-    popular_artists = Artist.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
+    popular_artists = Artist.objects.annotate(num_mediafiles=Count('mediafile')+Count('comic')).order_by('-num_mediafiles')[:5]
 
-    popular_characters = Character.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
+    popular_characters = Character.objects.annotate(num_mediafiles=Count('mediafile')+Count('comic')).order_by('-num_mediafiles')[:5]
     
-    popular_games = Game.objects.annotate(num_mediafiles=Count('mediafile')).order_by('-num_mediafiles')[:10]
+    popular_games = Game.objects.annotate(num_mediafiles=Count('mediafile')+Count('comic')).order_by('-num_mediafiles')[:5]
 
 
     #random_Tags = list(Tags.objects.all())
@@ -41,6 +70,7 @@ def get_sidebar_context():
 
 from itertools import chain
 
+@login_required(login_url='/login/')  # ruta de la vista login
 def index(request):
     user = request.user
 
@@ -83,6 +113,8 @@ def show(request):
     return redirect('index:index')  # Redirigir correctamente
 
 from django.shortcuts import redirect
+
+@login_required(login_url='/login/')  # ruta de la vista login
 
 def adminPage(request):
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
@@ -136,7 +168,7 @@ def adminPage(request):
     }
 
     return render(request, 'index/adminPage.html', context)
-    
+@login_required(login_url='/login/')  # ruta de la vista login  
 def navbarFilterHeader(request):
     thing_to_filter = request.GET.get('filter')
 
@@ -208,6 +240,7 @@ def autocomplete(request):
 #    }
 #    return render(request, 'index/multi_search_results.html', context)
 
+@login_required(login_url='/login/')  # ruta de la vista login
 def multi_search_results(request):
     query = request.GET.get("q", "").strip()
     terms = query.split()
@@ -252,6 +285,7 @@ def hide(request):
         med.save()  # Guardar cada instancia actualizada
     
     return redirect('index:index')  # Redirigir correctamente
+@login_required(login_url='/login/')  # ruta de la vista login
 
 def watchComic(request, id):
     comic = get_object_or_404(Comic, id=id)
@@ -282,6 +316,7 @@ def watchComic(request, id):
         'form': form,
         **sidebar_data
     })
+@login_required(login_url='/login/')  # ruta de la vista login
 
 def watchContent(request, id):
     mediafile = get_object_or_404(MediaFile, id=id)
@@ -292,8 +327,7 @@ def watchContent(request, id):
         if form.is_valid():
             comentario = form.save(commit=False)
             
-            # Asignar manualmente el usuario y el archivo mediaFile
-            comentario.usuario = request.user  # Suponiendo que el usuario está autenticado
+            comentario.usuario = request.user 
             comentario.mediaFileID = mediafile  # Obtener el archivo subido
 
             # Guardar el objeto Comentario con los campos adicionales
@@ -321,6 +355,32 @@ def watchContent(request, id):
         **sidebar_data,  # Integrar datos de la sidebar en el contexto de la vista
     })
 
+
+def stream_video(request, filename):
+    path = os.path.join(settings.MEDIA_ROOT, filename)
+
+    if not os.path.exists(path):
+        return HttpResponseNotFound("Archivo no encontrado")
+
+    range_header = request.headers.get('Range', '')
+    if range_header:
+        start, end = range_header.replace('bytes=', '').split('-')
+        start = int(start)
+        end = int(end) if end else os.path.getsize(path) - 1
+        length = end - start + 1
+
+        f = open(path, 'rb')
+        f.seek(start)
+        data = f.read(length)
+        response = HttpResponse(data, status=206, content_type='video/mp4')
+        response['Content-Range'] = f'bytes {start}-{end}/{os.path.getsize(path)}'
+        response['Accept-Ranges'] = 'bytes'
+        response['Content-Length'] = str(length)
+        return response
+
+    return FileResponse(open(path, 'rb'), content_type='video/mp4')
+
+@login_required(login_url='/login/')  # ruta de la vista login
 
 def filtered_media(request, filter_type, string):
     sidebar_context = get_sidebar_context()
@@ -357,6 +417,7 @@ def filtered_media(request, filter_type, string):
 
 
 import mimetypes
+@login_required(login_url='/login/')  # ruta de la vista login
 
 def uploadElement(request): 
     if request.method == 'POST':
@@ -366,16 +427,21 @@ def uploadElement(request):
             media.user = request.user
             media.save()
             form.save_m2m()
-       
-            media.save()  
-            
+
+            # Procesar tags
+            tags_raw = request.POST.get('tags_selected', '')
+            tag_names = [t.strip() for t in tags_raw.split(',') if t.strip()]
+            for tag_name in tag_names:
+                tag_obj, _ = Tags.objects.get_or_create(name=tag_name)
+                media.tags.add(tag_obj)
+
             return HttpResponseRedirect('/')
         else:
             print("Errores del formulario:", form.errors)
 
     else:
         form = UploadElementForm()
-    formComic=UploadComicForm()
+        formComic=UploadComicForm()
 
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
     sidebar_context = get_sidebar_context()
@@ -389,6 +455,16 @@ def uploadElement(request):
 
     return render(request, 'index/uploadElement.html', context)
 
+
+
+@login_required
+def tags_suggest(request):
+    q = request.GET.get('q', '')
+    tags = Tags.objects.filter(name__icontains=q).values_list('name', flat=True)[:10]
+    return JsonResponse(list(tags), safe=False)
+
+
+@login_required(login_url='/login/')  # ruta de la vista login
 
 def upload_comic(request):
     print("jalowween")
@@ -413,6 +489,39 @@ def upload_comic(request):
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
+# views.py
+
+
+def get_items(request, type):
+    model_map = {
+        'tags': Tags,
+        'artists': Artist,
+        'chars': Character,
+        'users': User,
+        'games': Game
+    }
+    Model = model_map.get(type)
+    if Model:
+        data = list(Model.objects.all().values('id', 'name'))
+        return JsonResponse(data, safe=False)
+    return JsonResponse({'error': 'Invalid type'}, status=400)
+
+
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+def delete_item(request, type, id):
+    model_map = {
+        'tags': Tags,
+        'artists': Artist,
+        'chars': Character,
+        'users': User,
+        'games': Game
+    }
+    Model = model_map.get(type)
+    if Model and request.method == 'DELETE':
+        Model.objects.filter(id=id).delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 
@@ -427,7 +536,7 @@ def safe_filename(name):
     return name.strip('_')
 
 
-
+@login_required(login_url='/login/')  # ruta de la vista login
 def download_video(request):
     context = {}
 
@@ -468,7 +577,7 @@ def download_video(request):
                     'nopart': True,
                     'outtmpl': os.path.join(output_dir, '%(title).100s.%(ext)s'),
                 }
-
+                print(download_type)
                 if download_type == 'audio':
                     ydl_opts.update({
                         'format': 'bestaudio',

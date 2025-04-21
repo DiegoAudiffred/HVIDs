@@ -1,0 +1,23 @@
+<!-- login.html -->
+{% extends 'layout/layout.html' %}
+{% load static %}
+
+{% block body %}
+
+<h2>Iniciar Sesión</h2>
+<form method="post">
+    {% csrf_token %}
+    <div>
+        {{ form.username.label_tag }}<br>
+        {{ form.username }}
+    </div>
+    <div>
+        {{ form.password.label_tag }}<br>
+        {{ form.password }}
+    </div>
+    <div>
+        <button type="submit">Ingresar</button>
+    </div>
+    <p style="color:red;">{{ msg }}</p>
+</form>
+{% endblock %}

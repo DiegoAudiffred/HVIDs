@@ -1,54 +1,66 @@
 <!-- uploadElement.html -->
 {% extends 'layout/layout.html' %}
 {% block body %}
+<style>
+    #tagSuggestions .suggestion-item:hover {
+        background-color: #f0f0f0;
+    }
+</style>
 
 <div class="container">
     <h1 class="py-4">Subir un Nuevo Elemento</h1>
     <div class="row pb-3">
-        <div class="col-6 text-center">
-            <button class="btn border-4 rounded-4 w-100 bg-primary text-cuarto fw-bold" id="comicBtn">Imagen/Galeria</button>
+        <div class="col-12 col-lg-6 text-center my-3 my-lg-0">
+            <button class="btn border-4 rounded-4 w-100 bg-primary text-cuarto fw-bold"
+                id="comicBtn">Imagen/Galería</button>
         </div>
-        <div class="col-6 text-center">
-            <button class="btn border-4 rounded-4 w-100 bg-secondary text-cuarto fw-bold" id="videoBtn">Video</button>
+        <div class="col-12 col-lg-6 text-center my-3 my-lg-0">
+            <button class="btn border-4 rounded-4 w-100 bg-secondary text-cuarto fw-bold"
+                id="videoBtn">Video/Canción</button>
         </div>
 
     </div>
 
 
     <!-- Formulario para Videos -->
-        <form method="post" enctype="multipart/form-data" id="videoForm" style="display:none">
-            
+    <form method="post" enctype="multipart/form-data" id="videoForm" style="display:none">
+
         {% csrf_token %}
         <div class="row p-2">
-            <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
+            <div class="col-md-3 col-12  my-auto ">
                 Titulo del video *
             </div>
-            <div class="col-9 my-auto">
+            <div class="col-md-9 col-12  my-auto">
                 {{ form.name }}
             </div>
         </div>
         <div class="row p-2">
 
-            <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
+            <div class="col-md-3 col-12  my-auto">
                 Artista/Actor
             </div>
-            <div class="col-9 my-auto">
+            <div class="col-md-9 col-12  my-auto">
                 {{ form.artist }}
             </div>
         </div>
         <div class="row p-2">
 
-            <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
+            <div class="col-3 my-auto">
                 Etiquetas
             </div>
-            <div class="col-9 my-auto">
-                {{ form.tags }}
+            <div class="col-9 my-auto position-relative">
+                <input type="text" id="tagInput" class="rounded-4 border-3 px-4 w-100 py-2"
+                    placeholder="Escribe una etiqueta y presiona Enter">
+                <div id="tagSuggestions" class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
+                </div>
+                <div id="tagContainer" class="mt-2 d-flex flex-wrap gap-2"></div>
             </div>
+
         </div>
 
         <div class="row p-2">
 
-            <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
+            <div class="col-3 my-auto">
                 Juego/Anime
             </div>
             <div class="col-9 my-auto">
@@ -58,7 +70,7 @@
 
         <div class="row p-2">
 
-            <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
+            <div class="col-3 my-auto">
                 Personaje
             </div>
             <div class="col-9 my-auto">
@@ -68,7 +80,7 @@
 
         <div class="row p-2">
 
-            <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
+            <div class="col-3 my-auto">
                 Link del Archivo *
             </div>
             <div class="col-9 my-auto">
@@ -77,7 +89,7 @@
         </div>
         <div class="row p-2">
 
-            <div class="col-3 my-auto" style="font-size: 20pt; font-style:italic; font-weight: 500;">
+            <div class="col-3 my-auto">
                 Miniatura
             </div>
             <div class="col-9 my-auto">
@@ -87,13 +99,15 @@
 
         <div class="row p-2 justify-content-end">
 
-            <div class="col-2 my-auto text-center" style="font-size: 20pt; font-style:italic; font-weight: 500;">
+            <div class="col-2 my-auto text-center">
                 <button type="submit" class="btn btn-primary py-2 px-4 w-100 fw-bold">Subir Video</button>
 
             </div>
 
         </div>
 </div>
+<input type="hidden" name="tags_selected" id="tagsSelected">
+
 </form>
 
 
@@ -171,6 +185,12 @@
             reader.readAsDataURL(file);
         }
     });
+    item.addEventListener("click", () => {
+        addTag(item.textContent);
+        tagInput.value = "";
+        tagSuggestions.classList.add("d-none");
+        tagInput.focus();  // 👈 volver a enfocar
+    });
 
     document.getElementById("comicForm").addEventListener("submit", function (e) {
         e.preventDefault();
@@ -188,10 +208,10 @@
             body: formData
         }).then(response => {
             if (response.ok) {
-            //    alert("Comic subido con éxito");
+                //    alert("Comic subido con éxito");
                 location.reload();
             } else {
-            //    alert("Error al subir el comic");
+                //    alert("Error al subir el comic");
             }
         });
     });
@@ -226,6 +246,99 @@
     });
 </script>
 
+<script>
+    const tagInput = document.getElementById("tagInput");
+    const tagSuggestions = document.getElementById("tagSuggestions");
+    const tagContainer = document.getElementById("tagContainer");
+    const tagsSelectedInput = document.getElementById("tagsSelected");
+
+    let selectedTags = [];
+    tagInput.addEventListener("keydown", (e) => {
+        const firstSuggestion = tagSuggestions.querySelector(".suggestion-item");
+
+        if ((e.key === "Enter" || e.key === "Tab") && tagInput.value.trim() !== "") {
+            e.preventDefault();
+            if (firstSuggestion) {
+                addTag(firstSuggestion.textContent);
+            } else {
+                addTag(tagInput.value.trim());
+            }
+            tagInput.value = "";
+            tagSuggestions.classList.add("d-none");
+            tagInput.focus();  // 👈 vuelve a enfocar para seguir escribiendo
+        }
+    });
+
+    tagInput.addEventListener("input", async () => {
+        const query = tagInput.value.trim();
+        if (query.length < 1) {
+            tagSuggestions.classList.add("d-none");
+            tagSuggestions.innerHTML = "";
+            return;
+        }
+
+        // Hacer fetch a las sugerencias de Django
+        const response = await fetch(`/tags-suggest/?q=${encodeURIComponent(query)}`);
+        const tags = await response.json();
+
+        tagSuggestions.innerHTML = "";
+        if (tags.length > 0) {
+            tagsSuggestionsHTML = tags.map(tag => `<div class="p-2 suggestion-item" style="cursor:pointer;">${tag}</div>`).join('');
+            tagSuggestions.innerHTML = tagsSuggestionsHTML;
+            tagSuggestions.classList.remove("d-none");
+
+            document.querySelectorAll('.suggestion-item').forEach(item => {
+                item.addEventListener("click", () => {
+                    addTag(item.textContent);
+                    tagInput.value = "";
+                    tagSuggestions.classList.add("d-none");
+                });
+            });
+        } else {
+            tagSuggestions.classList.add("d-none");
+        }
+    });
+
+    tagInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            const text = tagInput.value.trim();
+            if (text) addTag(text);
+            tagInput.value = "";
+            tagSuggestions.classList.add("d-none");
+        }
+    });
+
+    function addTag(text) {
+        if (selectedTags.includes(text)) return;
+
+        selectedTags.push(text);
+        updateTagsUI();
+        updateHiddenInput();
+    }
+
+    function updateTagsUI() {
+        tagContainer.innerHTML = "";
+        selectedTags.forEach(tag => {
+            const tagDiv = document.createElement("div");
+            tagDiv.className = "bg-primary text-white px-3 py-1 rounded-pill d-flex align-items-center";
+            tagDiv.innerHTML = `
+                ${tag}
+                <button type="button" class="btn-close btn-close-white btn-sm ms-2" aria-label="Close"></button>
+            `;
+            tagDiv.querySelector("button").addEventListener("click", () => {
+                selectedTags = selectedTags.filter(t => t !== tag);
+                updateTagsUI();
+                updateHiddenInput();
+            });
+            tagContainer.appendChild(tagDiv);
+        });
+    }
+
+    function updateHiddenInput() {
+        tagsSelectedInput.value = selectedTags.join(",");
+    }
+</script>
 
 
 
