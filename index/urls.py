@@ -11,6 +11,7 @@ app_name = "index"
 urlpatterns = [
     path("", views.index, name='index'),
     path('filtrar/<str:filter_type>/<str:string>/', views.filtered_media, name='filtered_media'),
+    path('media-stream/<str:filename>/', views.stream_video, name='media_stream'),
 
 
     path("uploadElement/", views.uploadElement, name='uploadElement'),

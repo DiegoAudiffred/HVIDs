@@ -35,23 +35,27 @@
                 <h1>Sección de administrador </h1>
             </div>
             <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
-                <button href="" class="btn adminLink border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="tags">Add tags</a>
+                <button href="" class="btn adminLink border border-3 dynamicQuery border-tercero px-4 py-2 text-center text-primary fw-bold w-100" data-type="tags" id="tags">Add tags</a>
 
             </div>
             <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
-                <button href="" class="btn adminLink border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="artists">Add artistas</a>
+                <button href="" class="btn adminLink border border-3 dynamicQuery border-tercero px-4 py-2 text-center text-primary fw-bold w-100" data-type="artists" id="artists">Add artistas</a>
 
             </div>
             <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
-                <button href="" class="btn adminLink border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="chars">Add chars</a>
+                <button href="" class="btn adminLink border border-3 dynamicQuery border-tercero px-4 py-2 text-center text-primary fw-bold w-100" data-type="chars" id="chars">Add chars</a>
 
             </div>
             <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
-                <button href="" class="btn adminLink border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="users">Add usuario</a>
+                <button href="" class="btn adminLink border border-3  border-tercero px-4 py-2 text-center text-primary fw-bold w-100" data-type="users" id="users">Add usuario</a>
             
             </div>
             <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
-                <button href="" class="btn adminLink border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" id="games">Add game</a>
+                <button href="" class="btn adminLink dynamicQuery border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" data-type="games" id="games">Add game</a>
+            
+            </div>
+            <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
+                <a href="{% url 'admin:index' %}" class="btn adminLink  border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" >Adminstracion</a>
             
             </div>
     </div>
@@ -139,13 +143,21 @@
             <div class="my-3">
                 <h1>Agregar un nuevo Usuario</h1>
             </div>  
-            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
+            <div class="col-md-2 mx-md-3 my-3 my-md-0 col-12 text-center">
                 {{ formUser.username }}
             </div>
-            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
+            <div class="col-md-2 mx-md-3 my-3 my-md-0 col-12 text-center">
                 {{ formUser.password }}
             </div>
-            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
+            <div class="col-md-2 mx-md-3 my-3 my-md-0 col-12 text-center">
+                Staff
+                {{ formUser.is_staff }}
+            </div>
+            <div class="col-md-2 mx-md-3 my-3 my-md-0 col-12 text-center">
+                Superusuario
+                {{ formUser.is_superuser }}
+            </div>
+            <div class="col-md-2 mx-md-3 my-3 my-md-0 col-12 text-center">
                 <button type="submit" class="btn  fw-bold w-100 bg-primary text-cuarto">Agregar Usuario</button>
             </div> 
         </div>
@@ -181,11 +193,60 @@
              
         </div>
     </form>
-    
+    <div id="dynamic-container" class="row mt-4">
+        <!-- Aquí se cargarán los tags/artistas/chars/etc -->
+      </div>
     
 </div>
 
-
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const buttons = document.querySelectorAll(".dynamicQuery");
+    
+      buttons.forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const type = btn.getAttribute("data-type");
+          const container = document.getElementById("dynamic-container");
+    
+          // Llama al backend (ajusta URL según tu framework)
+          const response = await fetch(`/get-items/${type}/`);
+          const items = await response.json();
+    
+          // Limpia el contenedor
+          container.innerHTML = "";
+    
+          // Muestra cada ítem
+          items.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "col-auto bg-primary border rounded-pill d-flex align-items-center px-4 py-2 m-2 text-white";
+            div.innerHTML = `
+              <span class="me-2">${item.name}</span>
+              <button class="btn-close btn-sm remove-tag" data-id="${item.id}" data-type="${type}"></button>
+            `;
+            container.appendChild(div);
+          });
+        });
+      });
+    
+      // Evento para eliminar (delegado)
+      document.getElementById("dynamic-container").addEventListener("click", async (e) => {
+        if (e.target.classList.contains("remove-tag")) {
+          const id = e.target.getAttribute("data-id");
+          const type = e.target.getAttribute("data-type");
+    
+          // Eliminar en el backend
+          await fetch(`/delete-item/${type}/${id}/`, {
+            method: "DELETE"
+          });
+    
+          // Eliminar del DOM
+          e.target.parentElement.remove();
+        }
+      });
+    });
+    </script>
+    
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
