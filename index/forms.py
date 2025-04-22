@@ -5,7 +5,7 @@ from db.models import *
 class UploadComicForm(forms.ModelForm):
     class Meta:
         model = Comic
-        fields = ['name', 'artist', 'tags', 'game', 'character','user']
+        fields = ['name', 'artist', 'tags', 'game', 'character','user','hide']
     def __init__(self, *args, **kwargs):
             super(UploadComicForm, self).__init__(*args, **kwargs)
 
@@ -41,7 +41,7 @@ class UploadElementForm(forms.ModelForm):
     )
     class Meta:
         model = MediaFile
-        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image']
+        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image','hide']
         
         widgets = {
             'file': forms.ClearableFileInput(attrs={'accept': 'video/*'}),

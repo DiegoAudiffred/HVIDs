@@ -15,7 +15,9 @@ import os
 from django.conf import settings
 # views.py
 from django.contrib.auth.decorators import login_required
-
+import os
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 import mimetypes
 import os
 from django.http import FileResponse, HttpResponse, HttpResponseNotFound
@@ -417,45 +419,86 @@ def filtered_media(request, filter_type, string):
 
 
 import mimetypes
-@login_required(login_url='/login/')  # ruta de la vista login
 
-def uploadElement(request): 
+@login_required(login_url='/login/')
+def uploadElement(request):
     if request.method == 'POST':
-        form = UploadElementForm(request.POST, request.FILES)
-        if form.is_valid():
-            media = form.save(commit=False)
-            media.user = request.user
-            media.save()
-            form.save_m2m()
+        form_type = request.POST.get('form_type')
 
-            # Procesar tags
-            
-            tags_raw = request.POST.get('tags_selected', '')
-            tag_names = [t.strip().upper() for t in tags_raw.split(',') if t.strip()]
-            for tag_name in tag_names:
-                tag_obj, _ = Tags.objects.get_or_create(name=tag_name)
-                media.tags.add(tag_obj)
+        if form_type == 'video':
+            form = UploadElementForm(request.POST, request.FILES)
+            if form.is_valid():
+                media = form.save(commit=False)
+                media.user = request.user
 
-            return HttpResponseRedirect('/')
-        else:
-            print("Errores del formulario:", form.errors)
+                uploaded_file = request.FILES['file']
+                original_name = uploaded_file.name
+                base_name, ext = os.path.splitext(original_name)
 
+                # Verifica si ya existe un archivo con ese nombre y añade _# si es necesario
+                final_name = original_name
+                count = 1
+                while default_storage.exists(f"{final_name}"):
+                    final_name = f"{base_name}_{count}{ext}"
+                    count += 1
+
+                # Guarda el archivo con el nombre final
+                path = default_storage.save(f"{final_name}", ContentFile(uploaded_file.read()))
+                media.file.name = path  # Actualiza la ruta del archivo en el modelo
+
+                media.save()
+                form.save_m2m()
+
+                # Procesar tags
+                tags_raw = request.POST.get('tags_selectedVideo', '')
+                tag_names = [t.strip().upper() for t in tags_raw.split(',') if t.strip()]
+                for tag_name in tag_names:
+                    tag_obj, _ = Tags.objects.get_or_create(name=tag_name)
+                    media.tags.add(tag_obj)
+
+                return redirect('index:index')
+
+        elif form_type == 'comic':
+            formComic = UploadComicForm(request.POST)
+            if formComic.is_valid():
+               # Después de validar y guardar el modelo Comic (formComic.is_valid()):
+                comic = formComic.save(commit=False)
+                comic.image = request.FILES.getlist('comicImages')[0]
+
+                comic.user = request.user
+                comic.save()
+                formComic.save_m2m()
+
+                # Guardar cada imagen subida
+                for image in request.FILES.getlist('comicImages'):
+                    ComicPage.objects.create(comic=comic, image=image)
+                    
+
+                # Guardar tags
+                tags_raw = request.POST.get('tags_selectedComic', '')
+                tag_names = [t.strip().upper() for t in tags_raw.split(',') if t.strip()]
+                for tag_name in tag_names:
+                    tag_obj, _ = Tags.objects.get_or_create(name=tag_name)
+                    comic.tags.add(tag_obj)
+
+                return redirect('index:index')
+
+        # Si llegamos aquí, hubo errores:
+        # re-render con errores
+        # (asegúrate de que `form` o `formComic` tenga el error)
     else:
         form = UploadElementForm()
-        formComic=UploadComicForm()
+        formComic = UploadComicForm()
 
-    media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
+    media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
     sidebar_context = get_sidebar_context()
 
-    context = {
+    return render(request, 'index/uploadElement.html', {
         'form': form,
-        'formComic':formComic,
+        'formComic': formComic,
         'media_files': media_files,
         **sidebar_context
-    }
-
-    return render(request, 'index/uploadElement.html', context)
-
+    })
 
 
 @login_required
@@ -463,31 +506,6 @@ def tags_suggest(request):
     q = request.GET.get('q', '')
     tags = Tags.objects.filter(name__icontains=q).values_list('name', flat=True)[:10]
     return JsonResponse(list(tags), safe=False)
-
-
-@login_required(login_url='/login/')  # ruta de la vista login
-
-def upload_comic(request):
-    print("jalowween")
-    if request.method == 'POST':
-        form = UploadComicForm(request.POST)
-        images = request.FILES.getlist('images')  # nombre del input que sube las imágenes
-
-        if form.is_valid():
-            comic = form.save(commit=False)
-            comic.image = images[0]
-            comic.user = request.user
-            comic.save()
-            form.save_m2m()
-
-            for idx, image in enumerate(images):
-                ComicPage.objects.create(comic=comic, image=image, order=idx)
-
-            return JsonResponse({'message': 'Comic subido con éxito'})
-        else:
-            return JsonResponse({'error': 'Formulario inválido', 'details': form.errors}, status=400)
-
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
 # views.py

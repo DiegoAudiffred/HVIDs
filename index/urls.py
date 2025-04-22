@@ -6,7 +6,7 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-app_name = "index"
+app_name = 'index'
 
 urlpatterns = [
     path("", views.index, name='index'),
@@ -26,8 +26,7 @@ urlpatterns = [
     path('buscar/', views.multi_search_results, name='multi_search_results'),
     path('multi-search/', views.multi_search_results, name='multi_search_results'),
     path('descargar/', views.download_video, name='download_video'),
-    #path('upload_comic/', views.upload_comic, name='upload_comic'),
-    path('upload/comic/', views.upload_comic, name='upload_comic'),
+    #path('upload/comic/', views.upload_comic, name='upload_comic'),
     path('comic/<int:id>/', views.watchComic, name='watchComic'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -2,144 +2,146 @@
 {% load static %}
 
 {% block body %}
-  <div class="container">
-    <h1>Descargar Video de YouTube</h1>
-    <form method="post" id="download-form">
-      <div class="row align-items-end ">
-        <div class="col-12 my-2">
-          <label for="url" class="fw-bold">URL del video de YouTube:</label>
-        </div>
-    
-        <div class="col-12 my-2">
-          {% csrf_token %}
-          <div class="d-flex w-100 gap-2">
-            <!-- Ícono SVG -->
-            <span class="d-flex justify-content-center" style="width: 50px; height: 50px;">
-              <svg height="50px" width="50px" viewBox="0 0 461.001 461.001" fill="#000000" xmlns="http://www.w3.org/2000/svg">
-                <path style="fill:#F61C0D;" d="M365.257,67.393H95.744C42.866,67.393,0,110.259,0,163.137v134.728
+<div class="container">
+  <h1>Descargar Video de YouTube</h1>
+  <form method="post" id="download-form">
+    <div class="row align-items-end ">
+      <div class="col-12 my-2">
+        <label for="url" class="fw-bold">URL del video de YouTube:</label>
+      </div>
+
+      <div class="col-12 my-2">
+        {% csrf_token %}
+        <div class="d-flex w-100 gap-2">
+          <!-- Ícono SVG -->
+          <span class="d-flex justify-content-center" style="width: 50px; height: 50px;">
+            <svg height="50px" width="50px" viewBox="0 0 461.001 461.001" fill="#000000"
+              xmlns="http://www.w3.org/2000/svg">
+              <path style="fill:#F61C0D;" d="M365.257,67.393H95.744C42.866,67.393,0,110.259,0,163.137v134.728
                 c0,52.878,42.866,95.744,95.744,95.744h269.513c52.878,0,95.744-42.866,95.744-95.744V163.137 
                 C461.001,110.259,418.135,67.393,365.257,67.393z M300.506,237.056l-126.06,60.123
                 c-3.359,1.602-7.239-0.847-7.239-4.568V168.607c0-3.774,3.982-6.22,7.348-4.514l126.06,63.881
-                C304.363,229.873,304.298,235.248,300.506,237.056z"/>
-              </svg>
-            </span>
-    
-            <!-- Input -->
-            <input class="form-control rounded-3 py-2 px-3 my-auto fnBadComicRegular" type="text" name="url" placeholder="https://youtube.com/..." required>
-          </div>
+                C304.363,229.873,304.298,235.248,300.506,237.056z" />
+            </svg>
+          </span>
+
+          <!-- Input -->
+          <input class="form-control rounded-3 py-2 px-3 my-auto fnBadComicRegular" type="text" name="url"
+            placeholder="https://youtube.com/..." required>
         </div>
-        <div class="col-md-6 col-12">
-          <label for="download_type" class="fw-bold">Tipo de descarga:</label>
-          <select name="download_type" id="download_type" class="form-select" required>
-            <option value="video" selected>Video</option>
-            <option value="audio">Audio</option>
-          </select>
-        </div>
-        
-        <div class="col-12 col-md-6 justify-content-center">
-          <button id="download-btn" type="submit" class="btn btn-primary px-4 fw-bold w-100">
-            Descargar
-          </button>
-          <button type="button" id="cancel-btn" class="btn btn-danger px-4 fw-bold ms-2" style="display: none;">
-            Cancelar
-          </button>
-        </div>
-    
-        <div class="col-12">
-          <div id="loading-bar" style="display: none;" class="my-3">
-            <p>⏳ Descargando video, por favor espera...</p>
-            <div class="progress">
-              <div id="progress-bar"
-                   class="progress-bar progress-bar-striped progress-bar-animated bg-success"
-                   role="progressbar"
-                   style="width: 100%">
-              </div>
+      </div>
+      <div class="col-md-6 col-12">
+        <label for="download_type" class="fw-bold">Tipo de descarga:</label>
+        <select name="download_type" id="download_type" class="form-select" required>
+          <option value="video" selected>Video</option>
+          <option value="audio">Audio</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-6 justify-content-center">
+        <button id="download-btn" type="submit" class="btn btn-primary px-4 fw-bold w-100">
+          Descargar
+        </button>
+        <button type="button" id="cancel-btn" class="btn btn-danger px-4 fw-bold ms-2" style="display: none;">
+          Cancelar
+        </button>
+      </div>
+
+      <div class="col-12">
+        <div id="loading-bar" style="display: none;" class="my-3">
+          <p>⏳ Descargando video, por favor espera...</p>
+          <div class="progress">
+            <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+              role="progressbar" style="width: 100%">
             </div>
           </div>
         </div>
       </div>
-    </form>
-    
-    {% if already_downloaded %}
-    <p>✅ El archivo ya estaba disponible: <a target="_blank" rel="noopener noreferrer"  href="/media/{{ filename }}">{{ filename }}</a></p>
+    </div>
+  </form>
+
+  {% if already_downloaded %}
+  <p>✅ El archivo ya estaba disponible: <a target="_blank" rel="noopener noreferrer" href="/media/{{ filename }}">{{
+      filename }}</a></p>
   {% elif used_fallback %}
-    <p>⚠️ Se descargó sin combinar audio y video porque ffmpeg no está disponible.</p>
+  <p>⚠️ Se descargó sin combinar audio y video porque ffmpeg no está disponible.</p>
   {% elif filename %}
-    <p>✅ Archivo descargado: <a target="_blank" rel="noopener noreferrer"  href="/media/{{ filename }}">{{ filename }}</a></p>
+  <p>✅ Archivo descargado: <a target="_blank" rel="noopener noreferrer" href="/media/{{ filename }}">{{ filename }}</a>
+  </p>
   {% elif error %}
-      <p style="color:red;">⚠️ {{ error }}</p>
-      <script>
-        document.addEventListener("DOMContentLoaded", function () {
-          const downloadBtn = document.getElementById("download-btn");
-          const cancelBtn = document.getElementById("cancel-btn");
-          const loadingBar = document.getElementById("loading-bar");
-    
-          if (downloadBtn && cancelBtn && loadingBar) {
-            downloadBtn.disabled = false;
-            downloadBtn.innerText = "Descargar";
-            cancelBtn.style.display = "none";
-            loadingBar.style.display = "none";
-          }
-        });
-      </script>
-    {% endif %}
-    
-   
-  </div>
+  <p style="color:red;">⚠️ {{ error }}</p>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const form = document.getElementById("download-form");
-      const loadingBar = document.getElementById("loading-bar");
       const downloadBtn = document.getElementById("download-btn");
       const cancelBtn = document.getElementById("cancel-btn");
-      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-  
-      if (form && loadingBar && downloadBtn && cancelBtn) {
-        form.addEventListener("submit", async function (e) {
-  e.preventDefault();
+      const loadingBar = document.getElementById("loading-bar");
 
-  loadingBar.style.display = "block";
-  downloadBtn.disabled = true;
-  downloadBtn.innerText = "Descargando...";
-  cancelBtn.style.display = "inline-block";
-
-  const url = form.querySelector('input[name="url"]').value;
-  const downloadType = form.querySelector('select[name="download_type"]').value;
-
-  try {
-    const response = await fetch("", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "X-CSRFToken": csrfToken,
-      },
-      body: new URLSearchParams({ url, download_type: downloadType })
-    });
-
-    const html = await response.text();
-
-    const parser = new DOMParser();
-    const newDoc = parser.parseFromString(html, "text/html");
-    const newBody = newDoc.querySelector(".container");
-
-    document.querySelector(".container").innerHTML = newBody.innerHTML;
-  } catch (err) {
-    alert("❌ Error inesperado. Verifica tu conexión o el video.");
-    loadingBar.style.display = "none";
-    downloadBtn.disabled = false;
-    downloadBtn.innerText = "Descargar";
-    cancelBtn.style.display = "none";
-  }
-});
-
-  
-        cancelBtn.addEventListener("click", function () {
-          location.reload(); // simplemente recarga para cancelar
-        });
+      if (downloadBtn && cancelBtn && loadingBar) {
+        downloadBtn.disabled = false;
+        downloadBtn.innerText = "Descargar";
+        cancelBtn.style.display = "none";
+        loadingBar.style.display = "none";
       }
     });
   </script>
-  
-    
-    
+  {% endif %}
+
+
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("download-form");
+    const loadingBar = document.getElementById("loading-bar");
+    const downloadBtn = document.getElementById("download-btn");
+    const cancelBtn = document.getElementById("cancel-btn");
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    if (form && loadingBar && downloadBtn && cancelBtn) {
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        loadingBar.style.display = "block";
+        downloadBtn.disabled = true;
+        downloadBtn.innerText = "Descargando...";
+        cancelBtn.style.display = "inline-block";
+
+        const url = form.querySelector('input[name="url"]').value;
+        const downloadType = form.querySelector('select[name="download_type"]').value;
+
+        try {
+          const response = await fetch("", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              "X-CSRFToken": csrfToken,
+            },
+            body: new URLSearchParams({ url, download_type: downloadType })
+          });
+
+          const html = await response.text();
+
+          const parser = new DOMParser();
+          const newDoc = parser.parseFromString(html, "text/html");
+          const newBody = newDoc.querySelector(".container");
+
+          document.querySelector(".container").innerHTML = newBody.innerHTML;
+        } catch (err) {
+          alert("❌ Error inesperado. Verifica tu conexión o el video.");
+          loadingBar.style.display = "none";
+          downloadBtn.disabled = false;
+          downloadBtn.innerText = "Descargar";
+          cancelBtn.style.display = "none";
+        }
+      });
+
+
+      cancelBtn.addEventListener("click", function () {
+        location.reload(); // simplemente recarga para cancelar
+      });
+    }
+  });
+</script>
+
+
+
 {% endblock %}
