@@ -18,6 +18,8 @@ urlpatterns = [
 
     path("uploadElement/", views.uploadElement, name='uploadElement'),
 
+path("detailsAbout/<str:filtro>/<str:valor>/", views.detailsAbout, name='detailsAbout'),
+
     path('adminPage/', views.adminPage, name='adminPage'),
     path("video/<int:id>/", views.watchContent, name='watchContent'),
     path("navbarFilterHeader/", views.navbarFilterHeader, name='navbarFilterHeader'),
@@ -27,5 +29,6 @@ urlpatterns = [
     path('descargar/', views.download_video, name='download_video'),
     #path('upload/comic/', views.upload_comic, name='upload_comic'),
     path('comic/<int:id>/', views.watchComic, name='watchComic'),
+    path('ajax/comment/<int:id>/', views.ajax_add_comment, name='ajax_add_comment'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

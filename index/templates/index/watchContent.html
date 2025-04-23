@@ -1,6 +1,5 @@
 {% extends 'layout/layout.html' %}
 {% load static %}
-{% load extras %}
 {% block body %}
 
 
@@ -44,7 +43,8 @@
             <div class="col-12">
                 <p>Agregar comentario</p>
             </div>
-            <form class="row" method="post" enctype="multipart/form-data">
+            <form class="row" method="post" id="comentarioForm">
+
                 {% csrf_token %}
                 <div class="col-9">
                     {{ form.comentario }}
@@ -54,47 +54,55 @@
                 </div>
             </form>
             <div class="col-12">
-                {% for comentario in comentarios %}
-                <div class="py-3 border-bottom">
-
-                    <p><a href="">{{ comentario.usuario }}</a> {{comentario.uploaded_at}}</p>
-
-
-                    <p>{{ comentario.comentario }}</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-    </div>
-
-    <div class="modal fade " id="imageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl ">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                    <!-- Carrusel -->
-
-
-
-                    {% for page in pages %}
-                    <img src="{{ page.file }}" class="d-block w-100" alt="Imagen">
-                    {% if loop.first %} active {% endif %}
-
+                <div id="comentariosContainer" class="col-12">
+                    {% for comentario in comentarios %}
+                    <div class="py-3 border-bottom">
+                        <p><a href="">{{ comentario.usuario }}</a> {{comentario.uploaded_at}}</p>
+                        <p>{{ comentario.comentario }}</p>
+                    </div>
                     {% endfor %}
-
-
                 </div>
 
             </div>
         </div>
+
     </div>
 
 
 
+
+    <script>
+        document.getElementById('comentarioForm').addEventListener('submit', function (e) {
+            e.preventDefault();  // Previene el envío tradicional
+
+            const form = e.target;
+            const formData = new FormData(form);
+
+            fetch("{% url 'index:ajax_add_comment' mediafile.id %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.error) {
+                        const nuevoComentario = `
+                        <div class="py-3 border-bottom">
+                            <p><a href="#">${data.usuario}</a> ${data.fecha}</p>
+                            <p>${data.texto}</p>
+                        </div>
+                    `;
+                        document.getElementById('comentariosContainer').innerHTML += nuevoComentario;
+                        form.reset();
+                    } else {
+                        alert('Hubo un error: ' + data.error);
+                    }
+                })
+                .catch(err => alert("Error al enviar el comentario."));
+        });
+    </script>
 
 
 
