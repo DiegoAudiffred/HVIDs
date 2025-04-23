@@ -1,3 +1,4 @@
+import datetime
 import random
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
@@ -23,29 +24,7 @@ import os
 from django.http import FileResponse, HttpResponse, HttpResponseNotFound
 from django.conf import settings
 
-def stream_video(request, filename):
-    path = os.path.join(settings.MEDIA_ROOT, filename)
 
-    if not os.path.exists(path):
-        return HttpResponseNotFound("Archivo no encontrado")
-
-    range_header = request.headers.get('Range', '')
-    if range_header:
-        start, end = range_header.replace('bytes=', '').split('-')
-        start = int(start)
-        end = int(end) if end else os.path.getsize(path) - 1
-        length = end - start + 1
-
-        f = open(path, 'rb')
-        f.seek(start)
-        data = f.read(length)
-        response = HttpResponse(data, status=206, content_type='video/mp4')
-        response['Content-Range'] = f'bytes {start}-{end}/{os.path.getsize(path)}'
-        response['Accept-Ranges'] = 'bytes'
-        response['Content-Length'] = str(length)
-        return response
-
-    return FileResponse(open(path, 'rb'), content_type='video/mp4')
 
 def get_sidebar_context():
     popular_tags = Tags.objects.annotate(num_mediafiles=Count('mediafile')+Count('comic')).order_by('-num_mediafiles')[:5]
@@ -358,11 +337,17 @@ def watchContent(request, id):
     })
 
 
-def stream_video(request, filename):
-    path = os.path.join(settings.MEDIA_ROOT, filename)
+def stream_video(request, id):
+    try:
+        media = MediaFile.objects.get(id=id)
+    except MediaFile.DoesNotExist:
+        return HttpResponseNotFound("Archivo no encontrado")
+
+    # Ruta absoluta en disco
+    path = os.path.join(settings.MEDIA_ROOT, media.file.name)
 
     if not os.path.exists(path):
-        return HttpResponseNotFound("Archivo no encontrado")
+        return HttpResponseNotFound("Archivo no encontrado en disco")
 
     range_header = request.headers.get('Range', '')
     if range_header:
@@ -371,9 +356,10 @@ def stream_video(request, filename):
         end = int(end) if end else os.path.getsize(path) - 1
         length = end - start + 1
 
-        f = open(path, 'rb')
-        f.seek(start)
-        data = f.read(length)
+        with open(path, 'rb') as f:
+            f.seek(start)
+            data = f.read(length)
+
         response = HttpResponse(data, status=206, content_type='video/mp4')
         response['Content-Range'] = f'bytes {start}-{end}/{os.path.getsize(path)}'
         response['Accept-Ranges'] = 'bytes'
@@ -381,6 +367,7 @@ def stream_video(request, filename):
         return response
 
     return FileResponse(open(path, 'rb'), content_type='video/mp4')
+
 
 @login_required(login_url='/login/')  # ruta de la vista login
 
@@ -434,17 +421,19 @@ def uploadElement(request):
                 uploaded_file = request.FILES['file']
                 original_name = uploaded_file.name
                 base_name, ext = os.path.splitext(original_name)
-
-                # Verifica si ya existe un archivo con ese nombre y añade _# si es necesario
-                final_name = original_name
+                
+                # Revisa si existe un archivo con el mismo nombre dentro del path de upload_to
+                upload_dir = datetime.datetime.now().now().strftime("media_files/%Y%m%d/")
+                final_name = f"{base_name}{ext}"
                 count = 1
-                while default_storage.exists(f"{final_name}"):
+                while default_storage.exists(os.path.join(upload_dir, final_name)):
                     final_name = f"{base_name}_{count}{ext}"
                     count += 1
+                
+                # Asigna el archivo con el nuevo nombre directamente al FileField
+                uploaded_file.name = final_name
+                media.file = uploaded_file
 
-                # Guarda el archivo con el nombre final
-                path = default_storage.save(f"{final_name}", ContentFile(uploaded_file.read()))
-                media.file.name = path  # Actualiza la ruta del archivo en el modelo
 
                 media.save()
                 form.save_m2m()
