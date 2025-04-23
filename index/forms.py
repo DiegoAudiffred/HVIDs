@@ -154,7 +154,7 @@ class addUserForm(forms.ModelForm):
 
         # Estilos personalizados para las checkboxes
         checkbox_style = {
-            'class': 'form-check-input fs-3 mx-2',  # Tamaño más grande con Bootstrap 5
+            'class': 'form-check-input fs-3 mx-2 my-0',  # Tamaño más grande con Bootstrap 5
             'style': 'transform: scale(1.5);'        # Agranda aún más la checkbox
         }
 

@@ -49,11 +49,10 @@
   }
 </style>
 <div class="container-fluid ">
-  <div class="row align-items-center ">
+  <div class="row align-items-center mt-4 ">
     <div class="col">
       <h1 class="text-primary">Subidos Recientemente</h1>
-      <a class="d-none" href="{% url 'index:show' %}">Show</a>
-      <a class="d-none" href="{% url 'index:hide' %}">Hide</a>
+
 
     </div>
     <div class="col-auto">
@@ -67,10 +66,10 @@
   <div class="row ">
     {% if not media_files%}
 
-    <h1>Nada que mostrar</h1>
+    <h3>Empieza por subir algo UwU</h3>
     {% endif %}
     {% for mediafile in media_files %}
-    <div class="col-12 col-lg-6 col-xl-4  my-2">
+    <div class="col-12 col-lg-6 col-xl-4 col-xxl-3  my-2">
       <div class="card h-100">
 
         {% if mediafile.tipo_objeto == 'comic' %}

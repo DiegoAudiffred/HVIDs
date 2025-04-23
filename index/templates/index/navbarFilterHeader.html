@@ -67,11 +67,12 @@
     }
 </style>
 <div class="container-fluid ">
-    <div class="row align-items-center ">
+    <div class="row align-items-center mt-4 ">
         <div class="col">
-            <h1 class="mb-4 text-primary">{{ filter_selected }} Recientes</h1>
+            <h1 class=" text-primary">{{ filter_selected }} Recientes</h1>
 
         </div>
+
     </div>
 
 
@@ -81,7 +82,7 @@
         <h1>Nada que mostrar</h1>
         {% endif %}
         {% for mediafile in media_files %}
-        <div class="col-12 col-lg-6 col-xl-4  my-2">
+        <div class="col-12 col-lg-6 col-xl-4 col-xxl-3  my-2">
             <div class="card h-100">
 
                 {% if mediafile.tipo_objeto == 'comic' %}
@@ -91,15 +92,17 @@
                         {% endif %}
 
                         {% if mediafile.image %}
-                        <div class="position-relative">
+                        <div class="position-relative" style="aspect-ratio: 1 / 1; overflow: hidden;">
                             <img src="{{ mediafile.image.url }}" alt="{{ mediafile.name }} Thumbnail"
-                                class="card-img-top " style="height: 200px; object-fit: cover;">
+                                class="card-img-top w-100 h-100" style="object-fit: cover;">
                         </div>
+
                         {% else %}
-                        <div class="position-relative">
-                            <img src="{% static 'img/noImage.jpg' %}" alt="Sin imagen" class="card-img-top "
-                                style="height: 200px; object-fit: cover;">
+                        <div class="position-relative" style="aspect-ratio: 1 / 1; overflow: hidden;">
+                            <img src="{% static 'img/noImage.jpg' %}" alt="Sin imagen" class="card-img-top w-100 h-100"
+                                style="object-fit: cover;">
                         </div>
+
                         {% endif %}
                     </a>
 
