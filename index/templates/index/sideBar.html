@@ -1,4 +1,14 @@
 <style>
+  #autocompleteContainer {
+    top: 100%;
+    /* aparece justo debajo del input */
+    left: 0;
+    z-index: 1050;
+    /* para asegurarte que se superponga incluso a tooltips, etc */
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
   #autocompleteContainer div {
     padding: 8px;
     cursor: pointer;
@@ -94,65 +104,68 @@
   </form>
 
 
-  <h2 class="text-primary">Tags</h2>
+  <h3 class="text-primary">Tags</h3>
   {% if popular_tags %}
 
 
   {% for tag in popular_tags %}
-  <h4 class="px-3">
-    <a class="text-tercero shine-underline" href="{% url 'index:filtered_media' 'tag' tag.name %}">{{ tag.name }}</a>
+  <h4 class="px-3 text-truncate" style="max-width: 100%;">
+    <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
+      href="{% url 'index:filtered_media' 'tag' tag.name %}">
+      {{ tag.name }}
+    </a>
   </h4>
   {% endfor %}
+
   {% else %}
-  <p class="text-tercero" style="font-size: 22px;"> No tags available.</p>
+  <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin tags.</h5>
   {% endif %}
 
-  <h2 class="text-primary">Artistas</h2>
+  <h3 class="text-primary">Artistas</h3>
   {% if popular_artists %}
 
   {% for artist in popular_artists %}
-  <h4 class="px-3">
-    <a class="text-tercero shine-underline" href="{% url 'index:filtered_media' 'artist' artist.name %}">
+  <h4 class="px-3 text-truncate" style="max-width: 100%;">
+    <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
+      href="{% url 'index:filtered_media' 'artist' artist.name %}">
       {{ artist.name }}</a>
 
   </h4>
   {% endfor %}
   {% else %}
-  <p class="text-tercero" style="font-size: 22px;"> No Artists available.</p>
+  <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin artistas.</h5>
   {% endif %}
 
-  <h2 class="text-primary">Personajes</h2>
+  <h3 class="text-primary">Personajes</h3>
   <!-- Añadir contenido adicional aquí -->
   {% if popular_characters %}
 
   {% for character in popular_characters %}
-  <h4 class="px-3">
-    <a class="text-tercero shine-underline" href="{% url 'index:filtered_media' 'character' character.name %}">{{
-      character.name }}</a>
+  <h4 class="px-3 text-truncate" style="max-width: 100%;">
+    <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
+      href="{% url 'index:filtered_media' 'character' character.name %}">{{ character.name }}</a>
 
   </h4>
   {% endfor %}
   {% else %}
-  <p class="text-tercero" style="font-size: 22px;"> No characters available.</p>
+  <h5 class="d-inline-block text-tercero text-truncate w-100">Sin Personajes.</h5>
   {% endif %}
 
-  <h2 class="text-primary">Juegos</h2>
+  <h3 class="text-primary">Juegos</h3>
   <!-- Añadir contenido adicional aquí -->
   {% if popular_games %}
 
   {% for game in popular_games %}
-  <h4 class="px-3">
-    <a class="text-tercero shine-underline" href="{% url 'index:filtered_media' 'game' game.name %}">{{ game.name }}</a>
+  <h4 class="px-3 text-truncate" style="max-width: 100%;">
+    <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
+      href="{% url 'index:filtered_media' 'game' game.name %}">
+      {{ game.name }}</a>
 
   </h4>
   {% endfor %}
   {% else %}
-  <p class="text-tercero" style="font-size: 22px;"> No characters available.</p>
+  <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin juegos.</h5>
   {% endif %}
-
-
-
-  <!-- Añadir contenido adicional aquí -->
 </div>
 <script>
   document.addEventListener('DOMContentLoaded', () => {

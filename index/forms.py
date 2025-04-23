@@ -140,16 +140,26 @@ class addUserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'password','is_staff','is_superuser']
+        fields = ['username', 'password', 'is_staff', 'is_superuser']
 
     def __init__(self, *args, **kwargs):
         super(addUserForm, self).__init__(*args, **kwargs)
+
         self.fields['username'].required = True
         self.fields['username'].widget.attrs.update({
             'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
             'placeholder': 'Introduce el nombre del usuario',
             'rows': '1'
         })
+
+        # Estilos personalizados para las checkboxes
+        checkbox_style = {
+            'class': 'form-check-input fs-3 mx-2',  # Tamaño más grande con Bootstrap 5
+            'style': 'transform: scale(1.5);'        # Agranda aún más la checkbox
+        }
+
+        self.fields['is_staff'].widget.attrs.update(checkbox_style)
+        self.fields['is_superuser'].widget.attrs.update(checkbox_style)
 
     def save(self, commit=True):
         user = super().save(commit=False)
