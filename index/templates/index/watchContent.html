@@ -7,92 +7,95 @@
 
 
 <div class="container-fluid">
-    <h1>{{ mediafile.name }}</h1>
+    <div class="row align-items-center mt-4 ">
+        <div class="col">
+            <h1>{{ mediafile.name }}</h1>
 
-    <div class="media-container"> <!-- Video -->
-        <!-- CSS -->
-        <link href="https://vjs.zencdn.net/8.9.0/video-js.css" rel="stylesheet" />
-
-        <video id="my-video" class="video-js vjs-default-skin w-100" controls preload="auto" crossorigin="anonymous"
-            data-setup='{}'>
-            <source src="{% url 'index:media_stream' mediafile.file.name|basename %}" type="video/mp4" />
-            Tu navegador no soporta la reproducción de video.
-        </video>
-
-
-
-    </div>
-
-    <div class="row">
-        <p><strong>Uploaded At:</strong> {{ mediafile.uploaded_at }}</p>
-        <p><strong>Tags:</strong>
-            {% for tag in mediafile.tags.all %}
-            <span class="badge bg-secondary">{{ tag.name }}</span>
-            {% endfor %}
-        </p>
-
-        <a href="{{ mediafile.file }}" class="btn btn-primary" download>Download</a>
-
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <h2>Comentarios</h2>
         </div>
-        <div class="col-12">
-            <p>Agregar comentario</p>
+        <div class="media-container"> <!-- Video -->
+            <!-- CSS -->
+            <link href="https://vjs.zencdn.net/8.9.0/video-js.css" rel="stylesheet" />
+
+            <video id="my-video" class="video-js vjs-default-skin w-100" controls preload="auto" crossorigin="anonymous"
+                data-setup='{}'>
+                <source src="{% url 'index:media_stream' mediafile.id %}" type="video/mp4" />
+                Tu navegador no soporta la reproducción de video.
+            </video>
+
+
+
         </div>
-        <form class="row" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="col-9">
-                {{ form.comentario }}
-            </div>
-            <div class="col-3">
-                <button class="btn btn-primary" type="submit">Enviar</button>
-            </div>
-        </form>
-        <div class="col-12">
-            {% for comentario in comentarios %}
-            <div class="py-3 border-bottom">
 
-                <p><a href="">{{ comentario.usuario }}</a> {{comentario.uploaded_at}}</p>
-
-
-                <p>{{ comentario.comentario }}</p>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-</div>
-
-<div class="modal fade " id="imageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl ">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body">
-                <!-- Carrusel -->
-
-
-
-                {% for page in pages %}
-                <img src="{{ page.file }}" class="d-block w-100" alt="Imagen">
-                {% if loop.first %} active {% endif %}
-
+        <div class="row">
+            <p><strong>Uploaded At:</strong> {{ mediafile.uploaded_at }}</p>
+            <p><strong>Tags:</strong>
+                {% for tag in mediafile.tags.all %}
+                <span class="badge bg-secondary">{{ tag.name }}</span>
                 {% endfor %}
+            </p>
 
-
-            </div>
+            <a href="{{ mediafile.file }}" class="btn btn-primary" download>Download</a>
 
         </div>
+        <div class="row">
+            <div class="col-12">
+                <h2>Comentarios</h2>
+            </div>
+            <div class="col-12">
+                <p>Agregar comentario</p>
+            </div>
+            <form class="row" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="col-9">
+                    {{ form.comentario }}
+                </div>
+                <div class="col-3">
+                    <button class="btn btn-primary" type="submit">Enviar</button>
+                </div>
+            </form>
+            <div class="col-12">
+                {% for comentario in comentarios %}
+                <div class="py-3 border-bottom">
+
+                    <p><a href="">{{ comentario.usuario }}</a> {{comentario.uploaded_at}}</p>
+
+
+                    <p>{{ comentario.comentario }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
     </div>
-</div>
+
+    <div class="modal fade " id="imageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Carrusel -->
+
+
+
+                    {% for page in pages %}
+                    <img src="{{ page.file }}" class="d-block w-100" alt="Imagen">
+                    {% if loop.first %} active {% endif %}
+
+                    {% endfor %}
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
 
 
 
 
-{% endblock %}
+    {% endblock %}
