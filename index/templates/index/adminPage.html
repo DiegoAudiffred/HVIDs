@@ -3,122 +3,153 @@
 
 {% block body %}
 <style>
-      .adminLink:hover {
-    color: #fff !important;
-    background-color: #8B0000 !important;
-    transform: translateY(-5px);
-    transition: transform 0.3s ease;
-  }
+    .adminLink:hover {
+        color: #fff !important;
+        background-color: #8B0000 !important;
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+    }
 </style>
 <style>
- @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes slideUp {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-20px); }
-}
-.slide-down {
-  animation: slideDown 0.5s ease forwards;
-}
-.slide-up {
-  animation: slideUp 0.5s ease forwards;
-}
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
 
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        to {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+    }
+
+    .slide-down {
+        animation: slideDown 0.5s ease forwards;
+    }
+
+    .slide-up {
+        animation: slideUp 0.5s ease forwards;
+    }
 </style>
 
 
-<div class="container">
+<div class="container-fluid">
     <div class="row">
-            <div class="">
-                <h1>Sección de administrador </h1>
-            </div>
-            <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
-                <button href="" class="btn adminLink border border-3 dynamicQuery border-tercero px-4 py-2 text-center text-primary fw-bold w-100" data-type="tags" id="tags">Add tags</a>
+        <div class="">
+            <h1>Sección de administrador </h1>
+        </div>
+        <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
+            <button href=""
+                class="btn adminLink border border-3 dynamicQuery border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
+                data-type="tags" id="tags">Tags</a>
 
-            </div>
-            <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
-                <button href="" class="btn adminLink border border-3 dynamicQuery border-tercero px-4 py-2 text-center text-primary fw-bold w-100" data-type="artists" id="artists">Add artistas</a>
+        </div>
+        <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
+            <button href=""
+                class="btn adminLink border border-3 dynamicQuery border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
+                data-type="artists" id="artists">Artistas</a>
 
-            </div>
-            <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
-                <button href="" class="btn adminLink border border-3 dynamicQuery border-tercero px-4 py-2 text-center text-primary fw-bold w-100" data-type="chars" id="chars">Add chars</a>
+        </div>
+        <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
+            <button href=""
+                class="btn adminLink border border-3 dynamicQuery border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
+                data-type="chars" id="chars">Personajes</a>
 
-            </div>
-            <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
-                <button href="" class="btn adminLink border border-3  border-tercero px-4 py-2 text-center text-primary fw-bold w-100" data-type="users" id="users">Add usuario</a>
-            
-            </div>
-            <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
-                <button href="" class="btn adminLink dynamicQuery border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" data-type="games" id="games">Add game</a>
-            
-            </div>
-            <div class="col-md-2 my-3 col-12 my-md-0 text-center ">
-                <a href="{% url 'admin:index' %}" class="btn adminLink  border border-3 border-tercero px-4 py-2 text-center text-primary fw-bold w-100" >Adminstracion</a>
-            
-            </div>
+        </div>
+        <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
+            <button href=""
+                class="btn adminLink dynamicQuery border border-3  border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
+                data-type="users" id="users">Usuarios</a>
+
+        </div>
+        <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
+            <button href=""
+                class="btn adminLink dynamicQuery border border-3 border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
+                data-type="games" id="games">Juegos</a>
+
+        </div>
+        <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
+            <a href="{% url 'admin:index' %}"
+                class="btn adminLink  border border-3 border-tercero px-2 py-2 text-center text-primary fw-bold w-100">Admin</a>
+
+        </div>
     </div>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="form_type" value="tag_form">
-        <div class="row d-none my-5 justify-content-center" id="tagForm">    
+        <div class="row d-none my-5 justify-content-center" id="tagForm">
             <div class="my-3">
                 <h1>Agregar una nueva Etiqueta/Tag</h1>
-            </div>      
-            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
+            </div>
+            <div class="col-lg-6  my-3 my-lg-0 col-12 text-center">
                 {{ formTag.name }}
-            </div>                                  
-            <div class="col-md-3 mx-md-3 col-12 text-center">
-                <button type="submit" class="btn  fw-bold w-100 bg-primary text-cuarto">Agregar Tag</button>
-            </div>                
+            </div>
+            <div class="col-lg-6 col-12 text-center">
+                <button type="submit" class="btn  fw-bold w-100 bg-secondary text-cuarto">Agregar Tag</button>
+            </div>
         </div>
-    </form>  
-    
+    </form>
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="form_type" value="artist_form">
-        <div class="row d-none my-5 justify-content-center" id="artistForm">           
+        <div class="row d-none my-5 justify-content-center" id="artistForm">
             <div class="my-3">
                 <h1>Agregar un nuevo Artista</h1>
-            </div>  
-            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
+            </div>
+            <div class="col-lg-6  my-3 my-lg-0 col-12 text-center">
                 <label for="imageInput2" style="cursor: pointer;">
-                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="2">
-                  </label>
-                  <input type="file" name="image" id="imageInput2" accept="image/*" class="d-none imageInput" data-preview-id="2">
-            </div>                
-            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"
+                        class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="2">
+                </label>
+                <input type="file" name="image" id="imageInput2" accept="image/*" class="d-none imageInput"
+                    data-preview-id="2">
+            </div>
+            <div class="col-lg-6  my-3 my-lg-0 col-12 text-center">
                 <div class="my-2">
                     {{ formArtist.name }}
                 </div>
                 <div class="my-2">
-                    <button type="submit" class="btn  fw-bold w-100 bg-primary text-cuarto">Agregar Artista</button>
+                    <button type="submit" class="btn  fw-bold w-100 bg-secondary text-cuarto">Agregar Artista</button>
                 </div>
             </div>
-            
-                       
+
+
         </div>
-    </form> 
-    
+    </form>
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="form_type" value="char_form">
         <div class="row d-none my-5 justify-content-center" id="charForm">
             <div class="my-3">
                 <h1>Agregar un nuevo Personaje</h1>
-            </div>  
-            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
-              
+            </div>
+            <div class="col-lg-6  my-3 my-md-0 col-12 text-center">
+
                 <label for="imageInput1" style="cursor: pointer;">
-                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="1">
-                  </label>
-                  <input type="file" name="image" id="imageInput1" accept="image/*" class="d-none imageInput" data-preview-id="1">
-                  
-                
-            </div>    
-    
-            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"
+                        class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="1">
+                </label>
+                <input type="file" name="image" id="imageInput1" accept="image/*" class="d-none imageInput"
+                    data-preview-id="1">
+
+
+            </div>
+
+            <div class="col-lg-6 my-3 my-md-0 col-12 text-center">
                 <div class="my-2">
                     {{ formChar.name }}
 
@@ -128,38 +159,44 @@
 
                 </div>
                 <div class="my-2">
-                    <button type="submit" class="btn  fw-bold w-100 bg-primary text-cuarto">Agregar Personaje</button>
+                    <button type="submit" class="btn  fw-bold w-100 bg-secondary text-cuarto">Agregar Personaje</button>
 
                 </div>
             </div>
-          
+
         </div>
-    </form> 
-    
+    </form>
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="form_type" value="user_form">
         <div class="row d-none my-5 justify-content-center" id="userForm">
             <div class="my-3">
                 <h1>Agregar un nuevo Usuario</h1>
-            </div>  
-            <div class="col-md-2 mx-md-3 my-3 my-md-0 col-12 text-center">
+            </div>
+            <div class="col-lg-6  my-3 col-12 text-center">
                 {{ formUser.username }}
             </div>
-            <div class="col-md-2 mx-md-3 my-3 my-md-0 col-12 text-center">
+            <div class="col-lg-6  my-3  col-12 text-center">
                 {{ formUser.password }}
             </div>
-            <div class="col-md-2 mx-md-3 my-3 my-md-0 col-12 text-center">
-                Staff
-                {{ formUser.is_staff }}
+            <div class="col-lg-6 my-3 col-6">
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <label class="mb-0 fs-5" for="{{ formUser.is_staff.id_for_label }}">Staff</label>
+                    {{ formUser.is_staff }}
+                </div>
             </div>
-            <div class="col-md-2 mx-md-3 my-3 my-md-0 col-12 text-center">
-                Superusuario
-                {{ formUser.is_superuser }}
+
+            <div class="col-lg-6 my-3 col-6">
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <label class="mb-0 fs-5" for="{{ formUser.is_superuser.id_for_label }}">Superusuario</label>
+                    {{ formUser.is_superuser }}
+                </div>
             </div>
-            <div class="col-md-2 mx-md-3 my-3 my-md-0 col-12 text-center">
-                <button type="submit" class="btn  fw-bold w-100 bg-primary text-cuarto">Agregar Usuario</button>
-            </div> 
+
+            <div class="col-lg-6  my-3  col-12 text-center">
+                <button type="submit" class="btn  fw-bold w-100 bg-secondary text-cuarto">Agregar Usuario</button>
+            </div>
         </div>
     </form>
     <form method="post" enctype="multipart/form-data">
@@ -168,158 +205,186 @@
         <div class="row d-none my-5 justify-content-center" id="gameForm">
             <div class="my-3">
                 <h1>Agregar un nuevo Juego</h1>
-            </div>  
-            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
-              
-                <label for="imageInput3" style="cursor: pointer;">
-                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="3">
-                  </label>
-                  <input type="file" name="image" id="imageInput3" accept="image/*" class="d-none imageInput" data-preview-id="3">
-
-                                
-                
             </div>
-            <div class="col-md-3 mx-md-3 my-3 my-md-0 col-12 text-center">
+            <div class="col-lg-6 my-3 my-md-0 col-12 text-center">
+
+                <label for="imageInput3" style="cursor: pointer;">
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"
+                        class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="3">
+                </label>
+                <input type="file" name="image" id="imageInput3" accept="image/*" class="d-none imageInput"
+                    data-preview-id="3">
+
+
+
+            </div>
+            <div class="col-lg-6  my-3 my-md-0 col-12 text-center">
                 <div class="my-2">
                     {{ formGame.name }}
 
                 </div>
-                    <div class="my-2">
-                        <button type="submit" class="btn  fw-bold w-100 bg-primary text-cuarto">Agregar Juego</button>
+                <div class="my-2">
+                    <button type="submit" class="btn  fw-bold w-100 bg-secondary text-cuarto">Agregar Juego</button>
 
-                    </div>
+                </div>
             </div>
-             
-             
+
+
         </div>
     </form>
     <div id="dynamic-container" class="row mt-4">
         <!-- Aquí se cargarán los tags/artistas/chars/etc -->
-      </div>
-    
+    </div>
+    <div id="response-message" class="text-center mt-2 d-none fw-bold text-tercero"></div>
+
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const buttons = document.querySelectorAll(".dynamicQuery");
-    
-      buttons.forEach(btn => {
-        btn.addEventListener("click", async (e) => {
-          e.preventDefault();
-          const type = btn.getAttribute("data-type");
-          const container = document.getElementById("dynamic-container");
-    
-          // Llama al backend (ajusta URL según tu framework)
-          const response = await fetch(`/get-items/${type}/`);
-          const items = await response.json();
-    
-          // Limpia el contenedor
-          container.innerHTML = "";
-    
-          // Muestra cada ítem
-          items.forEach(item => {
-            const div = document.createElement("div");
-            div.className = "col-auto bg-primary border rounded-pill d-flex align-items-center px-4 py-2 m-2 text-white";
-            div.innerHTML = `
+        const buttons = document.querySelectorAll(".dynamicQuery");
+
+        buttons.forEach(btn => {
+            btn.addEventListener("click", async (e) => {
+                e.preventDefault();
+                const type = btn.getAttribute("data-type");
+                const container = document.getElementById("dynamic-container");
+
+                // Llama al backend (ajusta URL según tu framework)
+                const response = await fetch(`/get-items/${type}/`);
+                const items = await response.json();
+
+                // Limpia el contenedor
+                container.innerHTML = "";
+
+                // Muestra cada ítem
+                items.forEach(item => {
+                    const div = document.createElement("div");
+                    div.className = "col-auto bg-primary border rounded-pill d-flex align-items-center px-4 py-2 m-2 text-white";
+
+                    if (type == "users") {
+                        div.innerHTML = `
+              <span class="me-2">${item.username}</span>
+              <button class="btn-close btn-sm remove-tag" data-id="${item.id}" data-type="${type}"></button>
+            `;
+
+                    } else {
+                        div.innerHTML = `
               <span class="me-2">${item.name}</span>
               <button class="btn-close btn-sm remove-tag" data-id="${item.id}" data-type="${type}"></button>
             `;
-            container.appendChild(div);
-          });
+
+                    }
+                    container.appendChild(div);
+                });
+            });
         });
-      });
-    
-      // Evento para eliminar (delegado)
-      document.getElementById("dynamic-container").addEventListener("click", async (e) => {
-        if (e.target.classList.contains("remove-tag")) {
-          const id = e.target.getAttribute("data-id");
-          const type = e.target.getAttribute("data-type");
-    
-          // Eliminar en el backend
-          await fetch(`/delete-item/${type}/${id}/`, {
-            method: "DELETE"
-          });
-    
-          // Eliminar del DOM
-          e.target.parentElement.remove();
-        }
-      });
+
+        // Evento para eliminar (delegado)
+        document.getElementById("dynamic-container").addEventListener("click", async (e) => {
+            if (e.target.classList.contains("remove-tag")) {
+                const id = e.target.getAttribute("data-id");
+                const type = e.target.getAttribute("data-type");
+
+                // Eliminar en el backend
+                const response = await fetch(`/delete-item/${type}/${id}/`, {
+                    method: "DELETE"
+                });
+
+                const data = await response.json();
+
+                // Mostrar respuesta en pantalla
+                const messageDiv = document.getElementById("response-message");
+                messageDiv.textContent = data.success ? "Elemento eliminado con éxito." : data.error;
+                messageDiv.classList.remove("d-none");
+                messageDiv.classList.add(data.success ? "text-success" : "text-danger");
+
+                // Solo eliminar del DOM si el backend respondió éxito
+                if (data.success) {
+                    e.target.parentElement.remove();
+                }
+                setTimeout(() => {
+                    messageDiv.classList.add("d-none");
+                    messageDiv.textContent = "";
+                }, 4000);
+            }
+        });
+
     });
-    </script>
-    
+</script>
+
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const imageInputs = document.querySelectorAll('.imageInput');
+    document.addEventListener('DOMContentLoaded', () => {
+        const imageInputs = document.querySelectorAll('.imageInput');
 
-  imageInputs.forEach(input => {
-    input.addEventListener('change', function () {
-      const previewId = this.dataset.previewId;
-      const imagePreview = document.querySelector(`.imagePreview[data-preview-id="${previewId}"]`);
-      const file = this.files[0];
+        imageInputs.forEach(input => {
+            input.addEventListener('change', function () {
+                const previewId = this.dataset.previewId;
+                const imagePreview = document.querySelector(`.imagePreview[data-preview-id="${previewId}"]`);
+                const file = this.files[0];
 
-      if (file && imagePreview) {
-        const reader = new FileReader();
+                if (file && imagePreview) {
+                    const reader = new FileReader();
 
-        reader.onload = function (e) {
-          imagePreview.src = e.target.result;
-          imagePreview.classList.remove('d-none');
-        };
+                    reader.onload = function (e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.classList.remove('d-none');
+                    };
 
-        reader.readAsDataURL(file);
-      } else if (imagePreview) {
-        imagePreview.src = "#";
-        imagePreview.classList.add('d-none');
-      }
+                    reader.readAsDataURL(file);
+                } else if (imagePreview) {
+                    imagePreview.src = "#";
+                    imagePreview.classList.add('d-none');
+                }
+            });
+        });
     });
-  });
-});
 
 
 
-document.getElementById('tags').onclick = function() {
-    toggleFormVisibility('#tagForm');
-};
+    document.getElementById('tags').onclick = function () {
+        toggleFormVisibility('#tagForm');
+    };
 
-document.getElementById('artists').onclick = function() {
-    toggleFormVisibility('#artistForm');
-};
+    document.getElementById('artists').onclick = function () {
+        toggleFormVisibility('#artistForm');
+    };
 
-document.getElementById('users').onclick = function() {
-    toggleFormVisibility('#userForm');
-};
+    document.getElementById('users').onclick = function () {
+        toggleFormVisibility('#userForm');
+    };
 
-document.getElementById('chars').onclick = function() {
-    toggleFormVisibility('#charForm');
-};
+    document.getElementById('chars').onclick = function () {
+        toggleFormVisibility('#charForm');
+    };
 
-document.getElementById('games').onclick = function() {
-    toggleFormVisibility('#gameForm');
-};
+    document.getElementById('games').onclick = function () {
+        toggleFormVisibility('#gameForm');
+    };
 
-function toggleFormVisibility(formId) {
-    const forms = ['#tagForm', '#artistForm', '#charForm', '#userForm', '#gameForm'];
-    forms.forEach(function(form) {
-        const formElement = document.querySelector(form);
-        if (formElement && form !== formId) {
-            formElement.classList.add('d-none');
-            formElement.classList.remove('slide-down', 'slide-up');
+    function toggleFormVisibility(formId) {
+        const forms = ['#tagForm', '#artistForm', '#charForm', '#userForm', '#gameForm'];
+        forms.forEach(function (form) {
+            const formElement = document.querySelector(form);
+            if (formElement && form !== formId) {
+                formElement.classList.add('d-none');
+                formElement.classList.remove('slide-down', 'slide-up');
+            }
+        });
+
+        const selectedForm = document.querySelector(formId);
+        if (selectedForm.classList.contains('d-none')) {
+            selectedForm.classList.remove('d-none');
+            selectedForm.classList.remove('slide-up');
+            selectedForm.classList.add('slide-down');
+        } else {
+            selectedForm.classList.remove('slide-down');
+            selectedForm.classList.add('slide-up');
+            setTimeout(() => {
+                selectedForm.classList.add('d-none');
+            }, 500);
         }
-    });
-
-    const selectedForm = document.querySelector(formId);
-    if (selectedForm.classList.contains('d-none')) {
-        selectedForm.classList.remove('d-none');
-        selectedForm.classList.remove('slide-up');
-        selectedForm.classList.add('slide-down');
-    } else {
-        selectedForm.classList.remove('slide-down');
-        selectedForm.classList.add('slide-up');
-        setTimeout(() => {
-            selectedForm.classList.add('d-none');
-        }, 500);
     }
-}
 
 </script>
 {% endblock %}

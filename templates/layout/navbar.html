@@ -65,30 +65,10 @@
     }
   }
 
-  /* Scroll horizontal custom para navbar */
-  .custom-scroll-navbar {
-    overflow-x: auto;
-    white-space: nowrap;
-    scrollbar-width: none;
-    /* Firefox */
-    -ms-overflow-style: none;
-    /* IE 10+ */
-    padding: 1rem 0;
-  }
-
-  .custom-scroll-navbar::-webkit-scrollbar {
-    display: none;
-    /* Chrome, Safari, Edge */
-  }
-
-  .custom-scroll-navbar .nav-item {
-    margin-right: 2rem;
-  }
-
-  /* Padding extra para la barra */
-  .navbar.bg-tercero {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+  .icon-navbar {
+    width: auto;
+    height: auto;
+    max-height: 7vw;
   }
 </style>
 
@@ -96,10 +76,9 @@
 <!-- navbar_desktop.html -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-tercero d-none d-lg-block">
   <div class="container-fluid px-4">
-    <a class="navbar-brand text-center text-primary fw-bold" href="{% url 'index:index' %}?show_all=true"
-      style="font-size: 24px;">
+    <a class="navbar-brand text-center text-primary fw-bold" href="{% url 'index:index' %}" style="font-size: 24px;">
       <img id="logo" src="{% static 'img/LogoHvids.png' %}" alt="Previsualización" class="d-block"
-        style="max-width: 175px;" data-preview-id="2">
+        style="max-width: 150px;" data-preview-id="2">
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -107,98 +86,92 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse bg-tercero overflow-x-auto custom-scroll-navbar" id="navbarSupportedContent">
-      <ul class="navbar-nav flex-row flex-nowrap overflow-x-auto custom-scroll-navbar gap-3">
-        <li class="nav-item mx-1">
+    <div class="collapse navbar-collapse bg-tercero " id="navbarSupportedContent">
+      <ul class="navbar-nav d-flex w-100 justify-content-between">
+        <!-- <li class="nav-item mx-1">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
             style="font-size: 25px;" href="{% url 'index:index' %}">
             <img src="{% static 'img/InicioLogo.png' %}" class="img-fluid mb-1"
               style="max-width: 75px; height:75px;">Inicio
           </a>
-        </li>
+        </li>-->
 
-        <li class="nav-item mx-1">
+        <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-            style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Artistas">
-            <img src="{% static 'img/AristLogo.png' %}" class="img-fluid mb-1"
-              style="max-width: 75px; height: 75px;">Artistas
+            style="font-size: 1.2vw;" href="{% url 'index:navbarFilterHeader' %}?filter=Artistas">
+            <img src="{% static 'img/AristLogo.png' %}" class="img-fluid icon-navbar mb-1">Artistas
           </a>
         </li>
 
-        <li class="nav-item mx-1">
+        <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-            style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=Series">
-            <img src="{% static 'img/SeriesLogo.png' %}" class="img-fluid mb-1"
-              style="max-width: 75px; height: 75px;">Series
+            style="font-size: 1.2vw;" href="{% url 'index:navbarFilterHeader' %}?filter=Series">
+            <img src="{% static 'img/SeriesLogo.png' %}" class="img-fluid icon-navbar mb-1">Series
           </a>
         </li>
 
-        <li class="nav-item mx-1">
+        <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-            style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=Personajes">
-            <img src="{% static 'img/CharacterLogo.png' %}" class="img-fluid mb-1"
-              style="max-width: 75px; height: 75px;">Personajes
+            style="font-size: 1.2vw;" href="{% url 'index:navbarFilterHeader' %}?filter=Personajes">
+            <img src="{% static 'img/CharacterLogo.png' %}" class="img-fluid icon-navbar mb-1">Personajes
           </a>
         </li>
 
-        <li class="nav-item mx-1">
-          <a class="nav-link active text-sexto fw-bold fnBadComicRegular d-flex flex-column align-items-center"
-            style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Videos">
-            <img src="{% static 'img/videosLogoNew.png' %}" class="img-fluid mb-1"
-              style="max-width: 75px; height: 75px;">Videos
-          </a>
-        </li>
-
-        <li class="nav-item mx-1">
+        <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-            style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Comics">
-            <img src="{% static 'img/ImageLogoNew.png' %}" class="img-fluid mb-1"
-              style="max-width: 75px; height: 75px;">Imagenes
+            style="font-size: 1.2vw;" href="{% url 'index:navbarFilterHeader' %}?filter=Videos">
+            <img src="{% static 'img/videosLogoNew.png' %}" class="img-fluid icon-navbar mb-1">Videos
           </a>
         </li>
 
-        <li class="nav-item mx-1">
+        <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-            style="font-size: 25px;" href="{% url 'index:download_video' %}">
-            <img src="{% static 'img/YoutubeLogoNew.png' %}" class="img-fluid mb-1"
-              style="max-width: 75px; height: 75px;">Descargar
+            style="font-size: 1.2vw;" href="{% url 'index:navbarFilterHeader' %}?filter=Comics">
+            <img src="{% static 'img/ImageLogoNew.png' %}" class="img-fluid icon-navbar mb-1">Imagenes
           </a>
         </li>
 
-        <li class="nav-item mx-1">
+        <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-            style="font-size: 25px;" href="{% url 'index:uploadElement' %}">
-            <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid mb-1"
-              style="max-width: 75px; height: 75px;">Subir
+            style="font-size: 1.2vw;" href="{% url 'index:download_video' %}">
+            <img src="{% static 'img/YoutubeLogoNew.png' %}" class="img-fluid icon-navbar mb-1">Descargar
           </a>
         </li>
 
+        <li class="nav-item flex-fill text-center">
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            style="font-size: 1.2vw;" href="{% url 'index:uploadElement' %}">
+            <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid icon-navbar mb-1">Subir
+          </a>
+        </li>
         {% if user.is_superuser and user.is_staff %}
-        <li class="nav-item mx-1">
+        <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-            style="font-size: 25px;" href="{% url 'index:adminPage' %}">
-            <img src="{% static 'img/settingsLogoNew2.png' %}" class="img-fluid mb-1"
-              style="max-width: 75px; height: 75px;">Configuración
+            style="font-size: 1.2vw;" href="{% url 'index:adminPage' %}">
+            <img src="{% static 'img/settingsLogoNew2.png' %}" class="img-fluid icon-navbar mb-1">
+            Configuración
           </a>
         </li>
         {% endif %}
 
         {% if request.user.is_authenticated %}
-        <li class="nav-item mx-1">
+        <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-            style="font-size: 25px;" href="{% url 'login:logout' %}">
-            <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid mb-1"
-              style="max-width: 75px; height: 75px;">Salir
+            style="font-size: 1.2vw;" href="{% url 'login:logout' %}">
+            <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid icon-navbar mb-1">
+            Salir
           </a>
         </li>
         {% endif %}
+
+
       </ul>
     </div>
   </div>
 </nav>
 
 
-
+<!-- navbar movil -->
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-tercero d-block d-lg-none">
   <div class="container-fluid px-4">
@@ -315,20 +288,3 @@
 
   </div>
 </nav>
-<script>
-  // scripts/navbar_scroll.js (solo si se usan flechas para mover el scroll horizontal)
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const scrollNavbar = document.querySelector('.custom-scroll-navbar');
-
-    // Flechas opcionales que tú podrías implementar visualmente
-    document.getElementById('left-arrow').addEventListener('click', () => {
-      scrollNavbar.scrollBy({ left: -150, behavior: 'smooth' });
-    });
-
-    document.getElementById('right-arrow').addEventListener('click', () => {
-      scrollNavbar.scrollBy({ left: 150, behavior: 'smooth' });
-    });
-  });
-
-</script>

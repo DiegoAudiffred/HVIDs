@@ -520,8 +520,14 @@ def get_items(request, type):
         'games': Game
     }
     Model = model_map.get(type)
+
+    if type =="users":
+        modelTypeName="username"
+    else:    
+        modelTypeName="name"
+
     if Model:
-        data = list(Model.objects.all().values('id', 'name'))
+        data = list(Model.objects.all().values('id', modelTypeName))
         return JsonResponse(data, safe=False)
     return JsonResponse({'error': 'Invalid type'}, status=400)
 
@@ -538,7 +544,10 @@ def delete_item(request, type, id):
     }
     Model = model_map.get(type)
     if Model and request.method == 'DELETE':
-        Model.objects.filter(id=id).delete()
+        if Model.objects.count() <= 1:
+            return JsonResponse({'error': 'No se puede eliminar el último usuario'}, status=400)
+        else:          
+            Model.objects.filter(id=id).delete()
         return JsonResponse({'success': True})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
