@@ -61,6 +61,8 @@ class Game(models.Model):
 
     def __str__(self):
         return self.name
+    def tipo_objeto(self):
+        return "juego"
 
 class Character(models.Model):
     name = models.CharField(max_length=255)    
@@ -68,6 +70,8 @@ class Character(models.Model):
     game= models.ForeignKey(Game, on_delete=models.CASCADE,blank=True,null=True)
     def __str__(self):
         return self.name
+    def tipo_objeto(self):
+        return "personaje"
 
     
 class Tags(models.Model):
@@ -82,7 +86,9 @@ class Artist(models.Model):
  
     def __str__(self):
         return self.name
-    
+    def tipo_objeto(self):
+        return "artista"
+
 
 #class MediaFile(models.Model):
 #    #file = models.FileField(upload_to='media_files/%Y/%m/%d/')
@@ -118,7 +124,7 @@ class MediaFile(models.Model):
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
     # Generación automática de thumbnail
     image = models.ImageField(upload_to='media_files/thumbnails/%Y%m%d/', blank=True, null=True)
-    isVideo = models.BooleanField(default=True)
+    #isVideo = models.BooleanField(default=True)
     
     def __str__(self):
         return self.name
@@ -126,7 +132,7 @@ class MediaFile(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        if self.isVideo and self.file and not self.image:
+        if self.file and not self.image:
             self.generate_thumbnail()
     @property
     def tipo_objeto(self):
@@ -179,7 +185,7 @@ class Comic(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     character= models.ManyToManyField(Character, blank=True)
     image = models.ImageField(upload_to='media_files/comicPortraits/', blank=True, null=True)
-    isVideo = models.BooleanField(default=False)
+    #isVideo = models.BooleanField(default=False)
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
 
     @property

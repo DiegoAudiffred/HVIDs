@@ -7,4 +7,5 @@ moviepy
 ffmpeg 
 django-hashids
 yt-dlp
-
+channels 
+channels_redis

@@ -160,7 +160,7 @@ def navbarFilterHeader(request):
     elif thing_to_filter == "Personajes":
         media_files = Character.objects.all
     elif thing_to_filter == "Videos":
-         media_files = MediaFile.objects.filter(isVideo=True).order_by('-uploaded_at')
+         media_files = MediaFile.objects.filter().order_by('-uploaded_at')
     elif thing_to_filter == "Comics":
          media_files = Comic.objects.all
     else:
@@ -335,6 +335,41 @@ def watchContent(request, id):
         'form':form,
         **sidebar_data,  # Integrar datos de la sidebar en el contexto de la vista
     })
+
+@login_required(login_url='/login/')  # ruta de la vista login
+def detailsAbout(request, filtro, valor):
+    sidebar_context = get_sidebar_context()
+
+    if filtro == "personaje":
+        personaje = get_object_or_404(Character, name__iexact=valor)
+        context = {
+            'personaje': personaje,
+            'filtro': filtro,
+            'valor': valor,
+            **sidebar_context,
+        }
+    else:
+        context = {
+            'mensaje': "Filtro no reconocido",
+            **sidebar_context,
+        }
+
+    return render(request, 'index/filteredInfoPage.html', context)
+
+@require_POST
+def ajax_add_comment(request, id):
+    form = addComentariosForm(request.POST)
+    if form.is_valid():
+        comentario = form.save(commit=False)
+        comentario.usuario = request.user
+        comentario.mediaFileID_id = id
+        comentario.save()
+        return JsonResponse({
+            'usuario': str(comentario.usuario),
+            'fecha': comentario.uploaded_at.strftime('%d/%m/%Y %H:%M'),
+            'texto': comentario.comentario
+        })
+    return JsonResponse({'error': 'Comentario no válido'}, status=400)
 
 
 def stream_video(request, id):
