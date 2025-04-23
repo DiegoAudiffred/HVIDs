@@ -17,8 +17,7 @@ urlpatterns = [
     path('delete-item/<str:type>/<int:id>/', views.delete_item, name='delete_item'),
 
     path("uploadElement/", views.uploadElement, name='uploadElement'),
-    path("show/", views.show, name='show'),
-    path("hide/", views.hide, name='hide'),
+
     path('adminPage/', views.adminPage, name='adminPage'),
     path("video/<int:id>/", views.watchContent, name='watchContent'),
     path("navbarFilterHeader/", views.navbarFilterHeader, name='navbarFilterHeader'),

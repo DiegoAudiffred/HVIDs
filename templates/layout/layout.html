@@ -19,42 +19,62 @@
 
     {% block style %}
     <!-- Aquí puedes añadir estilos específicos de la página -->
+    <style>
+        @media (max-width: 767.98px) {
+
+            /* En pantallas < md */
+            .no-grow-sm {
+                flex: none !important;
+                /* quita flex-grow */
+            }
+
+            .sidebar-sm-auto {
+                min-height: auto !important;
+                /* quita el min-vh-100 */
+            }
+        }
+    </style>
     {% endblock %}
 </head>
 
 <body class="d-flex flex-column min-vh-100 bg-cuarto fnBubbleSansRegular">
+
     {% include 'layout/navbar.html' %}
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div
-                class="d-none d-md-block col-md-4 col-lg-3 col-xl-3 col-xxl-2 bg-light  my-0 px-3 py-4 border-end border-bottom border-3 border-tercero min-vh-100">
+
+    <!-- este contenedor sólo crece en md+ -->
+    <div class="container-fluid no-grow-sm flex-grow-1">
+        <div class="row h-100">
+
+            <!-- Sidebar: min-vh-100 sólo en md+ gracias a sidebar-sm-auto -->
+            <aside class="col-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2 px-4 px-md-4
+                 bg-light border-end border-3 border-tercero 
+                 d-flex flex-column 
+                 min-vh-100 sidebar-sm-auto">
                 {% block sidebar %}
                 {% include 'index/sideBar.html' %}
                 {% endblock %}
-            </div>
-
+            </aside>
 
             <!-- Main Content -->
-            <div class="col-12 col-md-8 col-lg-9 col-xl-9 col-xxl-10 my-4 px-4 ">
+            <section class="col-12 col-md-8 col-lg-9 col-xl-9 col-xxl-10 my-0  px-4">
                 <main class="bg-cuarto">
-                    {% block body %}
-
-                    {% endblock %}
+                    {% block body %}{% endblock %}
                 </main>
-            </div>
+            </section>
+
         </div>
     </div>
-    {% include 'layout/footer.html' %}
+
+    <!-- Footer pegado abajo con mt-auto -->
+    <footer class="mt-auto">
+        {% include 'layout/footer.html' %}
+    </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
         integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
         crossorigin="anonymous"></script>
     <script src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
-    <!--    <script src="{% static 'js/csrfToken.js' %}"></script>
--->
-    {% block script %}
-    <!-- Aquí puedes añadir scripts específicos de la página -->
-    {% endblock %}
+    {% block script %}{% endblock %}
 </body>
 
 </html>

@@ -77,9 +77,10 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-tercero d-none d-lg-block">
   <div class="container-fluid px-4">
     <a class="navbar-brand text-center text-primary fw-bold" href="{% url 'index:index' %}" style="font-size: 24px;">
-      <img id="logo" src="{% static 'img/LogoHvids.png' %}" alt="Previsualización" class="d-block"
-        style="max-width: 150px;" data-preview-id="2">
+      <img id="logo" src="{% static 'img/LogoHvids.png' %}" alt="Previsualización" class="d-block img-fluid"
+        style="max-width: 13vw;" data-preview-id="2">
     </a>
+
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -141,7 +142,7 @@
         <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
             style="font-size: 1.2vw;" href="{% url 'index:uploadElement' %}">
-            <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid icon-navbar mb-1">Subir
+            <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid icon-navbar mb-1">Subir Archivo
           </a>
         </li>
         {% if user.is_superuser and user.is_staff %}
@@ -159,7 +160,7 @@
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
             style="font-size: 1.2vw;" href="{% url 'login:logout' %}">
             <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid icon-navbar mb-1">
-            Salir
+            Cerrar Sesión
           </a>
         </li>
         {% endif %}

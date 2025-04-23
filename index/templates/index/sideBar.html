@@ -89,10 +89,10 @@
 
 
 
-<div class="sidebar d-none d-md-block border-primary-3">
+<div class="sidebar border-primary-3 mt-4">
 
   <form id="multiSearchForm" method="GET" action="{% url 'index:multi_search_results' %}"
-    class="position-relative mb-4">
+    class="position-relative m-0 mb-md-4">
     <div class="input-group">
       <input type="text" id="multiSearchInput" name="q" class="form-control text-tercero border border-primary"
         placeholder="Buscar..." autocomplete="off">
@@ -104,68 +104,70 @@
   </form>
 
 
-  <h3 class="text-primary">Tags</h3>
-  {% if popular_tags %}
+  <div class="d-none d-md-block">
+    <h3 class="text-primary">Tags</h3>
+    {% if popular_tags %}
 
 
-  {% for tag in popular_tags %}
-  <h4 class="px-3 text-truncate" style="max-width: 100%;">
-    <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
-      href="{% url 'index:filtered_media' 'tag' tag.name %}">
-      {{ tag.name }}
-    </a>
-  </h4>
-  {% endfor %}
+    {% for tag in popular_tags %}
+    <h5 class="px-3 text-truncate" style="max-width: 100%;">
+      <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
+        href="{% url 'index:filtered_media' 'tag' tag.name %}">
+        {{ tag.name }}
+      </a>
+    </h5>
+    {% endfor %}
 
-  {% else %}
-  <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin tags.</h5>
-  {% endif %}
+    {% else %}
+    <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin tags.</h5>
+    {% endif %}
 
-  <h3 class="text-primary">Artistas</h3>
-  {% if popular_artists %}
+    <h3 class="text-primary">Artistas</h3>
+    {% if popular_artists %}
 
-  {% for artist in popular_artists %}
-  <h4 class="px-3 text-truncate" style="max-width: 100%;">
-    <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
-      href="{% url 'index:filtered_media' 'artist' artist.name %}">
-      {{ artist.name }}</a>
+    {% for artist in popular_artists %}
+    <h5 class="px-3 text-truncate" style="max-width: 100%;">
+      <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
+        href="{% url 'index:filtered_media' 'artist' artist.name %}">
+        {{ artist.name }}</a>
 
-  </h4>
-  {% endfor %}
-  {% else %}
-  <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin artistas.</h5>
-  {% endif %}
+    </h5>
+    {% endfor %}
+    {% else %}
+    <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin artistas.</h5>
+    {% endif %}
 
-  <h3 class="text-primary">Personajes</h3>
-  <!-- Añadir contenido adicional aquí -->
-  {% if popular_characters %}
+    <h3 class="text-primary">Personajes</h3>
+    <!-- Añadir contenido adicional aquí -->
+    {% if popular_characters %}
 
-  {% for character in popular_characters %}
-  <h4 class="px-3 text-truncate" style="max-width: 100%;">
-    <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
-      href="{% url 'index:filtered_media' 'character' character.name %}">{{ character.name }}</a>
+    {% for character in popular_characters %}
+    <h5 class="px-3 text-truncate" style="max-width: 100%;">
+      <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
+        href="{% url 'index:filtered_media' 'character' character.name %}">{{ character.name }}</a>
 
-  </h4>
-  {% endfor %}
-  {% else %}
-  <h5 class="d-inline-block text-tercero text-truncate w-100">Sin Personajes.</h5>
-  {% endif %}
+    </h5>
+    {% endfor %}
+    {% else %}
+    <h5 class="d-inline-block text-tercero text-truncate w-100">Sin Personajes.</h5>
+    {% endif %}
 
-  <h3 class="text-primary">Juegos</h3>
-  <!-- Añadir contenido adicional aquí -->
-  {% if popular_games %}
+    <h3 class="text-primary">Juegos</h3>
+    <!-- Añadir contenido adicional aquí -->
+    {% if popular_games %}
 
-  {% for game in popular_games %}
-  <h4 class="px-3 text-truncate" style="max-width: 100%;">
-    <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
-      href="{% url 'index:filtered_media' 'game' game.name %}">
-      {{ game.name }}</a>
+    {% for game in popular_games %}
+    <h5 class="px-3 text-truncate" style="max-width: 100%;">
+      <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
+        href="{% url 'index:filtered_media' 'game' game.name %}">
+        {{ game.name }}</a>
 
-  </h4>
-  {% endfor %}
-  {% else %}
-  <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin juegos.</h5>
-  {% endif %}
+    </h5>
+    {% endfor %}
+    {% else %}
+    <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin juegos.</h5>
+    {% endif %}
+  </div>
 </div>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
