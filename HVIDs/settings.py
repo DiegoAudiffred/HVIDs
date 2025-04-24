@@ -19,7 +19,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 CSRF_TRUSTED_ORIGINS = [
     "https://2f82-177-238-22-141.ngrok-free.app",
 ]
-
+TELEGRAM_BOT_TOKEN = '8047736753:AAFm6CyvCj5cVaHOn4VSBluJTVqd7vXkRoc'
+TELEGRAM_GROUP_CHAT_ID = '-1002634693432'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
