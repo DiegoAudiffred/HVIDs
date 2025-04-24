@@ -66,8 +66,8 @@
         transition: all 0.4s ease;
     }
 </style>
-<div class="container-fluid ">
-    <div class="row align-items-center mt-4 ">
+<div class="container-fluid mt-4 ">
+    <div class="row align-items-center ">
         <div class="col">
             <h1 class=" text-primary">{{ filter_selected }} Recientes</h1>
 
@@ -89,53 +89,57 @@
                 <a href="{% url 'index:watchComic' mediafile.id %}">
                     {% elif mediafile.tipo_objeto == 'mediafile' %}
                     <a href="{% url 'index:watchContent' mediafile.id %}">
-                        {% else %}
-                        <a href="{% url 'index:detailsAbout' 'personaje' mediafile.name|slugify %}">
-                            {% endif %}
+                        {% elif mediafile.tipo_objeto == 'personaje' %}
+                        <a href="{% url 'index:detailsAbout' 'personaje' mediafile.name %}">
+                            {% elif mediafile.tipo_objeto == 'artista' %}
+                            <a href="{% url 'index:detailsAbout' 'artista' mediafile.name %}">
+                                {% elif mediafile.tipo_objeto == 'juego' %}
+                                <a href="{% url 'index:detailsAbout' 'juego' mediafile.name %}">
+                                    {% endif %}
 
-                            {% if mediafile.image %}
-                            <div class="position-relative" style="aspect-ratio: 1 / 1; overflow: hidden;">
-                                <img src="{{ mediafile.image.url }}" alt="{{ mediafile.name }} Thumbnail"
-                                    class="card-img-top w-100 h-100" style="object-fit: cover;">
-                            </div>
+                                    {% if mediafile.image %}
+                                    <div class="position-relative" style="aspect-ratio: 1 / 1; overflow: hidden;">
+                                        <img src="{{ mediafile.image.url }}" alt="{{ mediafile.name }} Thumbnail"
+                                            class="card-img-top w-100 h-100" style="object-fit: cover;">
+                                    </div>
 
-                            {% else %}
-                            <div class="position-relative" style="aspect-ratio: 1 / 1; overflow: hidden;">
-                                <img src="{% static 'img/noImage.jpg' %}" alt="Sin imagen"
-                                    class="card-img-top w-100 h-100" style="object-fit: cover;">
-                            </div>
+                                    {% else %}
+                                    <div class="position-relative" style="aspect-ratio: 1 / 1; overflow: hidden;">
+                                        <img src="{% static 'img/noImage.jpg' %}" alt="Sin imagen"
+                                            class="card-img-top w-100 h-100" style="object-fit: cover;">
+                                    </div>
 
-                            {% endif %}
-                        </a>
+                                    {% endif %}
+                                </a>
 
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{ mediafile.name }}</h5>
-                            {% if filter_selected == 'Comics' or filter_selected == 'Videos' %}
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ mediafile.name }}</h5>
+                                    {% if filter_selected == 'Comics' or filter_selected == 'Videos' %}
 
-                            <p class="card-text"><strong>Tipo:</strong>
-                                {% if mediafile.tipo_objeto == 'mediafile' %}
-                                {% if mediafile.file %} Video {% else %} Imagen {% endif %}
-                                {% else %}
-                                Cómic
+                                    <p class="card-text"><strong>Tipo:</strong>
+                                        {% if mediafile.tipo_objeto == 'mediafile' %}
+                                        {% if mediafile.file %} Video {% else %} Imagen {% endif %}
+                                        {% else %}
+                                        Cómic
+                                        {% endif %}
+                                    </p>
+                                    <p class="card-text"><strong>Artista:</strong> {{ mediafile.artist }}</p>
+                                    <p class="card-text"><strong>Serie:</strong> {{ mediafile.game }}</p>
+                                    <p class="card-text"><strong>Etiquetas:</strong>
+                                        {% for tag in mediafile.tags.all %}
+                                        <span class="badge bg-secondary">{{ tag.name }}</span>
+                                        {% endfor %}
+                                    </p>
+
+                                    {% endif %}
+                                </div>
+
+                                {% if mediafile.tipo_objeto == 'mediafile' and mediafile.file %}
+                                <div class="card-footer text-center">
+                                    <a href="{{ mediafile.file.url }}" class="btn btn-primary text-white"
+                                        target="_blank">Descargar</a>
+                                </div>
                                 {% endif %}
-                            </p>
-                            <p class="card-text"><strong>Artista:</strong> {{ mediafile.artist }}</p>
-                            <p class="card-text"><strong>Serie:</strong> {{ mediafile.game }}</p>
-                            <p class="card-text"><strong>Etiquetas:</strong>
-                                {% for tag in mediafile.tags.all %}
-                                <span class="badge bg-secondary">{{ tag.name }}</span>
-                                {% endfor %}
-                            </p>
-
-                            {% endif %}
-                        </div>
-
-                        {% if mediafile.tipo_objeto == 'mediafile' and mediafile.file %}
-                        <div class="card-footer text-center">
-                            <a href="{{ mediafile.file.url }}" class="btn btn-primary text-white"
-                                target="_blank">Descargar</a>
-                        </div>
-                        {% endif %}
             </div>
         </div>
         {% endfor %}

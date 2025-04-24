@@ -18,7 +18,7 @@ urlpatterns = [
 
     path("uploadElement/", views.uploadElement, name='uploadElement'),
 
-path("detailsAbout/<str:filtro>/<str:valor>/", views.detailsAbout, name='detailsAbout'),
+    path("detailsAbout/<str:filtro>/<str:valor>/", views.detailsAbout, name='detailsAbout'),
 
     path('adminPage/', views.adminPage, name='adminPage'),
     path("video/<int:id>/", views.watchContent, name='watchContent'),
