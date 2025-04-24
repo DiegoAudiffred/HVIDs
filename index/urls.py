@@ -22,13 +22,14 @@ urlpatterns = [
 
     path('adminPage/', views.adminPage, name='adminPage'),
     path("video/<int:id>/", views.watchContent, name='watchContent'),
+    path('comic/<int:id>/', views.watchComic, name='watchComic'),
+
     path("navbarFilterHeader/", views.navbarFilterHeader, name='navbarFilterHeader'),
     path('autocomplete/', views.autocomplete, name='autocomplete'),
     path('buscar/', views.multi_search_results, name='multi_search_results'),
     path('multi-search/', views.multi_search_results, name='multi_search_results'),
     path('descargar/', views.download_video, name='download_video'),
     #path('upload/comic/', views.upload_comic, name='upload_comic'),
-    path('comic/<int:id>/', views.watchComic, name='watchComic'),
     path('ajax/comment/<int:id>/', views.ajax_add_comment, name='ajax_add_comment'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

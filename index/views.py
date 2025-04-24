@@ -1,7 +1,5 @@
 import datetime
-import random
-from urllib import request
-from django.http import Http404, HttpResponseRedirect
+
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
 from django.urls import reverse
@@ -12,60 +10,15 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.db.models import Q
-from django.shortcuts import render
-from pytube import YouTube
 import os
-from django.conf import settings
-# views.py
+
 from django.contrib.auth.decorators import login_required
-import os
-from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-import mimetypes
-import os
+
 from django.http import FileResponse, HttpResponse, HttpResponseNotFound
 from django.conf import settings
-import logging
+
 import requests
-
-from django.http import JsonResponse
-import logging
-
-
-
-@csrf_exempt
-def subscribe_phone(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            phone = data.get('phone', '').strip()
-
-            # Validación básica y normalización
-            if not phone.startswith('+'):
-                if phone.startswith('52'):
-                    phone = '+' + phone
-                else:
-                    phone = '+52' + phone
-
-            if not phone or len(phone) < 10:
-                return JsonResponse({'success': False, 'message': 'Número inválido'}, status=400)
-
-            # Verificar si ya existe un suscriptor activo
-            existing = Subscriber.objects.filter(phone=phone, active=True).first()
-            if existing:
-                existing.active = False
-                existing.save()
-                return JsonResponse({'success': True, 'message': 'Suscripción desactivada'})
-
-            # Crear uno nuevo (activo)
-            Subscriber.objects.create(phone=phone, active=True)
-
-            return JsonResponse({'success': True, 'message': 'Suscrito con éxito'})
-        except Exception as e:
-            return JsonResponse({'success': False, 'message': str(e)}, status=500)
-
-    return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
-
 
 
 def get_sidebar_context():
@@ -234,36 +187,9 @@ def autocomplete(request):
 
     return JsonResponse(list(results), safe=False)
 
-#def multi_search_results(request):
-#    query = request.GET.get('q', '')
-#    terms = query.strip().split()
-#
-#    tags = Tags.objects.none()
-#    artists = Artist.objects.none()
-#    games = Game.objects.none()
-#    characters = Character.objects.none()
-#    media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at').all()
-#    sidebar_context = get_sidebar_context()
-#
-#
-#    for term in terms:
-#        tags |= Tags.objects.filter(name__icontains=term)
-#        artists |= Artist.objects.filter(name__icontains=term)
-#        games |= Game.objects.filter(name__icontains=term)
-#        characters |= Character.objects.filter(name__icontains=term)
-#
-#    context = {
-#        'query': query,
-#        'tags': tags.distinct(),
-#        'artists': artists.distinct(),
-#        'games': games.distinct(),
-#        'characters': characters.distinct(),
-#        'media_files': media_files,
-#        **sidebar_context  # Unir el contexto de la sidebar
-#    }
-#    return render(request, 'index/multi_search_results.html', context)
 
-@login_required(login_url='/login/')  # ruta de la vista login
+
+@login_required(login_url='/login/')  
 def multi_search_results(request):
     query = request.GET.get("q", "").strip()
     terms = query.split()
@@ -300,15 +226,8 @@ def multi_search_results(request):
     return render(request, 'index/multi_search_results.html', context)
 
 
-def hide(request):
-    futa_tag = Tags.objects.get(name='Futa')  # Obtener el objeto Tag con el nombre 'futa'
-    media_files = MediaFile.objects.filter(tags=futa_tag)    
-    for med in media_files:
-        med.hide = True
-        med.save()  # Guardar cada instancia actualizada
-    
-    return redirect('index:index')  # Redirigir correctamente
-@login_required(login_url='/login/')  # ruta de la vista login
+
+@login_required(login_url='/login/')  
 
 def watchComic(request, id):
     comic = get_object_or_404(Comic, id=id)
@@ -339,13 +258,12 @@ def watchComic(request, id):
         'form': form,
         **sidebar_data
     })
-@login_required(login_url='/login/')  # ruta de la vista login
+@login_required(login_url='/login/')  
 
 def watchContent(request, id):
     mediafile = get_object_or_404(MediaFile, id=id)
 
     if request.method == 'POST':
-        # Si el formulario se ha enviado, procesar la subida del archivo
         form = addComentariosForm(request.POST, request.FILES)
         if form.is_valid():
             comentario = form.save(commit=False)
@@ -565,12 +483,13 @@ def uploadElement(request):
                 
                 # construye image_url absoluto si existe
                 if hasattr(media, 'image') and media.image:
-                    image_url = request.build_absolute_uri(media.image.url)
+                    image_path = media.image.path  # <-- Path local físico
                 else:
-                    image_url = None
+                    image_path = None
+
                 
-                print('DEBUG: enviando Telegram', texto, image_url)
-                resp = enviar_telegram_mensaje(texto, image_url)
+                print('DEBUG: enviando Telegram', texto, image_path)
+                resp = enviar_telegram_mensaje(texto, image_path)
                 print('DEBUG: respuesta Telegram', resp)
 
 
@@ -591,17 +510,17 @@ def uploadElement(request):
                         obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
                         comic.tags.add(obj)
 
-                file_url = request.build_absolute_uri(media.file.url)
-                texto = f"<b>¡Nuevo Comic subido!</b>\n\n📎 <a href='{file_url}'>Ver archivo</a>"
+                file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.id]))
+                texto = f"<b>¡Nueva galería subida!</b>\n\n<b> Cortesia de {comic.user}</b>\n\n <a href='{file_url}'>{comic.name}</a>"
                 
                 # construye image_url absoluto si existe
-                if hasattr(media, 'image') and media.image:
-                    image_url = request.build_absolute_uri(media.image.url)
+                if hasattr(comic, 'image') and comic.image:
+                    image_path = comic.image.path  # ¡Este es el path local físico!
                 else:
-                    image_url = None
+                    image_path = None
                 
-                print('DEBUG: enviando Telegram', texto, image_url)
-                resp = enviar_telegram_mensaje(texto, image_url)
+                print('DEBUG: enviando Telegram', texto, image_path)
+                resp = enviar_telegram_mensaje(texto, image_path)
                 print('DEBUG: respuesta Telegram', resp)
 
                 return redirect('index:index')
@@ -620,48 +539,54 @@ def uploadElement(request):
     return render(request, 'index/uploadElement.html', context)
 
 
-def enviar_telegram_mensaje(texto, image_url=None):
+def enviar_telegram_mensaje(texto, image_path=None):
     token = settings.TELEGRAM_BOT_TOKEN
     chat_id = settings.TELEGRAM_GROUP_CHAT_ID
 
-    # Primero enviamos el mensaje de texto
-    message_url = f"https://api.telegram.org/bot{token}/sendMessage"
-    data = {
-        'chat_id': chat_id,
-        'text': texto,
-        'parse_mode': 'HTML',
-        'disable_web_page_preview': True
-    }
+    # ⚙️ CAMBIO AQUÍ (Usa esto si estás en LOCAL + NGROK)
+    # Ejemplo: ngrok_url = "https://d3f4-189-204-123-123.ngrok-free.app"
+    # ⚠️ Este valor debería idealmente venir de settings o una variable de entorno
+    ngrok_url = "https://d3f4-189-204-123-123.ngrok-free.app"
 
-    print('DEBUG enviar_telegram_mensaje: llamando sendMessage', message_url, data)
-    try:
-        r1 = requests.post(message_url, data=data)
-        print('DEBUG enviar_telegram_mensaje: status_code', r1.status_code)
-        res1 = r1.json()
-        print('DEBUG enviar_telegram_mensaje: json', res1)
-    except Exception as e:
-        print('DEBUG enviar_telegram_mensaje: excepción en sendMessage', e)
-        return {'ok': False, 'error': str(e)}
+    # 🏠 Modo LOCAL (sin ngrok, puede fallar si image_path no es accesible desde fuera)
+    is_localhost = "127.0.0.1" in texto or "localhost" in texto
 
-    # Luego, si hay imagen válida, se manda como imagen
-    if image_url:
-        photo_url = f"https://api.telegram.org/bot{token}/sendPhoto"
-        photo_data = {
-            'chat_id': chat_id,
-            'photo': image_url
-        }
+    # ☝️ Si usas image_url generado desde Django (media.image.url), reemplaza 127.0.0.1 por tu ngrok
+    if is_localhost:
+        texto = texto.replace("http://127.0.0.1:8000", ngrok_url)
 
-        print('DEBUG enviar_telegram_mensaje: llamando sendPhoto', photo_url, photo_data)
+    if image_path and os.path.exists(image_path):
+        # 🖼️ Enviar imagen + texto juntos usando sendPhoto
+        url = f"https://api.telegram.org/bot{token}/sendPhoto"
         try:
-            r2 = requests.post(photo_url, data=photo_data)
-            print('DEBUG enviar_telegram_mensaje: status_code sendPhoto', r2.status_code)
-            res2 = r2.json()
-            print('DEBUG enviar_telegram_mensaje: json sendPhoto', res2)
+            with open(image_path, 'rb') as img:
+                files = {'photo': img}
+                data = {
+                    'chat_id': chat_id,
+                    'caption': texto,
+                    'parse_mode': 'HTML'
+                }
+                r = requests.post(url, data=data, files=files)
+                res = r.json()
+                return {'ok': True, 'combined_msg': res}
         except Exception as e:
-            print('DEBUG enviar_telegram_mensaje: excepción en sendPhoto', e)
-            return {'ok': False, 'error': str(e)}
+            return {'ok': False, 'error': f'Error en sendPhoto: {e}'}
+    else:
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        data = {
+            'chat_id': chat_id,
+            'text': texto,
+            'parse_mode': 'HTML',
+            'disable_web_page_preview': True
+        }
+        try:
+            r = requests.post(url, data=data)
+            res = r.json()
+            return {'ok': True, 'text_msg': res}
+        except Exception as e:
+            return {'ok': False, 'error': f'Error en sendMessage: {e}'}
 
-    return {'ok': True, 'text_msg': res1, 'image_msg': res2 if image_url else None}
+
 
 
 @login_required
