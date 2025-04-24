@@ -11,6 +11,12 @@ class UploadComicForm(forms.ModelForm):
 
             self.fields['name'].required = True
             self.fields['name'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+ # Estilos personalizados para las checkboxes
+            checkbox_style = {
+            'class': 'form-check-input fs-3 mx-2 my-0',  # Tamaño más grande con Bootstrap 5
+            'style': 'transform: scale(1.5);'        # Agranda aún más la checkbox
+            }
+            self.fields['hide'].widget.attrs.update(checkbox_style)
 
             self.fields['artist'].required = False
             self.fields['artist'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
@@ -66,8 +72,12 @@ class UploadElementForm(forms.ModelForm):
 
         self.fields['image'].required = False
         self.fields['image'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2 from-control', 'placeholder': ' Miniatura', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
-     
-
+      # Estilos personalizados para las checkboxes
+        checkbox_style = {
+            'class': 'form-check-input fs-3 mx-2 my-0',  # Tamaño más grande con Bootstrap 5
+            'style': 'transform: scale(1.5);'        # Agranda aún más la checkbox
+        }
+        self.fields['hide'].widget.attrs.update(checkbox_style)
         # Asegúrate de que el campo de tags está usando CheckboxSelectMultiple correctamente.
         self.fields['tags'].required = False
         self.fields['tags'].widget = forms.CheckboxSelectMultiple()

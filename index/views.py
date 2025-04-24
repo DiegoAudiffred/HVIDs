@@ -339,11 +339,53 @@ def watchContent(request, id):
 @login_required(login_url='/login/')  # ruta de la vista login
 def detailsAbout(request, filtro, valor):
     sidebar_context = get_sidebar_context()
-
     if filtro == "personaje":
-        personaje = get_object_or_404(Character, name__iexact=valor)
+        resultado = Character.objects.get(name=valor)
+        media_files = MediaFile.objects.filter(character=resultado)
+        comics = Comic.objects.filter(character=resultado)
+
+        combined_media = sorted(
+        chain(media_files, comics),
+        key=lambda x: x.uploaded_at,
+        reverse=True)
         context = {
-            'personaje': personaje,
+            'contenido':combined_media,
+            'resultado': resultado,
+            'filtro': filtro,
+            'valor': valor,
+            **sidebar_context,
+        }
+        
+    elif filtro=="artista":
+        resultado = Artist.objects.get(name=valor)
+        media_files = MediaFile.objects.filter(artist=resultado)
+        comics = Comic.objects.filter(artist=resultado)
+
+        combined_media = sorted(
+        chain(media_files, comics),
+        key=lambda x: x.uploaded_at,
+        reverse=True)
+       
+        context = {
+            'contenido':combined_media,
+            'resultado': resultado,
+            'filtro': filtro,
+            'valor': valor,
+            **sidebar_context,
+        }
+    elif filtro=="juego":
+        resultado = Game.objects.get(name=valor)
+        media_files = MediaFile.objects.filter(game=resultado)
+        comics = Comic.objects.filter(game=resultado)
+
+        combined_media = sorted(
+        chain(media_files, comics),
+        key=lambda x: x.uploaded_at,
+        reverse=True)
+       
+        context = {
+            'contenido':combined_media,
+            'resultado': resultado,
             'filtro': filtro,
             'valor': valor,
             **sidebar_context,
