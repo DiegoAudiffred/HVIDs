@@ -176,6 +176,10 @@ class MediaFile(models.Model):
 #    pagNum = models.IntegerField()
 #    file = models.URLField(max_length=2000, blank=True, null=True)  # Almacenar la URL del archivo en Google Drive
 
+class Subscriber(models.Model):
+    phone = models.IntegerField(null=False,blank=False,unique=True,max_length=15)
+    active = models.BooleanField(default=False)
+
 class Comic(models.Model):
     name = models.CharField(max_length=100)
     artist= models.ForeignKey(Artist, on_delete=models.CASCADE, blank=True, null=True)

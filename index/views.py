@@ -1,8 +1,10 @@
 import datetime
 import random
+from urllib import request
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
+from django.urls import reverse
 from db.models import *
 from .forms import *
 from django.http import JsonResponse
@@ -23,6 +25,46 @@ import mimetypes
 import os
 from django.http import FileResponse, HttpResponse, HttpResponseNotFound
 from django.conf import settings
+import logging
+import requests
+
+from django.http import JsonResponse
+import logging
+
+
+
+@csrf_exempt
+def subscribe_phone(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            phone = data.get('phone', '').strip()
+
+            # Validación básica y normalización
+            if not phone.startswith('+'):
+                if phone.startswith('52'):
+                    phone = '+' + phone
+                else:
+                    phone = '+52' + phone
+
+            if not phone or len(phone) < 10:
+                return JsonResponse({'success': False, 'message': 'Número inválido'}, status=400)
+
+            # Verificar si ya existe un suscriptor activo
+            existing = Subscriber.objects.filter(phone=phone, active=True).first()
+            if existing:
+                existing.active = False
+                existing.save()
+                return JsonResponse({'success': True, 'message': 'Suscripción desactivada'})
+
+            # Crear uno nuevo (activo)
+            Subscriber.objects.create(phone=phone, active=True)
+
+            return JsonResponse({'success': True, 'message': 'Suscrito con éxito'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+    return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
 
 
 
@@ -381,7 +423,7 @@ def detailsAbout(request, filtro, valor):
         combined_media = sorted(
         chain(media_files, comics),
         key=lambda x: x.uploaded_at,
-        reverse=True)
+        reverse=True)[:6]
        
         context = {
             'contenido':combined_media,
@@ -486,6 +528,7 @@ import mimetypes
 
 @login_required(login_url='/login/')
 def uploadElement(request):
+    # POST handling
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
@@ -495,76 +538,130 @@ def uploadElement(request):
                 media = form.save(commit=False)
                 media.user = request.user
 
+                # renombrado de archivo
                 uploaded_file = request.FILES['file']
-                original_name = uploaded_file.name
-                base_name, ext = os.path.splitext(original_name)
-                
-                # Revisa si existe un archivo con el mismo nombre dentro del path de upload_to
-                upload_dir = datetime.datetime.now().now().strftime("media_files/%Y%m%d/")
+                base_name, ext = os.path.splitext(uploaded_file.name)
+                upload_dir = datetime.datetime.now().strftime("media_files/%Y%m%d/")
                 final_name = f"{base_name}{ext}"
                 count = 1
                 while default_storage.exists(os.path.join(upload_dir, final_name)):
                     final_name = f"{base_name}_{count}{ext}"
                     count += 1
-                
-                # Asigna el archivo con el nuevo nombre directamente al FileField
                 uploaded_file.name = final_name
                 media.file = uploaded_file
-
-
                 media.save()
                 form.save_m2m()
 
-                # Procesar tags
-                tags_raw = request.POST.get('tags_selectedVideo', '')
-                tag_names = [t.strip().upper() for t in tags_raw.split(',') if t.strip()]
-                for tag_name in tag_names:
-                    tag_obj, _ = Tags.objects.get_or_create(name=tag_name)
-                    media.tags.add(tag_obj)
+                # tags
+                for tag in request.POST.get('tags_selectedVideo', '').split(','):
+                    if tag.strip():
+                        obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
+                        media.tags.add(obj)
+
+                # notificación
+              # ... dentro de uploadElement, tras media.save() y tags ...
+                file_url = request.build_absolute_uri(reverse('index:watchContent', args=[media.id]))
+                texto = f"<b>¡Nuevo video subido!</b>\n\n<b> Cortesia de {media.user}</b>\n\n <a href='{file_url}'>{media.name}</a>"
+                
+                # construye image_url absoluto si existe
+                if hasattr(media, 'image') and media.image:
+                    image_url = request.build_absolute_uri(media.image.url)
+                else:
+                    image_url = None
+                
+                print('DEBUG: enviando Telegram', texto, image_url)
+                resp = enviar_telegram_mensaje(texto, image_url)
+                print('DEBUG: respuesta Telegram', resp)
+
 
                 return redirect('index:index')
 
         elif form_type == 'comic':
             formComic = UploadComicForm(request.POST)
             if formComic.is_valid():
-               # Después de validar y guardar el modelo Comic (formComic.is_valid()):
                 comic = formComic.save(commit=False)
                 comic.image = request.FILES.getlist('comicImages')[0]
-
                 comic.user = request.user
                 comic.save()
                 formComic.save_m2m()
-
-                # Guardar cada imagen subida
                 for image in request.FILES.getlist('comicImages'):
                     ComicPage.objects.create(comic=comic, image=image)
-                    
+                for tag in request.POST.get('tags_selectedComic', '').split(','):
+                    if tag.strip():
+                        obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
+                        comic.tags.add(obj)
 
-                # Guardar tags
-                tags_raw = request.POST.get('tags_selectedComic', '')
-                tag_names = [t.strip().upper() for t in tags_raw.split(',') if t.strip()]
-                for tag_name in tag_names:
-                    tag_obj, _ = Tags.objects.get_or_create(name=tag_name)
-                    comic.tags.add(tag_obj)
+                file_url = request.build_absolute_uri(media.file.url)
+                texto = f"<b>¡Nuevo Comic subido!</b>\n\n📎 <a href='{file_url}'>Ver archivo</a>"
+                
+                # construye image_url absoluto si existe
+                if hasattr(media, 'image') and media.image:
+                    image_url = request.build_absolute_uri(media.image.url)
+                else:
+                    image_url = None
+                
+                print('DEBUG: enviando Telegram', texto, image_url)
+                resp = enviar_telegram_mensaje(texto, image_url)
+                print('DEBUG: respuesta Telegram', resp)
 
                 return redirect('index:index')
 
-        # Si llegamos aquí, hubo errores:
-        # re-render con errores
-        # (asegúrate de que `form` o `formComic` tenga el error)
-    else:
-        form = UploadElementForm()
-        formComic = UploadComicForm()
-
+    # GET o errores: reconstruir context original
+    form = UploadElementForm()
+    formComic = UploadComicForm()
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
     sidebar_context = get_sidebar_context()
-
-    return render(request, 'index/uploadElement.html', {
+    context = {
         'form': form,
         'formComic': formComic,
         'media_files': media_files,
         **sidebar_context
-    })
+    }
+    return render(request, 'index/uploadElement.html', context)
+
+
+def enviar_telegram_mensaje(texto, image_url=None):
+    token = settings.TELEGRAM_BOT_TOKEN
+    chat_id = settings.TELEGRAM_GROUP_CHAT_ID
+
+    # Primero enviamos el mensaje de texto
+    message_url = f"https://api.telegram.org/bot{token}/sendMessage"
+    data = {
+        'chat_id': chat_id,
+        'text': texto,
+        'parse_mode': 'HTML',
+        'disable_web_page_preview': True
+    }
+
+    print('DEBUG enviar_telegram_mensaje: llamando sendMessage', message_url, data)
+    try:
+        r1 = requests.post(message_url, data=data)
+        print('DEBUG enviar_telegram_mensaje: status_code', r1.status_code)
+        res1 = r1.json()
+        print('DEBUG enviar_telegram_mensaje: json', res1)
+    except Exception as e:
+        print('DEBUG enviar_telegram_mensaje: excepción en sendMessage', e)
+        return {'ok': False, 'error': str(e)}
+
+    # Luego, si hay imagen válida, se manda como imagen
+    if image_url:
+        photo_url = f"https://api.telegram.org/bot{token}/sendPhoto"
+        photo_data = {
+            'chat_id': chat_id,
+            'photo': image_url
+        }
+
+        print('DEBUG enviar_telegram_mensaje: llamando sendPhoto', photo_url, photo_data)
+        try:
+            r2 = requests.post(photo_url, data=photo_data)
+            print('DEBUG enviar_telegram_mensaje: status_code sendPhoto', r2.status_code)
+            res2 = r2.json()
+            print('DEBUG enviar_telegram_mensaje: json sendPhoto', res2)
+        except Exception as e:
+            print('DEBUG enviar_telegram_mensaje: excepción en sendPhoto', e)
+            return {'ok': False, 'error': str(e)}
+
+    return {'ok': True, 'text_msg': res1, 'image_msg': res2 if image_url else None}
 
 
 @login_required

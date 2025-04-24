@@ -50,62 +50,62 @@ $grayBorder: #CED4DA;
 $white: #FFFFFF;
 
 $theme-colors: (
-    "primary": $primary,
-    "secondary": $secondary,
-    "tercero": $tercero,
-    "cuarto": $cuarto,
-    "quinto": $quinto,
-    "sexto":$sexto,
-    "corporateNavyBlue800": $corporateNavyBlue800,
-    "corporateNavyBlue900": $corporateNavyBlue900,
-    "corporateNavyBlue700": $corporateNavyBlue700,
-    "corporateNavyBlue600": $corporateNavyBlue600,
-    "corporateNavyBlue500": $corporateNavyBlue500,
-    "corporateNavyBlue400": $corporateNavyBlue400,
-    "corporateNavyBlue300": $corporateNavyBlue300,
-    "corporateNavyBlue200": $corporateNavyBlue200,
-    "corporateNavyBlue100": $corporateNavyBlue100,
-    "corporateNavyBlue50": $corporateNavyBlue50,
-    "corporateOrange900": $corporateOrange900,
-    "corporateOrange800": $corporateOrange800,
-    "corporateOrange700": $corporateOrange700,
-    "corporateOrange600": $corporateOrange600,
-    "corporateOrange500": $corporateOrange500,
-    "corporateOrange400": $corporateOrange400,
-    "corporateOrange300": $corporateOrange300,
-    "corporateOrange200": $corporateOrange200,
-    "corporateOrange100": $corporateOrange100,
-    "corporateOrange50": $corporateOrange50,
-    "corporateGray900": $corporateGray900,
-    "corporateGray800": $corporateGray800,
-    "corporateGray700": $corporateGray700,
-    "corporateGray600": $corporateGray600,
-    "corporateGray500": $corporateGray500,
-    "corporateGray400": $corporateGray400,
-    "corporateGray300": $corporateGray300,
-    "corporateGray200": $corporateGray200,
-    "corporateGray100": $corporateGray100,
-    "corporateGray50": $corporateGray50,
-    "corporateYellow900": $corporateYellow900,
-    "corporateYellow800": $corporateYellow800,
-    "corporateYellow700": $corporateYellow700,
-    "corporateYellow600": $corporateYellow600,
-    "corporateYellow500": $corporateYellow500,
-    "corporateYellow400": $corporateYellow400,
-    "corporateYellow300": $corporateYellow300,
-    "corporateYellow200": $corporateYellow200,
-    "corporateYellow100": $corporateYellow100,
-    "corporateYellow50": $corporateYellow50,
-    "error": $error,
-    "grayBorder": $grayBorder,
-    "white": $white,
+  "primary": $primary,
+  "secondary": $secondary,
+  "tercero": $tercero,
+  "cuarto": $cuarto,
+  "quinto": $quinto,
+  "sexto":$sexto,
+  "corporateNavyBlue800": $corporateNavyBlue800,
+  "corporateNavyBlue900": $corporateNavyBlue900,
+  "corporateNavyBlue700": $corporateNavyBlue700,
+  "corporateNavyBlue600": $corporateNavyBlue600,
+  "corporateNavyBlue500": $corporateNavyBlue500,
+  "corporateNavyBlue400": $corporateNavyBlue400,
+  "corporateNavyBlue300": $corporateNavyBlue300,
+  "corporateNavyBlue200": $corporateNavyBlue200,
+  "corporateNavyBlue100": $corporateNavyBlue100,
+  "corporateNavyBlue50": $corporateNavyBlue50,
+  "corporateOrange900": $corporateOrange900,
+  "corporateOrange800": $corporateOrange800,
+  "corporateOrange700": $corporateOrange700,
+  "corporateOrange600": $corporateOrange600,
+  "corporateOrange500": $corporateOrange500,
+  "corporateOrange400": $corporateOrange400,
+  "corporateOrange300": $corporateOrange300,
+  "corporateOrange200": $corporateOrange200,
+  "corporateOrange100": $corporateOrange100,
+  "corporateOrange50": $corporateOrange50,
+  "corporateGray900": $corporateGray900,
+  "corporateGray800": $corporateGray800,
+  "corporateGray700": $corporateGray700,
+  "corporateGray600": $corporateGray600,
+  "corporateGray500": $corporateGray500,
+  "corporateGray400": $corporateGray400,
+  "corporateGray300": $corporateGray300,
+  "corporateGray200": $corporateGray200,
+  "corporateGray100": $corporateGray100,
+  "corporateGray50": $corporateGray50,
+  "corporateYellow900": $corporateYellow900,
+  "corporateYellow800": $corporateYellow800,
+  "corporateYellow700": $corporateYellow700,
+  "corporateYellow600": $corporateYellow600,
+  "corporateYellow500": $corporateYellow500,
+  "corporateYellow400": $corporateYellow400,
+  "corporateYellow300": $corporateYellow300,
+  "corporateYellow200": $corporateYellow200,
+  "corporateYellow100": $corporateYellow100,
+  "corporateYellow50": $corporateYellow50,
+  "error": $error,
+  "grayBorder": $grayBorder,
+  "white": $white,
 );
 
 //Shadows for buttons
 .orangeShadow {}
 
 .orangeShadow:hover {
-    box-shadow: 0px 2px 4px rgba(246, 135, 31, 0.13), 0px 12px 24px rgba(246, 135, 31, 0.33);
+  box-shadow: 0px 2px 4px rgba(246, 135, 31, 0.13), 0px 12px 24px rgba(246, 135, 31, 0.33);
 }
 
 //Typography
@@ -116,97 +116,114 @@ $theme-colors: (
 
 // ====== FONT IMPORT ====== 
 @font-face {
-    font-family: 'BadComic';
-    src: url('/static/fonts/BadComic-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-  @font-face {
-    font-family: 'BubbleSans';
-    src: url('/static/fonts/BubbleSans-Regular.otf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
-  
-  // ====== TIPOGRAFÍA ======
-  
-  // Estilo regular con peso fuerte (bold visual)
-  .fnBubbleSansRegular {
-    font-family: 'BubbleSans', sans-serif;
-    font-style: normal;
-    font-weight: 700; 
-    font-size: 15px;
-    line-height: 20px;
-  }
+  font-family: 'BadComic';
+  src: url('/static/fonts/BadComic-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
-  .fnBadComicRegular {
-    font-family: 'BadComic', sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 15px;
-    line-height: 20px;
-  }
-  
-  // Estilo ligero (puede que se vea igual si la fuente no tiene variante light)
-  .fnBadComicLight {
-    font-family: 'BadComic', sans-serif;
-    font-style: normal;
-    font-weight: 300; // Puede no cambiar si la fuente no tiene pesos definidos
-    font-size: 15px;
-    line-height: 20px;
-  }
-  
-  // Estilo en negrita
-  .fnBadComicBold {
-    font-family: 'BadComic', sans-serif;
-    font-style: normal;
-    font-weight: 900;
-    font-size: 15px;
-    line-height: 20px;
-  }
-  
-  // Estilo cursiva
-  .fnBadComicItalic {
-    font-family: 'BadComic', sans-serif;
-    font-style: italic;
-    font-weight: normal;
-    font-size: 15px;
-    line-height: 20px;
-  }
-  
-  // Variante grande para títulos
-  .fnBadComicTitle {
-    font-family: 'BadComic', sans-serif;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 28px;
-    line-height: 36px;
-    letter-spacing: 1px;
-  }
-  
-  // Variante para botones o llamados a la acción
-  .fnBadComicButton {
-    font-family: 'BadComic', sans-serif;
-    font-style: normal;
-    font-weight: bold;
-    font-size: 16px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-  }
-  
-  // Variante pequeña para notas o etiquetas
-  .fnBadComicSmall {
-    font-family: 'BadComic', sans-serif;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 12px;
-    line-height: 14px;
-    color: #555;
-  }
-  
- 
-  
- 
+@font-face {
+  font-family: 'BubbleSans';
+  src: url('/static/fonts/BubbleSans-Regular.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+// ====== TIPOGRAFÍA ======
+
+// Estilo regular con peso fuerte (bold visual)
+.fnBubbleSansRegularXL {
+  font-family: 'BubbleSans', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 25px;
+  line-height: 30px;
+}
+
+.fnBubbleSansRegular {
+  font-family: 'BubbleSans', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.fnBadComicRegularXL {
+  font-family: 'BadComic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 45px;
+}
+
+.fnBadComicRegular {
+  font-family: 'BadComic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+// Estilo ligero (puede que se vea igual si la fuente no tiene variante light)
+.fnBadComicLight {
+  font-family: 'BadComic', sans-serif;
+  font-style: normal;
+  font-weight: 300; // Puede no cambiar si la fuente no tiene pesos definidos
+  font-size: 15px;
+  line-height: 20px;
+}
+
+// Estilo en negrita
+.fnBadComicBold {
+  font-family: 'BadComic', sans-serif;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+// Estilo cursiva
+.fnBadComicItalic {
+  font-family: 'BadComic', sans-serif;
+  font-style: italic;
+  font-weight: normal;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+// Variante grande para títulos
+.fnBadComicTitle {
+  font-family: 'BadComic', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 36px;
+  letter-spacing: 1px;
+}
+
+// Variante para botones o llamados a la acción
+.fnBadComicButton {
+  font-family: 'BadComic', sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+// Variante pequeña para notas o etiquetas
+.fnBadComicSmall {
+  font-family: 'BadComic', sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 14px;
+  color: #555;
+}
+
+
+
+
 // Add custom code before this
 
 $form-select-color: $corporateGray900;
@@ -214,34 +231,34 @@ $form-select-indicator-color: #ACACAC;
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 input[type=number] {
-    -moz-appearance: textfield;
+  -moz-appearance: textfield;
 }
 
 .btn-outline-grayBorder:hover {
-    background-color: white !important;
+  background-color: white !important;
 }
 
 .btn-outline-grayBorder:active {
-    background-color: white !important;
+  background-color: white !important;
 }
 
 .btn-outline-grayBorder:visited {
-    background-color: white !important;
+  background-color: white !important;
 }
 
 $carousel-control-color: $primary;
 $carousel-indicator-width: 6px;
 $carousel-indicator-height: 6px;
 $carousel-indicator-opacity: 1;
-$carousel-indicator-active-bg: $corporateGray200; 
+$carousel-indicator-active-bg: $corporateGray200;
 
 .carousel-indicators [data-bs-target] {
-    border-radius: 100%;
+  border-radius: 100%;
 }
 
 @import "../bootstrap/scss/bootstrap.scss";

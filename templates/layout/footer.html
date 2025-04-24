@@ -1,8 +1,129 @@
-{% load static %}
-<footer class="bg-primary text-white mt-auto py-3">
-    <div class="container d-flex justify-content-center">
-        <ul class="nav">
+<footer class="bg-tercero text-white py-5">
+    <div class="container">
+        <div class="row align-items-center mb-4">
+            <div class="col-md-6">
+                <h5>¿Quieres estar al tanto de las mamadas que se suben?</h5>
+            </div>
+            <div class="col-md-6">
+                <!-- agregamos id al form y al input -->
+                <form id="subscribeForm" class="row g-2">
 
-        </ul>
+                    <div class="col-sm-12">
+                        <a href="https://t.me/+XYkCqTrCd3I1MzYx" type="submit" target='_blank'
+                            class="btn btn-light w-100 bg-secondary text-white">
+                            Unete al grupo de Telegram para no perderte nada!
+                        </a>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-6 d-none">
+                <!-- agregamos id al form y al input -->
+                <form id="subscribeForm" class="row g-2">
+                    <div class="col-sm-8">
+                        <label for="phoneInput">Si vuelves a escrib ir el número se da de baja lol</label>
+                        <input id="phoneInput" type="number" class="form-control"
+                            placeholder="Tus nudes aquí, digo teléfono celular" required>
+                    </div>
+                    <div class="col-sm-4">
+                        <button type="submit" class="btn btn-light w-100 bg-secondary text-white">
+                            ¡Suscríbeme!
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Aquí inyectaremos el botón de WhatsApp -->
+        <div id="whatsapp-container" class="text-center mb-3"></div>
+
+        <div class="text-center small">© 2025 Salchiis Company. ACMEUNPT.</div>
     </div>
 </footer>
+
+<style>
+    .footer a:hover {
+        text-decoration: underline;
+    }
+
+    .bg-tercero {
+        background-color: #343a40;
+    }
+
+    .btn-outline-light:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-whatsapp {
+        background: #25D366;
+        border-color: #1DA851;
+        transition: transform .2s;
+    }
+
+    .btn-whatsapp:hover {
+        transform: scale(1.1);
+        background: #1DA851;
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('subscribeForm');
+        const phoneInput = document.getElementById('phoneInput');
+        const whatsappContainer = document.getElementById('whatsapp-container'); // ahora solo muestra mensajes
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            let phone = phoneInput.value.trim();
+
+            if (!phone.startsWith('+')) {
+                if (phone.startsWith('52')) {
+                    phone = '+' + phone;
+                } else {
+                    phone = '+52' + phone;
+                }
+            }
+
+            if (!/^\+\d{10,15}$/.test(phone)) {
+                whatsappContainer.textContent = 'Número de teléfono inválido.';
+                return;
+            }
+
+            fetch('/api/subscribe-phone/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')  // si no usas @csrf_exempt
+                },
+                body: JSON.stringify({ phone: phone })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        whatsappContainer.textContent = data.message;
+                        phoneInput.value = '';
+                    } else {
+                        whatsappContainer.textContent = 'Error: ' + data.message;
+                    }
+                })
+                .catch(err => {
+                    whatsappContainer.textContent = 'Error al suscribirse.';
+                    console.error(err);
+                });
+        });
+
+        // Función para obtener CSRF desde cookies (si no usas @csrf_exempt)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
