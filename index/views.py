@@ -479,7 +479,13 @@ def uploadElement(request):
                 # notificación
               # ... dentro de uploadElement, tras media.save() y tags ...
                 file_url = request.build_absolute_uri(reverse('index:watchContent', args=[media.id]))
-                texto = f"<b>¡Nuevo video subido!</b>\n\n<b> Cortesia de {media.user}</b>\n\n <a href='{file_url}'>{media.name}</a>"
+                texto = (
+    f"🎬 <b>¡Nuevo video subido!</b>\n"
+    f"📤 <i>Cortesía de</i> <b>{media.user}</b>\n\n"
+    f"📎 <b>Nombre:</b> <a href='{file_url}'>{media.name}</a>\n"
+    f"📺 <i>Haz clic en el nombre para verlo o descargarlo.</i>\n\n"
+    f"🔞 <i>Contenido variado: anime, series, y más...</i>"
+)
                 
                 # construye image_url absoluto si existe
                 if hasattr(media, 'image') and media.image:
