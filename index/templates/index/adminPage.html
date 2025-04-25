@@ -2,7 +2,17 @@
 {% load static %}
 
 {% block body %}
+
 <style>
+    #tagSuggestions .suggestion-item:hover {
+        background-color: #f0f0f0;
+    }
+
+    /* Para resaltar la sugerencia activa si no tienes bg-light */
+    .suggestion-item.active {
+        background-color: #95acc4;
+    }
+
     .adminLink:hover {
         color: #fff !important;
         background-color: #8B0000 !important;
@@ -109,17 +119,103 @@
             <div class="my-3">
                 <h1>Agregar un nuevo Artista</h1>
             </div>
-            <div class="col-lg-6  my-3 my-lg-0 col-12 text-center">
+            <div class="col-lg-6 my-3 my-lg-0 col-12 text-center">
                 <label for="imageInput2" style="cursor: pointer;">
                     <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"
-                        class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="2">
+                        class="img-thumbnail d-block imagePreview w-100 h-auto"
+                        style="max-height: 500px; object-fit: contain;" data-preview-id="2">
                 </label>
                 <input type="file" name="image" id="imageInput2" accept="image/*" class="d-none imageInput"
                     data-preview-id="2">
             </div>
-            <div class="col-lg-6  my-3 my-lg-0 col-12 text-center">
+
+            <div class="col-lg-6  my-3 my-lg-0 col-12 text-start">
                 <div class="my-2">
+                    Nombre: *
                     {{ formArtist.name }}
+                </div>
+                <div class="my-2">
+                    Sexo:
+                    {{ formArtist.gender }}
+                </div>
+                <div class="my-2 position-relative">
+                    Etiquetas:
+                    <input type="text" id="tagInputArtist" class="rounded-3 border-3 border-primary px-4 w-100 py-2"
+                        placeholder="Escribe una etiqueta y presiona Enter">
+                    <div id="tagSuggestionsArtist"
+                        class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
+                    </div>
+                    <div id="tagContainerArtist" class="mt-2 d-flex flex-wrap gap-2"></div>
+                </div>
+                <div class="my-2">
+                    Descripción:
+                    {{ formArtist.description }}
+                </div>
+                <div class="my-2">
+                    Redes sociales
+                    <div id="socialButtons" class="mb-3">
+
+                        <button type="button" class="btn  btn-sm me-2 adminLink " data-net="facebook">
+                            Facebook</button>
+                        <button type="button" class="btn btn-sm me-2 adminLink " data-net="twitter">
+                            Twitter</button>
+                        <button type="button" class="btn  btn-sm me-2 adminLink " data-net="instagram">
+                            Instagram</button>
+                        <button type="button" class="btn  btn-sm me-2 adminLink " data-net="youtube">
+                            YouTube</button>
+                        <button type="button" class="btn  btn-sm me-2 adminLink " data-net="tiktok">
+                            TikTok</button>
+                        <button type="button" class="btn  btn-sm me-2 adminLink " data-net="onlyfans">
+                            OnlyFans</button>
+                        <button type="button" class="btn  btn-sm me-2 adminLink " data-net="extra1"> algo
+                            1</button>
+                        <button type="button" class="btn  btn-sm me-2 adminLink " data-net="extra2"> no se
+                            2</button>
+                        <button type="button" class="btn  btn-sm" data-net="extra3"> sexo </button>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 d-none social-input " id="input-facebook">
+                            <label class="form-label">Facebook</label>
+                            {{ formArtist.facebook }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-twitter">
+                            <label class="form-label">Twitter</label>
+                            {{ formArtist.twitter }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-instagram">
+                            <label class="form-label">Instagram</label>
+                            {{ formArtist.instagram }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-youtube">
+                            <label class="form-label">YouTube</label>
+                            {{ formArtist.youtube }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-tiktok">
+                            <label class="form-label">TikTok</label>
+                            {{ formArtist.tiktok }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-onlyfans">
+                            <label class="form-label">OnlyFans</label>
+                            {{ formArtist.onlyfans }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-extra1">
+                            <label class="form-label">Red extra 1</label>
+                            {{ formArtist.extra1 }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-extra2">
+                            <label class="form-label">Red extra 2</label>
+                            {{ formArtist.extra2 }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-extra3">
+                            <label class="form-label">Red extra 3</label>
+                            {{ formArtist.extra3 }}
+                        </div>
+                    </div>
+                </div>
+                <div class="my-2">
+                    Cumpleaños:
+                    {{ formArtist.birthdate }}
                 </div>
                 <div class="my-2">
                     <button type="submit" class="btn  fw-bold w-100 bg-secondary text-cuarto">Agregar Artista</button>
@@ -127,7 +223,10 @@
             </div>
 
 
+
         </div>
+        <input type="hidden" name="tags_selectedArtist" id="tagsSelectedArtist">
+
     </form>
 
     <form method="post" enctype="multipart/form-data">
@@ -232,13 +331,31 @@
 
         </div>
     </form>
-    <div id="dynamic-container" class="row mt-4">
+    <div id="dynamic-container" class="row my-4">
         <!-- Aquí se cargarán los tags/artistas/chars/etc -->
     </div>
     <div id="response-message" class="text-center mt-2 d-none fw-bold text-tercero"></div>
 
 </div>
-
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll('#socialButtons button');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const net = btn.dataset.net;
+                const container = document.getElementById('input-' + net);
+                const input = container.querySelector('input, textarea');
+                if (container.classList.contains('d-none')) {
+                    container.classList.remove('d-none');
+                } else {
+                    if (input.value.trim() === '') {
+                        container.classList.add('d-none');
+                    }
+                }
+            });
+        });
+    });
+</script>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const buttons = document.querySelectorAll(".dynamicQuery");
@@ -385,6 +502,166 @@
             }, 500);
         }
     }
+
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll('#socialButtons button');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const net = btn.dataset.net;
+                const container = document.getElementById('input-' + net);
+                const input = container.querySelector('input, textarea');
+
+                // si no está abierto, lo abrimos
+                if (!container.classList.contains('open')) {
+                    container.classList.add('open');
+                } else {
+                    // si ya abierto, solo lo cerramos si está vacío
+                    if (input.value.trim() === '') {
+                        container.classList.remove('open');
+                    }
+                }
+            });
+        });
+    });
+</script>
+<script>
+    function setupTagInput({ inputId, suggestionsId, containerId, hiddenInputId }) {
+        const tagInput = document.getElementById(inputId);
+        const tagSuggestions = document.getElementById(suggestionsId);
+        const tagContainer = document.getElementById(containerId);
+        const tagsSelectedInput = document.getElementById(hiddenInputId);
+
+        let selectedTags = [];
+        let selectedIndex = -1;
+
+        tagInput.addEventListener("input", async () => {
+            const query = tagInput.value.trim();
+            const terms = query.split(" ");
+            const lastTerm = terms[terms.length - 1];
+
+            if (lastTerm.length < 1) {
+                tagSuggestions.classList.add("d-none");
+                tagSuggestions.innerHTML = "";
+                selectedIndex = -1;
+                return;
+            }
+
+            const response = await fetch(`/tags-suggest/?q=${encodeURIComponent(lastTerm)}`);
+            const tags = await response.json();
+
+            tagSuggestions.innerHTML = "";
+            if (tags.length > 0) {
+                tagSuggestions.innerHTML = tags.map(tag => `
+                <div class="p-2 suggestion-item" style="cursor:pointer;">
+                    ${tag}
+                </div>
+            `).join('');
+
+                tagSuggestions.classList.remove("d-none");
+
+                document.querySelectorAll(`#${suggestionsId} .suggestion-item`).forEach((item, index) => {
+                    item.addEventListener("click", () => {
+                        addTag(item.textContent);
+                        tagInput.value = "";
+                        tagSuggestions.classList.add("d-none");
+                        selectedIndex = -1;
+                        tagInput.focus();
+                    });
+                });
+
+                selectedIndex = -1;
+            } else {
+                tagSuggestions.classList.add("d-none");
+            }
+        });
+
+        tagInput.addEventListener("keydown", e => {
+            const suggestions = tagSuggestions.querySelectorAll(".suggestion-item");
+
+            // Flechas arriba/abajo mantienen tu lógica
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                selectedIndex = (selectedIndex + 1) % suggestions.length;
+                updateActiveSuggestion(suggestions);
+            }
+            else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                selectedIndex = (selectedIndex - 1 + suggestions.length) % suggestions.length;
+                updateActiveSuggestion(suggestions);
+            }
+            // Tab: si moviste con flechas, toma esa; si no, la primera sugerencia
+            else if (e.key === "Tab") {
+                if (suggestions.length > 0) {
+                    e.preventDefault();
+                    const idx = selectedIndex >= 0 ? selectedIndex : 0;
+                    addTag(suggestions[idx].textContent);
+                    tagInput.value = "";
+                    tagSuggestions.classList.add("d-none");
+                    selectedIndex = -1;
+                }
+            }
+            // Enter: si moviste con flechas, toma esa; sino, toma lo que escribiste
+            else if (e.key === "Enter") {
+                e.preventDefault();
+                if (suggestions.length > 0 && selectedIndex >= 0) {
+                    addTag(suggestions[selectedIndex].textContent);
+                } else if (tagInput.value.trim() !== "") {
+                    addTag(tagInput.value.trim());
+                }
+                tagInput.value = "";
+                tagSuggestions.classList.add("d-none");
+                selectedIndex = -1;
+            }
+        });
+
+
+        function updateActiveSuggestion(suggestions) {
+            suggestions.forEach((item, index) => {
+                if (index === selectedIndex) {
+                    item.classList.add("bg-light", "active");
+                    item.scrollIntoView({ block: "nearest" });
+                } else {
+                    item.classList.remove("bg-light", "active");
+                }
+            });
+        }
+
+        function addTag(tagText) {
+            const cleanTag = tagText.trim();
+            if (cleanTag === "" || selectedTags.includes(cleanTag)) return;
+
+            selectedTags.push(cleanTag);
+
+            const tagDiv = document.createElement("div");
+            tagDiv.className = "badge bg-secondary text-white rounded-pill px-3 py-2 d-flex align-items-center gap-2";
+            tagDiv.innerHTML = `
+            ${cleanTag}
+            <button type="button" class="btn-close btn-close-white btn-sm ms-2" aria-label="Remove"></button>
+        `;
+
+            tagDiv.querySelector("button").addEventListener("click", () => {
+                tagContainer.removeChild(tagDiv);
+                selectedTags = selectedTags.filter(t => t !== cleanTag);
+                updateHiddenInput();
+            });
+
+            tagContainer.appendChild(tagDiv);
+            updateHiddenInput();
+        }
+
+        function updateHiddenInput() {
+            tagsSelectedInput.value = selectedTags.join(",");
+        }
+    }
+    setupTagInput({
+        inputId: "tagInputArtist",
+        suggestionsId: "tagSuggestionsArtist",
+        containerId: "tagContainerArtist",
+        hiddenInputId: "tagsSelectedArtist"
+    });
+
 
 </script>
 {% endblock %}

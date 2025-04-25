@@ -23,6 +23,7 @@ urlpatterns = [
     path('adminPage/', views.adminPage, name='adminPage'),
     path("video/<int:id>/", views.watchContent, name='watchContent'),
     path('comic/<int:id>/', views.watchComic, name='watchComic'),
+    path('edit/<str:tipo>/<int:pk>/', views.edit_objeto, name='edit_objeto'),
 
     path("navbarFilterHeader/", views.navbarFilterHeader, name='navbarFilterHeader'),
     path('autocomplete/', views.autocomplete, name='autocomplete'),

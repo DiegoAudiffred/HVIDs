@@ -10,3 +10,7 @@ yt-dlp
 channels 
 channels_redis
 requests
+crispy-bootstrap5
+django-bootstrap-datepicker-plus
+django-taggit-bootstrap
+django-json-widget

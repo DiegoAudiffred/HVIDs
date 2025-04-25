@@ -101,11 +101,11 @@ def adminPage(request):
     formUser = addUserForm()
     formChar = addCharsForm()
     formGame = addGameForm()
-
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
         if form_type == 'tag_form':
+            
             formTag = addTagsForm(request.POST, request.FILES)
             if formTag.is_valid():
                 formTag.save()
@@ -114,8 +114,21 @@ def adminPage(request):
         elif form_type == 'artist_form':
             formArtist = addArtistForm(request.POST, request.FILES)
             if formArtist.is_valid():
-                formArtist.save()
+                artist = formArtist.save(commit=False)
+                artist.save()  # guarda antes de M2M
+                for tag in request.POST.get('tags_selectedArtist', '').split(','):
+                    if tag.strip():
+                        obj, created = Tags.objects.get_or_create(name=tag.strip().upper())
+                        artist.tags.add(obj)
+
+                        if created:
+                            print(f"🔹 Nueva tag creada: ID={obj.id}, Nombre='{obj.name}'")
+                        else:
+                            print(f"✅ Tag existente encontrada: ID={obj.id}, Nombre='{obj.name}'")
+
+                # ❌ No repitas formArtist.save()
                 return redirect('index:adminPage')
+
 
         elif form_type == 'user_form':
             formUser = addUserForm(request.POST, request.FILES)
@@ -150,7 +163,7 @@ def navbarFilterHeader(request):
 
     if thing_to_filter == "Artistas":
         media_files = Artist.objects.all
-    elif thing_to_filter == "Series":
+    elif thing_to_filter == "Juegos":
         media_files = Game.objects.all
     elif thing_to_filter == "Personajes":
         media_files = Character.objects.all
@@ -446,7 +459,7 @@ import mimetypes
 
 @login_required(login_url='/login/')
 def uploadElement(request):
-    # POST handling
+
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
@@ -509,27 +522,46 @@ def uploadElement(request):
                 comic.user = request.user
                 comic.save()
                 formComic.save_m2m()
+            
                 for image in request.FILES.getlist('comicImages'):
                     ComicPage.objects.create(comic=comic, image=image)
+            
                 for tag in request.POST.get('tags_selectedComic', '').split(','):
                     if tag.strip():
                         obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
                         comic.tags.add(obj)
-
+            
                 file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.id]))
-                texto = f"<b>¡Nueva galería subida!</b>\n\n<b> Cortesia de {comic.user}</b>\n\n <a href='{file_url}'>{comic.name}</a>"
-                
-                # construye image_url absoluto si existe
-                if hasattr(comic, 'image') and comic.image:
-                    image_path = comic.image.path  # ¡Este es el path local físico!
-                else:
-                    image_path = None
-                
+                texto = (
+                    f"🎬 <b>¡Nuevo imagén subida!</b>\n"
+                    f"📤 <i>Cortesía de</i> <b>{comic.user}</b>\n\n"
+                    f"📎 <b>Nombre:</b> <a href='{file_url}'>{comic.name}</a>\n"
+                    f"📺 <i>Haz clic en el nombre para verlo.</i>\n\n"
+                    f"🔞 <i>Contenido variado: anime, series, y más...</i>"
+                )
+            
+                image_path = None
+                temp_image_path = None
+            
+                if comic.image:
+                    try:
+                        with Image.open(comic.image.path) as img:
+                            width, height = img.size
+                            if width > 0 and height > 0:
+                                if img.mode != "RGB":
+                                    img = img.convert("RGB")
+                                temp_file = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+                                img.save(temp_file.name, format="JPEG")
+                                temp_image_path = temp_file.name
+                                image_path = temp_image_path
+                            else:
+                                print(f"❌ Imagen con dimensiones inválidas: {width}x{height}")
+                    except Exception as e:
+                        print(f"❌ Error al abrir la imagen: {e}")
+            
                 print('DEBUG: enviando Telegram', texto, image_path)
                 resp = enviar_telegram_mensaje(texto, image_path)
                 print('DEBUG: respuesta Telegram', resp)
-
-                return redirect('index:index')
 
     # GET o errores: reconstruir context original
     form = UploadElementForm()
@@ -593,7 +625,38 @@ def enviar_telegram_mensaje(texto, image_path=None):
             return {'ok': False, 'error': f'Error en sendMessage: {e}'}
 
 
+@login_required(login_url='/login/')
 
+def edit_objeto(request, tipo, pk):
+    context = {}
+    modelo_map = {
+        'personaje': (Character, CharacterFormEdit),
+        'artista': (Artist, ArtistFormEdit),
+        'juego': (Game, GameFormEdit),
+    }
+    if tipo not in modelo_map:
+        return redirect('index:index')  # o lanza error
+
+    modelo, formulario_clase = modelo_map[tipo]
+    instancia = get_object_or_404(modelo, pk=pk)
+    print(instancia)
+    if request.method == 'POST':
+        form = formulario_clase(request.POST, request.FILES, instance=instancia)
+        print(tipo,instancia)
+
+        if form.is_valid():
+            form.save()
+            return redirect('index:detailsAbout', filtro=tipo, valor=instancia.name)
+    else:
+        form = formulario_clase(instance=instancia)
+    sidebar_context = get_sidebar_context()
+    context = {
+        'form': form,
+        'tipo': tipo,
+        'instancia':instancia,
+        **sidebar_context
+    }
+    return render(request, 'index/edit_objeto.html', context)
 
 @login_required
 def tags_suggest(request):

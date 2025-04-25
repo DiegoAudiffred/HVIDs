@@ -1,0 +1,14 @@
+{% extends 'layout/layout.html' %}
+{% block body %}
+<div class="container mt-4 text-white">
+    <h2 class="mb-4">Editar {{ tipo|title }}: {{ objeto.name }}</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Guardar</button>
+        {{ objeto.name}}
+        <a href="{% url 'index:detailsAbout' tipo instancia %}" class="btn btn-secondary">Cancelar
+        </a>
+    </form>
+</div>
+{% endblock %}

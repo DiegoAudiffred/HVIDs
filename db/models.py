@@ -54,36 +54,52 @@ class User(AbstractUser):
 
     def __str__(self):
         return str(self.username)
-    
-class Game(models.Model):
-    name = models.CharField(max_length=255)
-    image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-    def tipo_objeto(self):
-        return "juego"
-
-class Character(models.Model):
-    name = models.CharField(max_length=255)    
-    image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
-    game= models.ForeignKey(Game, on_delete=models.CASCADE,blank=True,null=True)
-    def __str__(self):
-        return self.name
-    def tipo_objeto(self):
-        return "personaje"
-
-    
 class Tags(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
     
-class Artist(models.Model):
-    name = models.CharField(max_length=100)    
+class Game(models.Model):
+    name = models.CharField(max_length=255)
     image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
- 
+    tags = models.ManyToManyField(Tags, blank=True)
+    published_at = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True, null=True)
+    social_media = models.JSONField(blank=True, null=True)
+    def __str__(self):
+        return self.name
+    def tipo_objeto(self):
+        return "juego"
+
+    
+class Character(models.Model):
+    name = models.CharField(max_length=255)    
+    image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
+    game= models.ForeignKey(Game, on_delete=models.CASCADE,blank=True,null=True)
+    gender=models.BooleanField(default=False)
+    tags = models.ManyToManyField(Tags, blank=True)
+    published_at = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True, null=True)#,max_length=255
+    social_media = models.JSONField(blank=True, null=True)
+    birthdate = models.DateField(blank=True, null=True)
+    def __str__(self):
+        return self.name
+    def tipo_objeto(self):
+        return "personaje"
+
+    
+
+    
+class Artist(models.Model):
+    name = models.CharField(max_length=100,unique=True)    
+    image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
+    gender=models.BooleanField(default=False)
+    tags = models.ManyToManyField(Tags, blank=True)
+    published_at = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True, null=True)
+    social_media = models.JSONField(blank=True, null=True)
+    birthdate = models.DateField(blank=True, null=True)
     def __str__(self):
         return self.name
     def tipo_objeto(self):
@@ -154,7 +170,9 @@ class Comic(models.Model):
     image = models.ImageField(upload_to='media_files/comicPortraits/', blank=True, null=True)
     #isVideo = models.BooleanField(default=False)
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
-
+  
+    def __str__(self):
+        return self.name
     @property
     def tipo_objeto(self):
         return "comic"
