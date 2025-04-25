@@ -67,7 +67,7 @@ def index(request):
         chain(media_files, comics),
         key=lambda x: x.uploaded_at,
         reverse=True
-    )
+    )[:15]
 
     sidebar_context = get_sidebar_context()
 
