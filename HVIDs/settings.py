@@ -16,7 +16,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CSRF_TRUSTED_ORIGINS = ['https://c97f-2806-2f0-7000-e9d9-bc1a-1db0-4147-7f6e.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://9c1f-2806-2f0-7000-e9d9-990e-29b0-ce29-af1f.ngrok-free.app']
 
 TELEGRAM_BOT_TOKEN = '8047736753:AAFm6CyvCj5cVaHOn4VSBluJTVqd7vXkRoc'
 TELEGRAM_GROUP_CHAT_ID = '-1002634693432'
