@@ -7,10 +7,43 @@
 
 <div class="container-fluid mt-4">
     <div class="row align-items-center  ">
-        <div class="col">
+        <div class="col-10">
             <h1>{{ mediafile.name }}</h1>
 
         </div>
+        <div class="col-1">
+            <button type="button" class="btn btn-quinto">
+                Editar
+            </button>
+
+        </div>
+        <div class="col-1">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#imageModal">Borrar</button>
+        </div>
+
+        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content bg-cuarto comic-modal m-auto">
+                    <div class="modal-header">
+                        <h2 class="modal-title fnBadComicTitle" id="modalLabel">Borrar registro</h2>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+
+                    </div>
+
+                    <div class="modal-body p-0 h-100 d-flex flex-column justify-content-center">
+                        <!-- Carrusel -->
+                        <div>
+                            Estas seguro de querer eliminar el archivo {{ mediafile.name }}, esta acción es permanente?
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="media-container"> <!-- Video -->
             <!-- CSS -->
             <link href="https://vjs.zencdn.net/8.9.0/video-js.css" rel="stylesheet" />
