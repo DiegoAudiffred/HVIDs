@@ -241,36 +241,79 @@ def multi_search_results(request):
 
 
 @login_required(login_url='/login/')  
-
 def watchComic(request, id):
     comic = get_object_or_404(Comic, id=id)
-    comentarios = Comentario.objects.filter(comicID = comic)
-    form = addComentariosForm()
-    comic_pages = ComicPage.objects.filter(comic=comic)
+    comentarios = Comentario.objects.filter(comicID=comic)
+    comic_pages = ComicPage.objects.filter(comic=comic).order_by('order')
     sidebar_data = get_sidebar_context()
+
+    form_comentario = addComentariosForm()
+    form_page = ComicPageForm()
+    formComic = UploadComicForm(instance=comic)
+
     if request.method == 'POST':
-        # Si el formulario se ha enviado, procesar la subida del archivo
-        form = addComentariosForm(request.POST, request.FILES)
-        if form.is_valid():
-            comentario = form.save(commit=False)
+        # Actualizar Comic
+        if 'update_comic' in request.POST:
+            formComic = UploadComicForm(request.POST, request.FILES, instance=comic)
+            if formComic.is_valid():
+                formComic.save()
+                mediafile = formComic.instance
+
+                if hasattr(mediafile, 'tags'):
+                    mediafile.tags.clear()
+                    for tag in request.POST.get('tags_selectedArtist', '').split(','):
+                        tag = tag.strip()
+                        if tag:
+                            print(tag)
+                            obj, _ = Tags.objects.get_or_create(name=tag.upper())
+                            mediafile.tags.add(obj)
+                    #formComic.save()
+                return redirect('index:watchComic', comic.id)
             
-            # Asignar manualmente el usuario y el archivo mediaFile
-            comentario.usuario = request.user  # Suponiendo que el usuario está autenticado
-            comentario.comicID = comic  # Obtener el archivo subido
 
-            # Guardar el objeto Comentario con los campos adicionales
-            comentario.save()
-            return redirect('index:watchComic', comic.id)  # Redirigir correctamente
+            
 
-    else:
-        form = addComentariosForm()
+        # Guardar Comentario
+        elif 'comentario' in request.POST:
+            form_comentario = addComentariosForm(request.POST)
+            if form_comentario.is_valid():
+                c = form_comentario.save(commit=False)
+                c.usuario = request.user
+                c.comicID = comic
+                c.save()
+                return redirect('index:watchComic', comic.id)
+
+        # Subir Nuevas páginas (múltiples)
+        images = request.FILES.getlist('images')
+        if images:
+            current = comic_pages.count()
+            for i, img in enumerate(images, start=1):
+                page = ComicPage(
+                    comic=comic,
+                    image=img,
+                    order=current + i
+                )
+                page.save()
+            return redirect('index:watchComic', comic.id)
+
     return render(request, 'index/watchComic.html', {
-        'mediafile': comic,
-        'comentarios': comentarios,
-        'comic_pages':comic_pages,
-        'form': form,
+        'mediafile':    comic,
+        'comentarios':  comentarios,
+        'comic_pages':  comic_pages,
+        'form':         form_comentario,
+        'form_page':    form_page,
+        'formComic':    formComic,
         **sidebar_data
     })
+
+@login_required(login_url='/login/')  
+def deleteComic(request,id):
+    com = Comic.objects.get(id=id)
+    com.delete()
+    return redirect('index:index')  # Redirigir correctamente
+
+
+
 @login_required(login_url='/login/')  
 
 def watchContent(request, id):
@@ -372,13 +415,27 @@ def detailsAbout(request, filtro, valor):
     return render(request, 'index/filteredInfoPage.html', context)
 
 @require_POST
+@login_required(login_url='/login/')  # ruta de la vista login
+
+@login_required(login_url='/login/')
 def ajax_add_comment(request, id):
     form = addComentariosForm(request.POST)
+
     if form.is_valid():
         comentario = form.save(commit=False)
         comentario.usuario = request.user
-        comentario.mediaFileID_id = id
+
+        tipo_objeto = request.POST.get('tipo_objeto')  # <<<<<< Recibimos lo que mandamos en el fetch
+        
+        if tipo_objeto == 'comic':
+            comentario.comicID_id = id
+        elif tipo_objeto == 'mediafile':
+            comentario.mediaFileID_id = id
+        else:
+            return JsonResponse({'error': 'Tipo de objeto inválido'}, status=400)
+
         comentario.save()
+
         return JsonResponse({
             'usuario': str(comentario.usuario),
             'fecha': comentario.uploaded_at.strftime('%d/%m/%Y %H:%M'),
@@ -628,32 +685,46 @@ def enviar_telegram_mensaje(texto, image_path=None):
 @login_required(login_url='/login/')
 
 def edit_objeto(request, tipo, pk):
-    context = {}
+    # Mapea tipo a modelo y formulario
     modelo_map = {
-        'personaje': (Character, CharacterFormEdit),
-        'artista': (Artist, ArtistFormEdit),
-        'juego': (Game, GameFormEdit),
+        'personaje': (Character, addCharsForm),
+        'artista': (Artist, addArtistForm),
+        'juego': (Game, addGameForm),
     }
     if tipo not in modelo_map:
-        return redirect('index:index')  # o lanza error
+        return redirect('index:index')
 
-    modelo, formulario_clase = modelo_map[tipo]
-    instancia = get_object_or_404(modelo, pk=pk)
-    print(instancia)
+    Modelo, Formulario = modelo_map[tipo]
+    instancia = get_object_or_404(Modelo, pk=pk)
+
     if request.method == 'POST':
-        form = formulario_clase(request.POST, request.FILES, instance=instancia)
-        print(tipo,instancia)
-
+        form = Formulario(request.POST, request.FILES, instance=instancia)
         if form.is_valid():
+            # guarda campos del formulario
             form.save()
+            instancia = form.instance
+
+            # si el modelo tiene campo ManyToMany 'tags', actualizarlo
+            if hasattr(instancia, 'tags'):
+                # opcional: limpiar etiquetas previas
+                instancia.tags.clear()
+                # agregar nuevas etiquetas desde el input oculto
+                for tag in request.POST.get('tags_selectedArtist', '').split(','):
+                    tag = tag.strip()
+                    if tag:
+                        obj, _ = Tags.objects.get_or_create(name=tag.upper())
+                        instancia.tags.add(obj)
+
             return redirect('index:detailsAbout', filtro=tipo, valor=instancia.name)
     else:
-        form = formulario_clase(instance=instancia)
+        form = Formulario(instance=instancia)
+
+    # Contexto lateral u otros datos
     sidebar_context = get_sidebar_context()
     context = {
         'form': form,
         'tipo': tipo,
-        'instancia':instancia,
+        'instancia': instancia,
         **sidebar_context
     }
     return render(request, 'index/edit_objeto.html', context)

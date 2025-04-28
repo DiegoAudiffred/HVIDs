@@ -50,24 +50,225 @@
 </style>
 
 
+<style>
+  #tagSuggestions .suggestion-item:hover {
+    background-color: #f0f0f0;
+  }
 
+  /* Para resaltar la sugerencia activa si no tienes bg-light */
+  .suggestion-item.active {
+    background-color: #95acc4;
+  }
+
+  .adminLink:hover {
+    color: #fff !important;
+    background-color: #8B0000 !important;
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+  }
+</style>
 
 <div class="container-fluid mt-4">
   <div class="row border-bottom border-primary mb-4">
-    <h1 class="">{{ mediafile.name }}</h1>
+    <div class="col-10">
+      <h1 class="">{{ mediafile.name }}</h1>
+    </div>
+    <div class="col-1">
+      <button class="btn btn-quinto" data-bs-toggle="modal" data-bs-target="#imageFileEdit">Editar</button>
+
+    </div>
+    <div class="modal fade" id="imageFileEdit" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-cuarto comic-modal m-auto">
+          <div class="modal-header">
+            <h2 class="modal-title fnBadComicTitle" id="modalLabel">Editar registro</h2>
+
+
+          </div>
+
+          <div class="modal-body p-0 h-100 d-flex flex-column justify-content-center">
+            <div class="row px-3">
+              <div class="col-12 text-center">
+
+                <form method="post" enctype="multipart/form-data" id="comicForm">
+                  {% csrf_token %}
+                  <input type="hidden" name="update_comic" value="1">
+                  <div class="row p-2">
+                    <div class="col-md-3 col-12 my-auto">
+                      Portada del comic *
+                    </div>
+                    <div class="col-md-9 col-12 my-auto">
+                      <div class="text-center">
+                        <label for="imageInput2" style="cursor: pointer;">
+                          {% if mediafile.image %}
+                          <img src="{{ mediafile.image.url }}" alt="Imagen del comic"
+                            class="img-thumbnail d-block imagePreview w-100 h-auto"
+                            style="max-height: 500px; object-fit: contain;" data-preview-id="2">
+                          {% else %}
+                          <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"
+                            class="img-thumbnail d-block imagePreview w-100 h-auto"
+                            style="max-height: 500px; object-fit: contain;" data-preview-id="2">
+                          {% endif %}
+
+                        </label>
+                        <input type="file" name="image" id="imageInput2" accept="image/*" class="d-none imageInput"
+                          data-preview-id="2">
+
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <div class="row p-2">
+                    <div class="col-md-3 col-12 my-auto">
+                      Nombre del Comic *
+                    </div>
+                    <div class="col-md-9 col-12 my-auto">
+                      {{ formComic.name }}
+                    </div>
+                  </div>
+
+                  <div class="row p-2">
+                    <div class="col-md-3 col-12 my-auto">
+                      Artista
+                    </div>
+                    <div class="col-md-9 col-12 my-auto">
+                      {{ formComic.artist }}
+                    </div>
+                  </div>
+
+                  <div class="row p-2">
+                    <div class="col-md-3 col-12 my-auto">
+                      Etiquetas
+                    </div>
+                    <div class="col-md-9 col-12 my-auto position-relative"> <!-- <- Agregado position-relative aquí -->
+                      <input type="text" id="tagInputArtist" class="rounded-3 border-3 border-primary px-4 w-100 py-2"
+                        placeholder="Escribe una etiqueta y presiona Enter">
+                      <div id="tagSuggestionsArtist"
+                        class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
+                      </div>
+                      <div id="tagContainerArtist" class="mt-2 d-flex flex-wrap gap-2">
+                        {% for tag in mediafile.tags.all %}
+                        <div
+                          class="badge bg-secondary text-white rounded-pill px-3 py-2 d-flex align-items-center gap-2"
+                          id="tag-{{ tag.id }}">
+                          {{ tag.name }}
+                          <button type="button" class="btn-close btn-close-white btn-sm ms-2"
+                            aria-label="Remove"></button>
+                        </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div class="row p-2">
+                    <div class="col-md-3 col-12 my-auto">
+                      Juego
+                    </div>
+                    <div class="col-md-9 col-12 my-auto">
+                      {{ formComic.game }}
+                    </div>
+                  </div>
+
+                  <div class="row p-2">
+                    <div class="col-md-3 col-12 my-auto">
+                      Personajes
+                    </div>
+                    <div class="col-md-9 col-12 my-auto">
+                      {{ formComic.character }}
+                    </div>
+                  </div>
+
+                  <div class="row p-2">
+                    <div class="col-md-3 col-12 my-auto">
+                      Ocultar
+                    </div>
+                    <div class="col-md-9 col-12 my-auto">
+                      {{ formComic.hide }}
+                    </div>
+                  </div>
+
+
+                  <div class="row p-2">
+                    <div class="col-12 text-end">
+                      <button type="submit" class="btn btn-primary">Actualizar Comic</button>
+                      <button type="button" class="btn btn-quinto" data-bs-dismiss="modal">Cancelar</button>
+
+                    </div>
+                  </div>
+                  <input type="text" name="tags_selectedArtist" id="tagsSelectedArtist"
+                    value="{% for tag in mediafile.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+
+                </form>
+
+              </div>
+            </div>
+
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-1">
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#imageModalDelete">Borrar</button>
+    </div>
+    <div class="modal fade" id="imageModalDelete" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-cuarto comic-modal m-auto">
+          <div class="modal-header">
+            <h2 class="modal-title fnBadComicTitle" id="modalLabel">Borrar registro</h2>
+
+
+          </div>
+
+          <div class="modal-body p-0 h-100 d-flex flex-column justify-content-center">
+            <!-- Carrusel -->
+            <div class="row px-3">
+              <div class="col-12 text-center">
+                Estas seguro de querer eliminar el archivo {{ mediafile.name }}? esta acción es permanente
+
+              </div>
+            </div>
+
+
+          </div>
+          <div class="modal-footer">
+            <a href="{% url 'index:deleteComic' mediafile.id %}" class="btn btn-primary">Sí, quiero borrarlos</a>
+            <button type="button" class="btn-quinto btn" data-bs-dismiss="modal" aria-label="Cerrar">No, me
+              arrepenti</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div>
   <div class="row">
     {% for page in comic_pages %}
     <div class="col-12 col-sm-6 col-md-4 mb-4 d-flex justify-content-center">
-      <button class="but zoom-hover border-0 bg-transparent w-100 p-0 " data-bs-toggle="modal"
-        data-bs-target="#imageModal">
+      <button class="zoom-hover border-0 bg-transparent w-100 p-0" data-bs-toggle="modal" data-bs-target="#imageModal">
         <div class="ratio w-100" style="--bs-aspect-ratio: 133%;">
           <img src="{{ page.image.url }}" class="img-fluid shadow" />
         </div>
       </button>
     </div>
     {% endfor %}
+
+    <!-- Botón para subir múltiples imágenes -->
+    <div class="col-12 col-sm-6 col-md-4 mb-4 d-flex justify-content-center">
+      <form method="post" enctype="multipart/form-data" class="w-100 text-center">
+        {% csrf_token %}
+        <input type="file" name="images" id="newPagesInput" class="d-none" multiple onchange="this.form.submit()">
+        <label for="newPagesInput" class="zoom-hover border border-4 bg-transparent border-sexto w-100 p-0"
+          style="cursor:pointer;">
+          <div class="ratio w-100" style="--bs-aspect-ratio: 133%;">
+            <span class="d-flex justify-content-center align-items-center h-100 fs-1 text-secondary">＋</span>
+          </div>
+        </label>
+      </form>
+    </div>
   </div>
 
 
@@ -83,14 +284,15 @@
     <a href="{{ mediafile.file.url }}" class="btn btn-primary" download>Download</a>
 
   </div>
-  <div class="row">
+  <div class="row mb-5">
     <div class="col-12">
       <h2>Comentarios</h2>
     </div>
     <div class="col-12">
       <p>Agregar comentario</p>
     </div>
-    <form class="row" method="post" enctype="multipart/form-data">
+    <form class="row" method="post" id="comentarioForm">
+
       {% csrf_token %}
       <div class="col-9">
         {{ form.comentario }}
@@ -100,16 +302,15 @@
       </div>
     </form>
     <div class="col-12">
-      {% for comentario in comentarios %}
-      <div class="py-3 border-bottom">
-
-        <p><a href="">{{ comentario.usuario }}</a> {{comentario.uploaded_at}}</p>
-
-
-
-        <p>{{ comentario.comentario }}</p>
+      <div id="comentariosContainer" class="col-12">
+        {% for comentario in comentarios %}
+        <div class="py-3 border-bottom">
+          <p><a href="">{{ comentario.usuario }}</a> {{comentario.uploaded_at}}</p>
+          <p>{{ comentario.comentario }}</p>
+        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
+
     </div>
   </div>
 
@@ -209,5 +410,258 @@
     object-fit: contain;
   }
 </style>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const imageInputs = document.querySelectorAll('.imageInput');
+
+    imageInputs.forEach(input => {
+      input.addEventListener('change', function () {
+        const previewId = this.dataset.previewId;
+        const imagePreview = document.querySelector(`.imagePreview[data-preview-id="${previewId}"]`);
+        const file = this.files[0];
+
+        if (file && imagePreview) {
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            imagePreview.src = e.target.result;
+            imagePreview.classList.remove('d-none');
+          };
+
+          reader.readAsDataURL(file);
+        } else if (imagePreview) {
+          imagePreview.src = "#";
+          imagePreview.classList.add('d-none');
+        }
+      });
+    });
+  });
+
+</script>
+
+<script>
+  function setupTagInput({ inputId, suggestionsId, containerId, hiddenInputId }) {
+    const tagInput = document.getElementById(inputId);
+    const tagSuggestions = document.getElementById(suggestionsId);
+    const tagContainer = document.getElementById(containerId);
+    const tagsSelectedInput = document.getElementById(hiddenInputId);
+
+    let selectedTags = [];
+    let selectedIndex = -1;
+
+    // Cargar las etiquetas existentes (si las hay)
+    function loadTags(existingTags) {
+      selectedTags = existingTags.split(",").filter(tag => tag.trim() !== "");
+      renderTags();
+    }
+
+    function renderTags() {
+      tagContainer.innerHTML = '';  // Limpiar el contenedor
+      selectedTags.forEach(tag => {
+        const tagDiv = document.createElement("div");
+        tagDiv.className = "badge bg-secondary text-white rounded-pill px-3 py-2 d-flex align-items-center gap-2";
+        tagDiv.innerHTML = `
+                    ${tag}
+                    <button type="button" class="btn-close btn-close-white btn-sm ms-2" aria-label="Remove"></button>
+                `;
+
+        tagDiv.querySelector("button").addEventListener("click", () => {
+          removeTag(tag);
+        });
+
+        tagContainer.appendChild(tagDiv);
+      });
+      updateHiddenInput();
+    }
+
+    // Al cargar la página con tags preexistentes
+    const existingTags = tagsSelectedInput.value; // Suponiendo que ya tienes las etiquetas separadas por coma
+    loadTags(existingTags);
+
+    tagInput.addEventListener("input", async () => {
+      const query = tagInput.value.trim();
+      const terms = query.split(" ");
+      const lastTerm = terms[terms.length - 1];
+
+      if (lastTerm.length < 1) {
+        tagSuggestions.classList.add("d-none");
+        tagSuggestions.innerHTML = "";
+        selectedIndex = -1;
+        return;
+      }
+
+      const response = await fetch(`/tags-suggest/?q=${encodeURIComponent(lastTerm)}`);
+      const tags = await response.json();
+
+      tagSuggestions.innerHTML = "";
+      if (tags.length > 0) {
+        tagSuggestions.innerHTML = tags.map(tag => `
+                    <div class="p-2 suggestion-item" style="cursor:pointer;">
+                        ${tag}
+                    </div>
+                `).join('');
+
+        tagSuggestions.classList.remove("d-none");
+
+        document.querySelectorAll(`#${suggestionsId} .suggestion-item`).forEach((item, index) => {
+          item.addEventListener("click", () => {
+            addTag(item.textContent);
+            tagInput.value = "";
+            tagSuggestions.classList.add("d-none");
+            selectedIndex = -1;
+            tagInput.focus();
+          });
+        });
+
+        selectedIndex = -1;
+      } else {
+        tagSuggestions.classList.add("d-none");
+      }
+    });
+
+    tagInput.addEventListener("keydown", e => {
+      const suggestions = tagSuggestions.querySelectorAll(".suggestion-item");
+
+      // Flechas arriba/abajo mantienen tu lógica
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        selectedIndex = (selectedIndex + 1) % suggestions.length;
+        updateActiveSuggestion(suggestions);
+      }
+      else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        selectedIndex = (selectedIndex - 1 + suggestions.length) % suggestions.length;
+        updateActiveSuggestion(suggestions);
+      }
+      // Tab: si moviste con flechas, toma esa; si no, la primera sugerencia
+      else if (e.key === "Tab") {
+        if (suggestions.length > 0) {
+          e.preventDefault();
+          const idx = selectedIndex >= 0 ? selectedIndex : 0;
+          addTag(suggestions[idx].textContent);
+          tagInput.value = "";
+          tagSuggestions.classList.add("d-none");
+          selectedIndex = -1;
+        }
+      }
+      // Enter: si moviste con flechas, toma esa; sino, toma lo que escribiste
+      else if (e.key === "Enter") {
+        e.preventDefault();
+        if (suggestions.length > 0 && selectedIndex >= 0) {
+          addTag(suggestions[selectedIndex].textContent);
+        } else if (tagInput.value.trim() !== "") {
+          addTag(tagInput.value.trim());
+        }
+        tagInput.value = "";
+        tagSuggestions.classList.add("d-none");
+        selectedIndex = -1;
+      }
+    });
+
+    function updateActiveSuggestion(suggestions) {
+      suggestions.forEach((item, index) => {
+        if (index === selectedIndex) {
+          item.classList.add("bg-light", "active");
+          item.scrollIntoView({ block: "nearest" });
+        } else {
+          item.classList.remove("bg-light", "active");
+        }
+      });
+    }
+
+    function addTag(tagText) {
+      const cleanTag = tagText.trim();
+      if (cleanTag === "" || selectedTags.includes(cleanTag)) return;
+
+      selectedTags.push(cleanTag);
+
+      const tagDiv = document.createElement("div");
+      tagDiv.className = "badge bg-secondary text-white rounded-pill px-3 py-2 d-flex align-items-center gap-2";
+      tagDiv.innerHTML = `
+                ${cleanTag}
+                <button type="button" class="btn-close btn-close-white btn-sm ms-2" aria-label="Remove"></button>
+            `;
+
+      tagDiv.querySelector("button").addEventListener("click", () => {
+        tagContainer.removeChild(tagDiv);
+        selectedTags = selectedTags.filter(t => t !== cleanTag);
+        updateHiddenInput();
+      });
+
+      tagContainer.appendChild(tagDiv);
+      updateHiddenInput();
+    }
+
+    function updateHiddenInput() {
+      tagsSelectedInput.value = selectedTags.join(",");
+    }
+
+  }
+
+  setupTagInput({
+    inputId: "tagInputArtist",
+    suggestionsId: "tagSuggestionsArtist",
+    containerId: "tagContainerArtist",
+    hiddenInputId: "tagsSelectedArtist"
+  });
+  document.addEventListener('DOMContentLoaded', function () {
+    const tagContainer = document.getElementById('tagContainerArtist');
+    const hiddenInput = document.getElementById('tagsSelectedArtist');
+
+    // Delegamos el click en cualquier .btn-close dentro de tagContainerArtist
+    tagContainer.addEventListener('click', function (e) {
+      if (!e.target.classList.contains('btn-close')) return;
+
+      // encuentra la badge más cercana y la elimina
+      const badge = e.target.closest('.badge');
+      if (badge) badge.remove();
+
+      // luego actualiza el input oculto con las badges que quedan
+      const tags = Array.from(tagContainer.querySelectorAll('.badge'))
+        .map(b => b.firstChild.textContent.trim());
+      hiddenInput.value = tags.join(',');
+    });
+  });
+
+
+
+
+
+</script>
+
+<script>
+  document.getElementById('comentarioForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+    formData.append('tipo_objeto', '{{ mediafile.tipo_objeto }}');  // <<< AGREGAS ESTO
+
+    fetch("{% url 'index:ajax_add_comment' mediafile.id %}", {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: formData
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (!data.error) {
+          const nuevoComentario = `
+        <div class="py-3 border-bottom">
+          <p><a href="#">${data.usuario}</a> ${data.fecha}</p>
+          <p>${data.texto}</p>
+        </div>
+      `;
+          document.getElementById('comentariosContainer').innerHTML += nuevoComentario;
+          form.reset();
+        } else {
+          alert('Hubo un error: ' + data.error);
+        }
+      })
+      .catch(err => alert("Error al enviar el comentario."));
+  });
+
+</script>
 
 {% endblock %}
