@@ -1,64 +1,14 @@
 # forms.py
 from django import forms
 from db.models import *
-class GameFormEdit(forms.ModelForm):
-    class Meta:
-        model = Game
-        fields = [
-            'name',
-            'image',
-            'tags',
-            'description',
-            'social_media',
-        ]
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 4}),
-            'social_media': forms.Textarea(attrs={'rows': 2}),
-        }
 
 
-class CharacterFormEdit(forms.ModelForm):
-    class Meta:
-        model = Character
-        fields = [
-            'name',
-            'image',
-            'game',
-            'gender',
-            'tags',
-            'description',
-            'social_media',
-            'birthdate',
-        ]
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 4}),
-            'social_media': forms.Textarea(attrs={'rows': 2}),
-            'birthdate': forms.DateInput(attrs={'type': 'date'}),
-        }
-
-
-class ArtistFormEdit(forms.ModelForm):
-    class Meta:
-        model = Artist
-        fields = [
-            'name',
-            'image',
-            'gender',
-            'tags',
-            'description',
-            'social_media',
-            'birthdate',
-        ]
-        widgets = {
-            'description': forms.Textarea(attrs={'rows': 4}),
-            'social_media': forms.Textarea(attrs={'rows': 2}),
-            'birthdate': forms.DateInput(attrs={'type': 'date'}),
-        }
+    
 
 class UploadComicForm(forms.ModelForm):
     class Meta:
         model = Comic
-        fields = ['name', 'artist', 'tags', 'game', 'character','user','hide']
+        fields = ['name', 'artist', 'tags', 'game', 'character','user','hide','image']
     def __init__(self, *args, **kwargs):
             super(UploadComicForm, self).__init__(*args, **kwargs)
 
@@ -166,34 +116,44 @@ class addTagsForm(forms.ModelForm):
 
 
 class addArtistForm(forms.ModelForm):
-    # campos “virtuales” para redes
-    facebook   = forms.CharField(required=False, label="Facebook", max_length=255)
-    twitter    = forms.CharField(required=False, label="Twitter", max_length=255)
-    instagram  = forms.CharField(required=False, label="Instagram", max_length=255)
-    youtube    = forms.CharField(required=False, label="YouTube", max_length=255)
-    tiktok     = forms.CharField(required=False, label="TikTok", max_length=255)
-    onlyfans   = forms.CharField(required=False, label="OnlyFans", max_length=255)
-    extra1     = forms.CharField(required=False, label="Red extra 1", max_length=255)
-    extra2     = forms.CharField(required=False, label="Red extra 2", max_length=255)
-    extra3     = forms.CharField(required=False, label="Red extra 3", max_length=255)
+    # campos virtuales para redes
+    facebook  = forms.CharField(required=False, label="Facebook", max_length=255)
+    twitter   = forms.CharField(required=False, label="Twitter", max_length=255)
+    instagram = forms.CharField(required=False, label="Instagram", max_length=255)
+    youtube   = forms.CharField(required=False, label="YouTube", max_length=255)
+    tiktok    = forms.CharField(required=False, label="TikTok", max_length=255)
+    onlyfans  = forms.CharField(required=False, label="OnlyFans", max_length=255)
+    extra1    = forms.CharField(required=False, label="Red extra 1", max_length=255)
+    extra2    = forms.CharField(required=False, label="Red extra 2", max_length=255)
+    extra3    = forms.CharField(required=False, label="Red extra 3", max_length=255)
+
+    # 🔵 Aquí defines birthdate manualmente:
+    birthdate = forms.DateField(
+        required=False,
+        widget=forms.DateInput(
+            format='%d/%m/%Y', 
+            attrs={
+                'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+                }
+        ),
+        input_formats=['%d/%m/%Y'],
+    )
 
     class Meta:
         model = Artist
         fields = [
-            'name','image','gender','tags','description','birthdate',
+            'name', 'image', 'gender', 'tags', 'description', 'birthdate',
         ]
         widgets = {
             'description': forms.Textarea(attrs={'rows':4,'class':'form-control'}),
-            'birthdate':   forms.DateInput(attrs={'type':'date','class':'form-control'}),
             'name':        forms.TextInput(attrs={'class':'form-control form-control-lg'}),
             'gender':      forms.RadioSelect(choices=[(True,'Masculino'),(False,'Femenino')]),
-            # tags lo dejas oculto para usar tu tag-picker
+            # tags oculto para usar tu tag-picker
+            # birthdate ya no lo defines aquí, porque ya lo definimos arriba
         }
-
 
     def clean(self):
         cleaned = super().clean()
-        # construye el JSON solo con los campos que tengan valor
         social = {}
         for key in ['facebook','twitter','instagram','youtube','tiktok','onlyfans','extra1','extra2','extra3']:
             val = cleaned.get(key)
@@ -203,42 +163,71 @@ class addArtistForm(forms.ModelForm):
         return cleaned
 
     def save(self, commit=True):
-        # asigna el JSON construido
         self.instance.social_media = self.cleaned_data['social_media']
         return super().save(commit=commit)
 
     def __init__(self, *args, **kwargs):
-            super(addArtistForm, self).__init__(*args, **kwargs)
+        super(addArtistForm, self).__init__(*args, **kwargs)
 
-            self.fields['name'].required = True
-            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2 ', 'placeholder': ' Introduce el nombre del artista', 'rows': '1'})
+        self.fields['name'].required = True
+        self.fields['name'].widget.attrs.update({
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 
+            'placeholder': ' Introduce el nombre del artista', 
+            'rows': '1'
+        })
 
-            self.fields['description'].required = False
-            self.fields['description'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2 ', 'placeholder': ' Añade una breve descripción', 'rows':'4' })
- 
-            self.fields['tags'].required = False
-            self.fields['tags'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2 ', 'placeholder': ' Introduce el nombre del artista', 'rows': '1'})
-            
-            self.fields['birthdate'].required = False
-            self.fields['birthdate'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2 ', 'placeholder': ' Introduce el nombre del artista', 'rows': '1'})
-     # inicializar los valores desde el JSON existente
-            social = self.instance.social_media or {}
-            for field in ['facebook','twitter','instagram','youtube','tiktok','onlyfans','extra1','extra2','extra3']:
-                self.fields[field].initial = social.get(field,'')
+        self.fields['description'].required = False
+        self.fields['description'].widget.attrs.update({
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+            'placeholder': ' Añade una breve descripción',
+            'rows':'4'
+        })
+
+        self.fields['tags'].required = False
+        self.fields['tags'].widget.attrs.update({
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+            'placeholder': ' Introduce los tags del artista',
+            'rows': '1'
+        })
+
+        # 🔵 birthdate ya tiene su widget correcto arriba
+
+        # inicializar los valores desde el JSON existente
+        social = self.instance.social_media or {}
+        for field in ['facebook','twitter','instagram','youtube','tiktok','onlyfans','extra1','extra2','extra3']:
+            self.fields[field].initial = social.get(field,'')
 
         # aplica clase bootstrap a los virtuales
-            for field in ['facebook','twitter','instagram','youtube','tiktok','onlyfans','extra1','extra2','extra3']:
-                self.fields[field].widget.attrs.setdefault('class','form-control')
+        for field in ['facebook','twitter','instagram','youtube','tiktok','onlyfans','extra1','extra2','extra3']:
+            self.fields[field].widget.attrs.setdefault('class','form-control')
+
 
 class addCharsForm(forms.ModelForm):
+    birthdate = forms.DateField(
+        required=False,
+        widget=forms.DateInput(
+            format='%d/%m/%Y', 
+            attrs={
+                'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+                'placeholder': 'dd/mm/yyyy'
+            }
+        ),
+        input_formats=['%d/%m/%Y'],
+    )
     class Meta:
         model = Character
-        fields = ['name','image','game']
+        fields = ['name','image','game','description','gender','birthdate']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows':4,'class':'form-control'}),
+            'name':        forms.TextInput(attrs={'class':'form-control form-control-lg'}),
+            'gender':      forms.RadioSelect(choices=[(True,'Masculino'),(False,'Femenino')]),
+            # tags oculto para usar tu tag-picker
+            # birthdate ya no lo defines aquí, porque ya lo definimos arriba
+        }
     def __init__(self, *args, **kwargs):
             super(addCharsForm, self).__init__(*args, **kwargs)
-
-            self.fields['name'].required = True
-            self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del personaje', 'rows': '1'})
+    
+            
             self.fields['game'].required = False
             self.fields['game'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del personaje', 'rows': '1'})
     
@@ -290,7 +279,7 @@ class addUserForm(forms.ModelForm):
 class addGameForm(forms.ModelForm):
     class Meta:
         model = Game
-        fields = ['name','image']
+        fields = ['name','image','tags']
     def __init__(self, *args, **kwargs):
             super(addGameForm, self).__init__(*args, **kwargs)
 

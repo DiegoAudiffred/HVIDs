@@ -65,8 +65,7 @@ class Game(models.Model):
     image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
     tags = models.ManyToManyField(Tags, blank=True)
     published_at = models.DateTimeField(auto_now_add=True)
-    description = models.TextField(blank=True, null=True)
-    social_media = models.JSONField(blank=True, null=True)
+ 
     def __str__(self):
         return self.name
     def tipo_objeto(self):

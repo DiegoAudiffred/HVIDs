@@ -43,19 +43,30 @@
 
                 <!-- Columna izquierda -->
                 <div class="col-12 col-lg-6 p-3 fnBubbleSansRegular" style="min-width: 0;">
+                    {% if resultado.tipo_objeto != "juego" %}
+
                     <div class="mb-2">
+
                         <strong>Género:</strong>
                         {% if resultado.gender %}
                         <label class="text-sexto">Masculino</label>
                         {% else %}
                         <label class="text-sexto">Femenino</label>
                         {% endif %}
+
+
                     </div>
+                    {% endif %}
+                    {% if resultado.tipo_objeto != "juego" %}
 
                     <div class="mb-2">
                         <strong>Cumpleaños:</strong>
-                        <label class="text-sexto">{{ resultado.birthdate }}</label>
+                        <label class="text-sexto">{{ resultado.birthdate|date:"d/m/Y" }}
+                        </label>
+
                     </div>
+                    {% endif %}
+                    {% if resultado.tipo_objeto != "juego" %}
 
                     <div class="mb-2">
                         <strong>Descripción:</strong>
@@ -65,6 +76,7 @@
                         style="max-height: 170px; overflow-y: auto; word-break: break-word;">
                         {{ resultado.description }}
                     </div>
+                    {% endif %}
 
                     <div class="mt-2">
                         <strong>Publicado:</strong>
@@ -86,6 +98,7 @@
                         </span>
                         {% endfor %}
                     </div>
+                    {% if resultado.tipo_objeto != "juego" %}
 
                     <div class="mb-2"><strong>Links:</strong></div>
                     <div class="text-break" style="max-height: 150px; overflow-y: auto; word-break: break-word;">
@@ -99,6 +112,7 @@
                         </p>
                         {% endfor %}
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

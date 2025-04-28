@@ -31,6 +31,8 @@ urlpatterns = [
     path('multi-search/', views.multi_search_results, name='multi_search_results'),
     path('descargar/', views.download_video, name='download_video'),
     #path('upload/comic/', views.upload_comic, name='upload_comic'),
-    path('ajax/comment/<int:id>/', views.ajax_add_comment, name='ajax_add_comment'),
+    path('ajax_add_comment/<int:id>/', views.ajax_add_comment, name='ajax_add_comment'),
+
+    path('deleteComic/<int:id>',views.deleteComic,name="deleteComic"),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
