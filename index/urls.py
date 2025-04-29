@@ -34,5 +34,6 @@ urlpatterns = [
     path('ajax_add_comment/<int:id>/', views.ajax_add_comment, name='ajax_add_comment'),
 
     path('deleteComic/<int:id>',views.deleteComic,name="deleteComic"),
+    path('deleteVideo/<int:id>',views.deleteVideo,name="deleteVideo"),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

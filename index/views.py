@@ -240,6 +240,71 @@ def multi_search_results(request):
 
 
 
+
+@login_required(login_url='/login/')  
+def deleteComic(request,id):
+    com = Comic.objects.get(id=id)
+    com.delete()
+    return redirect('index:index')  # Redirigir correctamente
+
+
+def deleteVideo(request,id):
+    com = MediaFile.objects.get(id=id)
+    com.delete()
+    return redirect('index:index')  # Redirigir correctamente
+
+@login_required(login_url='/login/')  
+
+def watchContent(request, id):
+    mediafile = get_object_or_404(MediaFile, id=id)
+
+    if request.method == 'POST':
+        if 'update_video' in request.POST:
+            formVideo = UploadElementForm(request.POST, request.FILES, instance=mediafile)
+            if formVideo.is_valid():
+                formVideo.save()
+                mediafile = formVideo.instance
+
+                if hasattr(mediafile, 'tags'):
+                    mediafile.tags.clear()
+                    for tag in request.POST.get('tags_selectedArtist', '').split(','):
+                        tag = tag.strip()
+                        if tag:
+                            print(tag)
+                            obj, _ = Tags.objects.get_or_create(name=tag.upper())
+                            mediafile.tags.add(obj)
+                    #formComic.save()
+                return redirect('index:watchContent', mediafile.id)
+        elif 'comentario' in request.POST:   
+            form = addComentariosForm(request.POST, request.FILES)
+            if form.is_valid():
+                comentario = form.save(commit=False)
+
+                comentario.usuario = request.user 
+                comentario.mediaFileID = mediafile  # Obtener el archivo subido
+
+                # Guardar el objeto Comentario con los campos adicionales
+                comentario.save()
+                return redirect('index:watchContent', mediafile.id)  # Redirigir correctamente
+
+    else:
+        form = addComentariosForm()
+        formVideo = UploadElementForm(instance=mediafile)
+
+   
+    mediafile = get_object_or_404(MediaFile, id=id)
+    comentarios = Comentario.objects.filter(mediaFileID = mediafile)
+
+    sidebar_data = get_sidebar_context()
+
+    return render(request, 'index/watchContent.html', {
+        'mediafile': mediafile,
+        #'pages':pages,
+        'comentarios':comentarios,
+        'form':form,
+        'formVideo':formVideo,
+        **sidebar_data,  # Integrar datos de la sidebar en el contexto de la vista
+    })
 @login_required(login_url='/login/')  
 def watchComic(request, id):
     comic = get_object_or_404(Comic, id=id)
@@ -304,52 +369,6 @@ def watchComic(request, id):
         'form_page':    form_page,
         'formComic':    formComic,
         **sidebar_data
-    })
-
-@login_required(login_url='/login/')  
-def deleteComic(request,id):
-    com = Comic.objects.get(id=id)
-    com.delete()
-    return redirect('index:index')  # Redirigir correctamente
-
-
-
-@login_required(login_url='/login/')  
-
-def watchContent(request, id):
-    mediafile = get_object_or_404(MediaFile, id=id)
-
-    if request.method == 'POST':
-        form = addComentariosForm(request.POST, request.FILES)
-        if form.is_valid():
-            comentario = form.save(commit=False)
-            
-            comentario.usuario = request.user 
-            comentario.mediaFileID = mediafile  # Obtener el archivo subido
-
-            # Guardar el objeto Comentario con los campos adicionales
-            comentario.save()
-            return redirect('index:watchContent', mediafile.id)  # Redirigir correctamente
-
-    else:
-        form = addComentariosForm()
-    
-   
-    mediafile = get_object_or_404(MediaFile, id=id)
-    #pages = comicImages.objects.filter(mediaFile = mediafile)
-    comentarios = Comentario.objects.filter(mediaFileID = mediafile)
-    
-   
-    
-    # Obtener el contexto de la sidebar
-    sidebar_data = get_sidebar_context()
-
-    return render(request, 'index/watchContent.html', {
-        'mediafile': mediafile,
-        #'pages':pages,
-        'comentarios':comentarios,
-        'form':form,
-        **sidebar_data,  # Integrar datos de la sidebar en el contexto de la vista
     })
 
 @login_required(login_url='/login/')  # ruta de la vista login
