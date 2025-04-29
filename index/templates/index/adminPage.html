@@ -138,8 +138,9 @@
                     Sexo:
                     {{ formArtist.gender }}
                 </div>
-                <div class="my-2 position-relative">
-                    Etiquetas:
+                <div class="tag-input-wrapper my-2 position-relative" data-input-id="tagInputArtist"
+                    data-suggestions-id="tagSuggestionsArtist" data-container-id="tagContainerArtist"
+                    data-hidden-id="tagsSelectedArtist"> Etiquetas:
                     <input type="text" id="tagInputArtist" class="rounded-3 border-3 border-primary px-4 w-100 py-2"
                         placeholder="Escribe una etiqueta y presiona Enter">
                     <div id="tagSuggestionsArtist"
@@ -247,8 +248,10 @@
 
                 <label for="imageInput1" style="cursor: pointer;">
                     <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"
-                        class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="1">
+                        class="img-thumbnail d-block imagePreview w-100 h-auto"
+                        style="max-height: 500px; object-fit: contain;" data-preview-id="1">
                 </label>
+
                 <input type="file" name="image" id="imageInput1" accept="image/*" class="d-none imageInput"
                     data-preview-id="1">
 
@@ -271,17 +274,19 @@
                     {{ formChar.game }}
 
                 </div>
-                <div class="my-2 position-relative">
-                    Etiquetas:
-                    <input type="text" id="tagInputArtist" class="rounded-3 border-3 border-primary px-4 w-100 py-2"
+                <div class="tag-input-wrapper my-2 position-relative" data-input-id="tagInputChar"
+                    data-suggestions-id="tagSuggestionsChar" data-container-id="tagContainerChar"
+                    data-hidden-id="tagsSelectedChar"> Etiquetas:
+                    <input type="text" id="tagInputChar" class="rounded-3 border-3 border-primary px-4 w-100 py-2"
                         placeholder="Escribe una etiqueta y presiona Enter">
-                    <div id="tagSuggestionsArtist"
+                    <div id="tagSuggestionsChar"
                         class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
                     </div>
-                    <div id="tagContainerArtist" class="mt-2 d-flex flex-wrap gap-2">
+                    <div id="tagContainerChar" class="mt-2 d-flex flex-wrap gap-2">
 
 
                     </div>
+
                 </div>
                 <div class=" my-2">
                     Descripción:
@@ -299,6 +304,8 @@
             </div>
 
         </div>
+        <input type="hidden" name="tags_selectedChar" id="tagsSelectedChar">
+
     </form>
 
     <form method="post" enctype="multipart/form-data">
@@ -357,6 +364,22 @@
                     {{ formGame.name }}
 
                 </div>
+                <div class="tag-input-wrapper my-2 position-relative" data-input-id="tagInputGame"
+                    data-suggestions-id="tagSuggestionsGame" data-container-id="tagContainerGame"
+                    data-hidden-id="tagsSelectedGame">
+
+                    Etiquetas:
+                    <input type="text" id="tagInputGame" class="rounded-3 border-3 border-primary px-4 w-100 py-2"
+                        placeholder="Escribe una etiqueta y presiona Enter">
+                    <div id="tagSuggestionsGame"
+                        class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
+                    </div>
+                    <div id="tagContainerGame" class="mt-2 d-flex flex-wrap gap-2">
+
+
+                    </div>
+                </div>
+
                 <div class="my-2">
                     <button type="submit" class="btn  fw-bold w-100 bg-secondary text-cuarto">Agregar Juego</button>
 
@@ -365,6 +388,8 @@
 
 
         </div>
+        <input type="hidden" name="tags_selectedGame" id="tagsSelectedGame">
+
     </form>
     <div id="dynamic-container" class="row my-4">
         <!-- Aquí se cargarán los tags/artistas/chars/etc -->
@@ -566,7 +591,7 @@
         const tagInput = document.getElementById(inputId);
         const tagSuggestions = document.getElementById(suggestionsId);
         const tagContainer = document.getElementById(containerId);
-        const tagsSelectedInput = document.getElementById(hiddenInputId);
+        const tagsSelectedInput = document.getElementById(hiddenInputId);  // ya lo hallará
 
         let selectedTags = [];
         let selectedIndex = -1;
@@ -690,12 +715,15 @@
             tagsSelectedInput.value = selectedTags.join(",");
         }
     }
-    setupTagInput({
-        inputId: "tagInputArtist",
-        suggestionsId: "tagSuggestionsArtist",
-        containerId: "tagContainerArtist",
-        hiddenInputId: "tagsSelectedArtist"
+    document.querySelectorAll('.tag-input-wrapper').forEach(wrapper => {
+        setupTagInput({
+            inputId: wrapper.dataset.inputId,
+            suggestionsId: wrapper.dataset.suggestionsId,
+            containerId: wrapper.dataset.containerId,
+            hiddenInputId: wrapper.dataset.hiddenId    // << aquí coincide con data-hidden-id
+        });
     });
+
 
 
 </script>

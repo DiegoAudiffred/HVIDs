@@ -218,7 +218,7 @@ class addCharsForm(forms.ModelForm):
 
     class Meta:
         model = Character
-        fields = ['name','image','game','description','gender','birthdate']
+        fields = ['name','image','game','description','gender','birthdate','tags']
         widgets = {
             'description': forms.Textarea(attrs={'rows':4,'class':'form-control'}),
             'name':        forms.TextInput(attrs={'class':'form-control form-control-lg'}),
@@ -228,7 +228,27 @@ class addCharsForm(forms.ModelForm):
         }
     def __init__(self, *args, **kwargs):
             super(addCharsForm, self).__init__(*args, **kwargs)
-    
+            self.fields['name'].required = True
+            self.fields['name'].widget.attrs.update({
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 
+            'placeholder': ' Introduce el nombre del personaje', 
+            'rows': '1'
+        })
+
+            self.fields['description'].required = False
+            self.fields['description'].widget.attrs.update({
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+            'placeholder': ' Añade una breve descripción',
+            'rows':'4'
+        })
+
+            self.fields['tags'].required = False
+            self.fields['tags'].widget.attrs.update({
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+            'placeholder': ' Introduce los tags del personaje',
+            'rows': '1'
+        })
+
             
             self.fields['game'].required = False
             self.fields['game'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del personaje', 'rows': '1'})
@@ -287,4 +307,10 @@ class addGameForm(forms.ModelForm):
 
             self.fields['name'].required = True
             self.fields['name'].widget.attrs.update({'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2', 'placeholder': ' Introduce el nombre del juego', 'rows': '1'})
-         
+            
+            self.fields['tags'].required = False
+            self.fields['tags'].widget.attrs.update({
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+            'placeholder': ' Introduce los tags del personaje',
+            'rows': '1'
+        })
