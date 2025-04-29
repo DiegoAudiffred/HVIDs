@@ -65,11 +65,15 @@ class Game(models.Model):
     image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
     tags = models.ManyToManyField(Tags, blank=True)
     published_at = models.DateTimeField(auto_now_add=True)
+    likes = models.ManyToManyField(User, related_name='liked_game', blank=True)
+
+    def total_likes(self):
+        return self.likes.count()
  
     def __str__(self):
         return self.name
     def tipo_objeto(self):
-        return "juego"
+        return "game"
 
     
 class Character(models.Model):
@@ -82,10 +86,14 @@ class Character(models.Model):
     description = models.TextField(blank=True, null=True)#,max_length=255
     social_media = models.JSONField(blank=True, null=True)
     birthdate = models.DateField(blank=True, null=True)
+    likes = models.ManyToManyField(User, related_name='liked_character', blank=True)
+
+    def total_likes(self):
+        return self.likes.count()
     def __str__(self):
         return self.name
     def tipo_objeto(self):
-        return "personaje"
+        return "character"
 
     
 
@@ -99,10 +107,14 @@ class Artist(models.Model):
     description = models.TextField(blank=True, null=True)
     social_media = models.JSONField(blank=True, null=True)
     birthdate = models.DateField(blank=True, null=True)
+    likes = models.ManyToManyField(User, related_name='liked_artist', blank=True)
+
+    def total_likes(self):
+        return self.likes.count()
     def __str__(self):
         return self.name
     def tipo_objeto(self):
-        return "artista"
+        return "artist"
 
 class MediaFile(models.Model):
     name = models.CharField(max_length=255)
@@ -119,7 +131,10 @@ class MediaFile(models.Model):
     # Generación automática de thumbnail
     image = models.ImageField(upload_to='media_files/thumbnails/%Y%m%d/', blank=True, null=True)
     #isVideo = models.BooleanField(default=True)
-    
+    likes = models.ManyToManyField(User, related_name='liked_mediafiles', blank=True)
+
+    def total_likes(self):
+        return self.likes.count()
     def __str__(self):
         return self.name
 
@@ -169,7 +184,11 @@ class Comic(models.Model):
     image = models.ImageField(upload_to='media_files/comicPortraits/', blank=True, null=True)
     #isVideo = models.BooleanField(default=False)
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
-  
+    likes = models.ManyToManyField(User, related_name='liked_comic', blank=True)
+
+    def total_likes(self):
+        return self.likes.count()
+    
     def __str__(self):
         return self.name
     @property

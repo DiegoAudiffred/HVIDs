@@ -43,7 +43,7 @@
 
                 <!-- Columna izquierda -->
                 <div class="col-12 col-lg-6 p-3 fnBubbleSansRegular" style="min-width: 0;">
-                    {% if resultado.tipo_objeto != "juego" %}
+                    {% if resultado.tipo_objeto != "game" %}
 
                     <div class="mb-2">
 
@@ -57,7 +57,7 @@
 
                     </div>
                     {% endif %}
-                    {% if resultado.tipo_objeto != "juego" %}
+                    {% if resultado.tipo_objeto != "game" %}
 
                     <div class="mb-2">
                         <strong>Cumpleaños:</strong>
@@ -72,7 +72,7 @@
 
                     </div>
                     {% endif %}
-                    {% if resultado.tipo_objeto != "juego" %}
+                    {% if resultado.tipo_objeto != "game" %}
 
                     <div class="mb-2">
                         <strong>Descripción:</strong>
@@ -92,6 +92,103 @@
 
                 <!-- Columna derecha -->
                 <div class="col-12 col-lg-6 p-3 fnBubbleSansRegular" style="min-width: 0;">
+                    <style>
+                        /* Contenedor del ícono: tamaño fijo para que no salte el layout */
+                        .btn-like .position-relative {
+                            width: 24px;
+                            height: 24px;
+                        }
+
+                        /* Ambos íconos superpuestos */
+                        .like-icon {
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            transition: opacity 0.3s ease;
+                            /* transición de la opacidad */
+                            will-change: opacity;
+                            /* mejora el rendimiento */
+                        }
+
+                        /* Opcional: efecto hover en el botón */
+                        .btn-like:hover .like-icon {
+                            transform: scale(1.2);
+                            transition: transform 0.2s ease;
+                        }
+                    </style>
+
+                    <div class="mb-3">
+                        <label class="form-label">Likes: </label>
+                        <button class="btn btn-like p-0 border-0 bg-transparent d-flex align-items-center gap-2"
+                            data-model="{{ resultado.tipo_objeto }}" data-id="{{ resultado.id }}">
+
+                            <div class="position-relative">
+                                <!-- Ícono: Like -->
+
+                                <img src="{% static 'img/Liked.png' %}" alt="Liked"
+                                    class="like-icon liked position-absolute top-0 start-0 transition-opacity"
+                                    style="{% if not resultado.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: opacity 0.3s ease;" />
+
+                                <!-- Ícono: Not Liked -->
+                                <img src="{% static 'img/Likend.png' %}" alt="Not Liked"
+                                    class="like-icon not-liked position-absolute top-0 start-0 transition-opacity"
+                                    style="{% if resultado.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: opacity 0.3s ease;" />
+                            </div>
+
+                            <span class="like-count text-white">{{ resultado.total_likes }}</span>
+                        </button>
+                    </div>
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            document.querySelectorAll('.btn-like').forEach(function (button) {
+                                button.addEventListener('click', function () {
+                                    const model = button.getAttribute('data-model');
+                                    const id = button.getAttribute('data-id');
+
+                                    fetch(`/toggle-like/${model}/${id}/`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRFToken': getCookie('csrftoken'),
+                                            'X-Requested-With': 'XMLHttpRequest',
+                                        },
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.liked !== undefined) {
+                                                button.querySelector('.like-count').textContent = data.total_likes;
+
+                                                const likedIcon = button.querySelector('.liked');
+                                                const notLikedIcon = button.querySelector('.not-liked');
+
+                                                if (data.liked) {
+                                                    likedIcon.style.opacity = '1';
+                                                    notLikedIcon.style.opacity = '0';
+                                                } else {
+                                                    likedIcon.style.opacity = '0';
+                                                    notLikedIcon.style.opacity = '1';
+                                                }
+                                            }
+                                        });
+                                });
+                            });
+
+                            function getCookie(name) {
+                                let cookieValue = null;
+                                if (document.cookie && document.cookie !== '') {
+                                    document.cookie.split(';').forEach(function (cookie) {
+                                        cookie = cookie.trim();
+                                        if (cookie.startsWith(name + '=')) {
+                                            cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+                                        }
+                                    });
+                                }
+                                return cookieValue;
+                            }
+                        });
+                    </script>
                     <div class="mb-2">
                         <strong>Etiquetas:</strong> #{{ resultado.tags.all.count }}
                     </div>
@@ -104,7 +201,7 @@
                         </span>
                         {% endfor %}
                     </div>
-                    {% if resultado.tipo_objeto != "juego" %}
+                    {% if resultado.tipo_objeto != "game" %}
 
                     <div class="mb-2"><strong>Links:</strong></div>
                     <div class="text-break" style="max-height: 150px; overflow-y: auto; word-break: break-word;">

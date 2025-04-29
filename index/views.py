@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.db.models import Q
 import os
+from django.contrib.contenttypes.models import ContentType
 
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
@@ -87,8 +88,45 @@ def show(request):
         med.save()  # Guardar cada instancia actualizada
     
     return redirect('index:index')  # Redirigir correctamente
+@login_required(login_url='/login/')  # ruta de la vista login
+def userProfile(request,username):
+    user = User.objects.get(username=username)
+ 
+    sidebar_context = get_sidebar_context()
+    context = {
+       
+    'mediafiles': user.liked_mediafiles.all(),
+    'artists': user.liked_artist.all(),
+    'comics': user.liked_comic.all(),
+    'characters': user.liked_character.all(),
+    'games': user.liked_game.all(),
+    'user': user,
+            **sidebar_context
 
-from django.shortcuts import redirect
+}
+    
+    return render(request, 'index/userProfile.html', context)
+
+@login_required(login_url='/login/')  # ruta de la vista login
+
+def toggle_like(request, model, pk):
+    user = request.user
+
+    try:
+        content_type = ContentType.objects.get(model=model.lower())
+        model_class = content_type.model_class()
+        obj = get_object_or_404(model_class, pk=pk)
+    except ContentType.DoesNotExist:
+        return JsonResponse({'error': 'Modelo no válido'}, status=400)
+
+    if obj.likes.filter(id=user.id).exists():
+        obj.likes.remove(user)
+        liked = False
+    else:
+        obj.likes.add(user)
+        liked = True
+
+    return JsonResponse({'liked': liked, 'total_likes': obj.likes.count()})
 
 @login_required(login_url='/login/')  # ruta de la vista login
 
@@ -274,92 +312,72 @@ def deleteVideo(request,id):
     com.delete()
     return redirect('index:index')  # Redirigir correctamente
 
-@login_required(login_url='/login/')  
+def deleteComicImage(request, id):
+    com = ComicPage.objects.get(id=id)
+    comic_id = com.comic.id  
+    com.delete()
+    return redirect('index:watchComic', comic_id)
 
+
+
+@login_required(login_url='/login/')
 def watchContent(request, id):
     mediafile = get_object_or_404(MediaFile, id=id)
-
+    formVideo = UploadElementForm(instance=mediafile)
+    form = addComentariosForm()
     if request.method == 'POST':
         if 'update_video' in request.POST:
             formVideo = UploadElementForm(request.POST, request.FILES, instance=mediafile)
             if formVideo.is_valid():
                 formVideo.save()
                 mediafile = formVideo.instance
-
                 if hasattr(mediafile, 'tags'):
                     mediafile.tags.clear()
                     for tag in request.POST.get('tags_selectedArtist', '').split(','):
                         tag = tag.strip()
                         if tag:
-                            print(tag)
                             obj, _ = Tags.objects.get_or_create(name=tag.upper())
                             mediafile.tags.add(obj)
-                    #formComic.save()
                 return redirect('index:watchContent', mediafile.id)
-        elif 'comentario' in request.POST:   
+        elif 'comentario' in request.POST:
             form = addComentariosForm(request.POST, request.FILES)
             if form.is_valid():
                 comentario = form.save(commit=False)
-
-                comentario.usuario = request.user 
-                comentario.mediaFileID = mediafile  # Obtener el archivo subido
-
-                # Guardar el objeto Comentario con los campos adicionales
+                comentario.usuario = request.user
+                comentario.mediaFileID = mediafile
                 comentario.save()
-                return redirect('index:watchContent', mediafile.id)  # Redirigir correctamente
-
-    else:
-        form = addComentariosForm()
-        formVideo = UploadElementForm(instance=mediafile)
-
-   
-    mediafile = get_object_or_404(MediaFile, id=id)
-    comentarios = Comentario.objects.filter(mediaFileID = mediafile)
-
+                return redirect('index:watchContent', mediafile.id)
+    mediafile.liked_by_user = request.user.is_authenticated and mediafile.likes.filter(id=request.user.id).exists()
+    comentarios = Comentario.objects.filter(mediaFileID=mediafile)
     sidebar_data = get_sidebar_context()
-
     return render(request, 'index/watchContent.html', {
         'mediafile': mediafile,
-        #'pages':pages,
-        'comentarios':comentarios,
-        'form':form,
-        'formVideo':formVideo,
-        **sidebar_data,  # Integrar datos de la sidebar en el contexto de la vista
+        'comentarios': comentarios,
+        'form': form,
+        'formVideo': formVideo,
+        **sidebar_data,
     })
-@login_required(login_url='/login/')  
+
+@login_required(login_url='/login/')
 def watchComic(request, id):
     comic = get_object_or_404(Comic, id=id)
-    comentarios = Comentario.objects.filter(comicID=comic)
-    comic_pages = ComicPage.objects.filter(comic=comic).order_by('order')
-    sidebar_data = get_sidebar_context()
-
     form_comentario = addComentariosForm()
     form_page = ComicPageForm()
     formComic = UploadComicForm(instance=comic)
-
     if request.method == 'POST':
-        # Actualizar Comic
         if 'update_comic' in request.POST:
             formComic = UploadComicForm(request.POST, request.FILES, instance=comic)
             if formComic.is_valid():
                 formComic.save()
                 mediafile = formComic.instance
-
                 if hasattr(mediafile, 'tags'):
                     mediafile.tags.clear()
                     for tag in request.POST.get('tags_selectedArtist', '').split(','):
                         tag = tag.strip()
                         if tag:
-                            print(tag)
                             obj, _ = Tags.objects.get_or_create(name=tag.upper())
                             mediafile.tags.add(obj)
-                    #formComic.save()
                 return redirect('index:watchComic', comic.id)
-            
-
-            
-
-        # Guardar Comentario
         elif 'comentario' in request.POST:
             form_comentario = addComentariosForm(request.POST)
             if form_comentario.is_valid():
@@ -368,20 +386,16 @@ def watchComic(request, id):
                 c.comicID = comic
                 c.save()
                 return redirect('index:watchComic', comic.id)
-
-        # Subir Nuevas páginas (múltiples)
         images = request.FILES.getlist('images')
         if images:
-            current = comic_pages.count()
+            current = ComicPage.objects.filter(comic=comic).count()
             for i, img in enumerate(images, start=1):
-                page = ComicPage(
-                    comic=comic,
-                    image=img,
-                    order=current + i
-                )
-                page.save()
+                ComicPage(comic=comic, image=img, order=current + i).save()
             return redirect('index:watchComic', comic.id)
-
+    comic.liked_by_user = request.user.is_authenticated and comic.likes.filter(id=request.user.id).exists()
+    comentarios = Comentario.objects.filter(comicID=comic)
+    comic_pages = ComicPage.objects.filter(comic=comic).order_by('order')
+    sidebar_data = get_sidebar_context()
     return render(request, 'index/watchComic.html', {
         'mediafile':    comic,
         'comentarios':  comentarios,
@@ -392,70 +406,66 @@ def watchComic(request, id):
         **sidebar_data
     })
 
-@login_required(login_url='/login/')  # ruta de la vista login
+
+@login_required(login_url='/login/')
 def detailsAbout(request, filtro, valor):
     sidebar_context = get_sidebar_context()
-    if filtro == "personaje":
-        resultado = Character.objects.get(name=valor)
+
+    # helper para saber si el user ha likeado un objeto
+    def mark_liked(obj):
+        # si no está autenticado, siempre False
+        if not request.user.is_authenticated:
+            obj.liked_by_user = False
+        else:
+            # asume que cada modelo tiene el M2M .likes
+            obj.liked_by_user = obj.likes.filter(id=request.user.id).exists()
+        return obj
+
+    if filtro == "character":
+        resultado = get_object_or_404(Character, name=valor)
         media_files = MediaFile.objects.filter(character=resultado)
-        comics = Comic.objects.filter(character=resultado)
+        comics      = Comic.objects.filter(character=resultado)
 
-        combined_media = sorted(
-        chain(media_files, comics),
-        key=lambda x: x.uploaded_at,
-        reverse=True)
-        context = {
-            'contenido':combined_media,
-            'resultado': resultado,
-            'filtro': filtro,
-            'valor': valor,
-            **sidebar_context,
-        }
-        
-    elif filtro=="artista":
-        resultado = Artist.objects.get(name=valor)
+    elif filtro=="artist":
+        resultado   = get_object_or_404(Artist, name=valor)
         media_files = MediaFile.objects.filter(artist=resultado)
-        comics = Comic.objects.filter(artist=resultado)
+        comics      = Comic.objects.filter(artist=resultado)
 
-        combined_media = sorted(
-        chain(media_files, comics),
-        key=lambda x: x.uploaded_at,
-        reverse=True)
-       
-        context = {
-            'contenido':combined_media,
-            'resultado': resultado,
-            'filtro': filtro,
-            'valor': valor,
-            **sidebar_context,
-        }
-    elif filtro=="juego":
-        resultado = Game.objects.get(name=valor)
+    elif filtro=="game":
+        resultado   = get_object_or_404(Game, name=valor)
         media_files = MediaFile.objects.filter(game=resultado)
-        comics = Comic.objects.filter(game=resultado)
+        comics      = Comic.objects.filter(game=resultado)
 
-        combined_media = sorted(
+    else:
+        return render(request, 'index/filteredInfoPage.html', {
+            'mensaje': "Filtro no reconocido",
+            **sidebar_context
+        })
+
+    # combina y ordena
+    combined_media = sorted(
         chain(media_files, comics),
         key=lambda x: x.uploaded_at,
-        reverse=True)[:6]
-       
-        context = {
-            'contenido':combined_media,
-            'resultado': resultado,
-            'filtro': filtro,
-            'valor': valor,
-            **sidebar_context,
-        }
-    else:
-        context = {
-            'mensaje': "Filtro no reconocido",
-            **sidebar_context,
-        }
+        reverse=True
+    )
+
+    # marca liked_by_user en resultado y en cada item de combined_media
+    resultado = mark_liked(resultado)
+    combined_media = [mark_liked(obj) for obj in combined_media]
+
+    # arma el contexto
+    context = {
+        'contenido': combined_media,
+        'resultado': resultado,
+        'filtro': filtro,
+        'valor': valor,
+        **sidebar_context,
+    }
 
     return render(request, 'index/filteredInfoPage.html', context)
 
+
 @require_POST
-@login_required(login_url='/login/')  # ruta de la vista login
 
 @login_required(login_url='/login/')
 def ajax_add_comment(request, id):
@@ -727,9 +737,9 @@ def enviar_telegram_mensaje(texto, image_path=None):
 def edit_objeto(request, tipo, pk):
     # Mapea tipo a modelo y formulario
     modelo_map = {
-        'personaje': (Character, addCharsForm),
-        'artista': (Artist, addArtistForm),
-        'juego': (Game, addGameForm),
+        'character': (Character, addCharsForm),
+        'artist': (Artist, addArtistForm),
+        'game': (Game, addGameForm),
     }
     if tipo not in modelo_map:
         return redirect('index:index')

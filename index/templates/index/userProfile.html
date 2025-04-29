@@ -1,9 +1,151 @@
-<!-- uploadElement.html -->
 {% extends 'layout/layout.html' %}
+{% load static %}
 {% block body %}
 
+<h2 class="mt-4 mb-4">Los favoritos de {{user}}❤️</h2>
 
+<!-- MediaFiles -->
+<h3 class="mt-4">MediaFiles</h3>
+{% if mediafiles %}
+<div class="row">
+    {% for item in mediafiles %}
+    <div class="col-md-3 mb-4">
+        <a href="{% url 'index:watchContent' item.id %}" class="text-decoration-none text-dark">
+            <!-- Completa el href -->
+            <div class="card shadow-sm h-100">
+                {% if item.image %}
 
+                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
 
+                {% else %}
+
+                <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top"
+                    alt="{{ item.name }}">
+
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No has dado like a ningún MediaFile.</p>
+{% endif %}
+
+<!-- Artistas -->
+<h3 class="mt-4">Artistas</h3>
+{% if artists %}
+<div class="row">
+    {% for item in artists %}
+    <div class="col-md-3 mb-4">
+        <a href="{% url 'index:detailsAbout' 'artist' item.name %}" class="text-decoration-none text-dark">
+            <div class="card shadow-sm h-100">
+                {% if item.image %}
+
+                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+
+                {% else %}
+
+                <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top"
+                    alt="{{ item.name }}">
+
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No has dado like a ningún artista.</p>
+{% endif %}
+
+<!-- Cómics -->
+<h3 class="mt-4">Cómics</h3>
+{% if comics %}
+<div class="row">
+    {% for item in comics %}
+    <div class="col-md-3 mb-4">
+        <a href="{% url 'index:watchComic' item.id %}" class="text-decoration-none text-dark">
+            <div class="card shadow-sm h-100">
+                {% if item.image %}
+
+                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+
+                {% else %}
+
+                <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top"
+                    alt="{{ item.name }}">
+
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No has dado like a ningún cómic.</p>
+{% endif %}
+
+<!-- Personajes -->
+<h3 class="mt-4">Personajes</h3>
+{% if characters %}
+<div class="row">
+    {% for item in characters %}
+    <div class="col-md-3 mb-4">
+        <a href="{% url 'index:detailsAbout' 'character' item.name %}" class="text-decoration-none text-dark">
+            <div class="card shadow-sm h-100">
+                {% if item.image %}
+
+                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+
+                {% else %}
+
+                <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top"
+                    alt="{{ item.name }}">
+
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No has dado like a ningún personaje.</p>
+{% endif %}
+
+<!-- Juegos -->
+<h3 class="mt-4">Juegos</h3>
+{% if games %}
+<div class="row">
+    {% for item in games %}
+    <div class="col-md-3 mb-4">
+        <a href="{% url 'index:detailsAbout' 'game' item.name %}" class="text-decoration-none text-dark">
+            <div class="card shadow-sm h-100">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No has dado like a ningún juego.</p>
+{% endif %}
 
 {% endblock %}

@@ -106,6 +106,8 @@
             </p>
             <p class="card-text"><strong>Artista:</strong> {{ mediafile.artist }}</p>
             <p class="card-text"><strong>Serie:</strong> {{ mediafile.game }}</p>
+            <p class="card-text"><strong>Likes: </strong>{{mediafile.total_likes}}</p>
+
             <p class="card-text text-truncate"><strong>Etiquetas:</strong>
               {% for tag in mediafile.tags.all %}
               <span class="badge bg-secondary">{{ tag.name }}</span>

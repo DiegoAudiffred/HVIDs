@@ -21,7 +21,7 @@
 <div class="container mt-4">
     <h2 class="mb-4">Editar {{ tipo }}: {{ instancia }}</h2>
 
-    {% if instancia.tipo_objeto == "artista" %}
+    {% if instancia.tipo_objeto == "artist" %}
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -178,7 +178,7 @@
     </form>
     {% endif %}
 
-    {% if instancia.tipo_objeto == "personaje" %}
+    {% if instancia.tipo_objeto == "character" %}
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -266,7 +266,7 @@
 
     </form>
     {% endif %}
-    {% if instancia.tipo_objeto == "juego" %}
+    {% if instancia.tipo_objeto == "game" %}
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}

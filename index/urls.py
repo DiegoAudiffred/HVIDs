@@ -32,8 +32,10 @@ urlpatterns = [
     path('descargar/', views.download_video, name='download_video'),
     #path('upload/comic/', views.upload_comic, name='upload_comic'),
     path('ajax_add_comment/<int:id>/', views.ajax_add_comment, name='ajax_add_comment'),
-
     path('deleteComic/<int:id>',views.deleteComic,name="deleteComic"),
     path('deleteVideo/<int:id>',views.deleteVideo,name="deleteVideo"),
+    path('toggle-like/<str:model>/<int:pk>/', views.toggle_like, name='toggle_like'),
+    path('comic/page/deleteComicImage/<int:id>', views.deleteComicImage, name='deleteComicImage'),
 
+    path('profile/<str:username>',views.userProfile, name='userProfile')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
