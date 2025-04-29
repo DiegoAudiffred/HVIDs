@@ -315,10 +315,12 @@
             <div class="my-3">
                 <h1>Agregar un nuevo Usuario</h1>
             </div>
-            <div class="col-lg-6  my-3 col-12 text-center">
+            <div class="col-lg-6  my-3 col-12 text-start">
+                Nombre:*
                 {{ formUser.username }}
             </div>
-            <div class="col-lg-6  my-3  col-12 text-center">
+            <div class="col-lg-6  my-3  col-12 text-start">
+                Contraseña:*
                 {{ formUser.password }}
             </div>
             <div class="col-lg-6 my-3 col-6">
@@ -351,7 +353,8 @@
 
                 <label for="imageInput3" style="cursor: pointer;">
                     <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"
-                        class="img-thumbnail d-block imagePreview" style="max-width: 300px;" data-preview-id="3">
+                        class="img-thumbnail d-block imagePreview w-100 h-auto"
+                        style="max-height: 500px; object-fit: contain;" data-preview-id="3">
                 </label>
                 <input type="file" name="image" id="imageInput3" accept="image/*" class="d-none imageInput"
                     data-preview-id="3">
@@ -359,8 +362,9 @@
 
 
             </div>
-            <div class="col-lg-6  my-3 my-md-0 col-12 text-center">
+            <div class="col-lg-6  my-3 my-md-0 col-12 text-start">
                 <div class="my-2">
+                    Nombre del juego:*
                     {{ formGame.name }}
 
                 </div>

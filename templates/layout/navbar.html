@@ -158,6 +158,13 @@
         {% if request.user.is_authenticated %}
         <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            style="font-size: 1.2vw;" href="{% url 'index:userProfile' request.user.username %}">
+            <img src="{% static 'img/profileImageLogoPNG.png' %}" class="img-fluid icon-navbar mb-1">
+            Ver perfil
+          </a>
+        </li>
+        <li class="nav-item flex-fill text-center">
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
             style="font-size: 1.2vw;" href="{% url 'login:logout' %}">
             <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid icon-navbar mb-1">
             Cerrar Sesión

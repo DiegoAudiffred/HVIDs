@@ -118,9 +118,11 @@
             <p class="card-text"><strong>Artista:</strong> {{ mediafile.artist }}</p>
             <p class="card-text"><strong>Serie:</strong> {{ mediafile.game }}</p>
             <p class="card-text"><strong>Etiquetas:</strong>
-              {% for tag in mediafile.tags.all %}
-              <span class="badge bg-secondary">{{ tag.name }}</span>
-              {% endfor %}
+            <p class="card-text"><strong>Likes: </strong>{{mediafile.total_likes}}</p>
+
+            {% for tag in mediafile.tags.all %}
+            <span class="badge bg-secondary">{{ tag.name }}</span>
+            {% endfor %}
             </p>
           </div>
 
