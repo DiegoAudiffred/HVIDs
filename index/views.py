@@ -126,7 +126,6 @@ def adminPage(request):
                         else:
                             print(f"✅ Tag existente encontrada: ID={obj.id}, Nombre='{obj.name}'")
 
-                # ❌ No repitas formArtist.save()
                 return redirect('index:adminPage')
 
 
@@ -134,16 +133,38 @@ def adminPage(request):
             formUser = addUserForm(request.POST, request.FILES)
             if formUser.is_valid():
                 formUser.save()
+                
                 return redirect('index:adminPage')
         elif form_type == 'game_form':
             formGame = addGameForm(request.POST, request.FILES)
             if formGame.is_valid():
+                game = formGame.save(commit=False)
+                game.save() 
                 formGame.save()
+                for tag in request.POST.get('tags_selectedGame', '').split(','):
+                    if tag.strip():
+                        obj, created = Tags.objects.get_or_create(name=tag.strip().upper())
+                        game.tags.add(obj)
+
+                        if created:
+                            print(f"🔹 Nueva tag creada: ID={obj.id}, Nombre='{obj.name}'")
+                        else:
+                            print(f"✅ Tag existente encontrada: ID={obj.id}, Nombre='{obj.name}'")
                 return redirect('index:adminPage')
         elif form_type == 'char_form':
             formChar = addCharsForm(request.POST, request.FILES)
             if formChar.is_valid():
-                formChar.save()
+                char = formChar.save(commit=False)
+                char.save()
+                for tag in request.POST.get('tags_selectedChar', '').split(','):
+                    if tag.strip():
+                        obj, created = Tags.objects.get_or_create(name=tag.strip().upper())
+                        char.tags.add(obj)
+
+                        if created:
+                            print(f"🔹 Nueva tag creada: ID={obj.id}, Nombre='{obj.name}'")
+                        else:
+                            print(f"✅ Tag existente encontrada: ID={obj.id}, Nombre='{obj.name}'")
                 return redirect('index:adminPage')
 
     context = {
