@@ -197,7 +197,7 @@
 
                     </div>
                   </div>
-                  <input type="text" name="tags_selectedArtist" id="tagsSelectedArtist"
+                  <input type="text" name="tags_selectedArtist" id="tagsSelectedArtist" hidden
                     value="{% for tag in mediafile.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}">
 
                 </form>
@@ -622,8 +622,6 @@
       hiddenInput.value = tags.join(',');
     });
   });
-
-
 
 
 

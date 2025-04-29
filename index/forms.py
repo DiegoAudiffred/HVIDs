@@ -131,12 +131,13 @@ class addArtistForm(forms.ModelForm):
     birthdate = forms.DateField(
         required=False,
         widget=forms.DateInput(
-            format='%d/%m/%Y', 
+            format='%Y-%m-%d',            # <-- ISO para <input type="date">
             attrs={
-                'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
-                }
-        ),
-        input_formats=['%d/%m/%Y'],
+                'type': 'date',           # activa el calendario nativo
+                'class': 'form-control …',
+                'placeholder': 'dd/mm/aaaa',
+            }
+        )
     )
 
     class Meta:
@@ -206,14 +207,15 @@ class addCharsForm(forms.ModelForm):
     birthdate = forms.DateField(
         required=False,
         widget=forms.DateInput(
-            format='%d/%m/%Y', 
+            format='%Y-%m-%d',            # <-- ISO para <input type="date">
             attrs={
-                'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
-                'placeholder': 'dd/mm/yyyy'
+                'type': 'date',           # activa el calendario nativo
+                'class': 'form-control …',
+                'placeholder': 'dd/mm/aaaa',
             }
-        ),
-        input_formats=['%d/%m/%Y'],
+        )
     )
+
     class Meta:
         model = Character
         fields = ['name','image','game','description','gender','birthdate']

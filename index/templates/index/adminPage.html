@@ -255,14 +255,42 @@
 
             </div>
 
-            <div class="col-lg-6 my-3 my-md-0 col-12 text-center">
+            <div class="col-lg-6 my-3 my-md-0 col-12 text-start">
                 <div class="my-2">
+                    Nombre:*
                     {{ formChar.name }}
 
                 </div>
                 <div class="my-2">
+                    Sexo:
+                    {{ formChar.gender }}
+
+                </div>
+                <div class="my-2">
+                    Juego:
                     {{ formChar.game }}
 
+                </div>
+                <div class="my-2 position-relative">
+                    Etiquetas:
+                    <input type="text" id="tagInputArtist" class="rounded-3 border-3 border-primary px-4 w-100 py-2"
+                        placeholder="Escribe una etiqueta y presiona Enter">
+                    <div id="tagSuggestionsArtist"
+                        class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
+                    </div>
+                    <div id="tagContainerArtist" class="mt-2 d-flex flex-wrap gap-2">
+
+
+                    </div>
+                </div>
+                <div class=" my-2">
+                    Descripción:
+                    {{ formChar.description }}
+                </div>
+
+                <div class="my-2">
+                    Cumpleaños:
+                    {{ formChar.birthdate }}
                 </div>
                 <div class="my-2">
                     <button type="submit" class="btn  fw-bold w-100 bg-secondary text-cuarto">Agregar Personaje</button>
