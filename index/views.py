@@ -91,7 +91,22 @@ def show(request):
 @login_required(login_url='/login/')  # ruta de la vista login
 def userProfile(request,username):
     user = User.objects.get(username=username)
- 
+
+    allThigs={ 'mediafiles': user.liked_mediafiles.all(),
+    'artists': user.liked_artist.all(),
+    'comics': user.liked_comic.all(),
+    'characters': user.liked_character.all(),
+    'games': user.liked_game.all(),
+    }
+
+    favTags=[]
+    for name,thing in allThigs.items():
+      # print(name,thing)
+       for file in thing:
+            for tag in file.tags.all():
+                favTags.append(tag)
+    #print(favTags[:5]) 
+    favTags = favTags[:5]
     sidebar_context = get_sidebar_context()
     context = {
        
@@ -101,6 +116,7 @@ def userProfile(request,username):
     'characters': user.liked_character.all(),
     'games': user.liked_game.all(),
     'user': user,
+    'favTags':favTags,
             **sidebar_context
 
 }
