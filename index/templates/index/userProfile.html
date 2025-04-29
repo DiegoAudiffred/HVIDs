@@ -3,6 +3,11 @@
 {% block body %}
 
 <h2 class="mt-4 mb-4">Los favoritos de {{user}}❤️</h2>
+{% for tag in favTags %}
+<a href="{% url 'index:filtered_media' 'tag' tag.name %}" class="btn btn-sexto rounded rounded-pill">{{tag.name}}
+</a>
+
+{% endfor %}
 
 <!-- MediaFiles -->
 <h3 class="mt-4">MediaFiles</h3>
