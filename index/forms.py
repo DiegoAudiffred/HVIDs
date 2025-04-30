@@ -304,6 +304,44 @@ class addUserForm(forms.ModelForm):
             user.save()
         return user
 
+
+class editUserForm(forms.ModelForm):
+    password = forms.CharField(
+        label='Contraseña',
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+            'placeholder': 'Introduce una contraseña nueva (opcional)',
+        }),
+        required=False
+    )
+
+    class Meta:
+        model = User  # usa get_user_model() si prefieres
+        fields = ['username', 'password', 'image', 'banner']
+
+    def __init__(self, *args, **kwargs):
+        super(editUserForm, self).__init__(*args, **kwargs)
+        self.fields['username'].required = True
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+            'placeholder': 'Introduce el nombre del usuario',
+            'rows': '1'
+        })
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password = self.cleaned_data.get('password')
+        if password:
+            user.set_password(password)
+        if commit:
+            user.save()
+        return user
+
+    
+
+ 
+
+
 class addGameForm(forms.ModelForm):
     class Meta:
         model = Game

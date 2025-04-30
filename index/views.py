@@ -1,6 +1,7 @@
 import datetime
 from typing import Counter
 from django.utils.formats import date_format
+from django.contrib.auth import authenticate, login
 
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
@@ -97,16 +98,25 @@ def userProfile(request,username):
 
     if request.method == 'POST':
         print("entro")
-        form = addUserForm(request.POST, request.FILES, instance=user)
+        form = editUserForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
-            # guarda campos del formulario
-            form.save()
-            return redirect('index:userProfile', user.id)
+            updated_user = form.save()
+            password2 = form.cleaned_data.get('password')
+        
+            if password2:
+                user = authenticate(username=updated_user.username, password=password2)
+                if user is not None:
+                    login(request, user)
 
+                
+            return redirect('index:userProfile', user)
+        else:
+            print(form.errors)
+            
 
     
    
-    formUser = addUserForm(instance=user)
+    formUser = editUserForm(instance=user)
 
     media_files = MediaFile.objects.filter(hide=False,user=user)
     comics = Comic.objects.filter(hide=False,user=user)
