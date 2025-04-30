@@ -94,6 +94,14 @@
                                             {{ formVideo.artist }}
                                         </div>
                                     </div>
+                                    <div class="row p-2">
+                                        <div class="col-md-3 col-12 my-auto">
+                                            Subid por
+                                        </div>
+                                        <div class="col-md-9 col-12 my-auto">
+                                            {{ formVideo.user }}
+                                        </div>
+                                    </div>
 
                                     <div class="row p-2">
                                         <div class="col-md-3 col-12 my-auto">
@@ -103,7 +111,7 @@
                                             <!-- <- Agregado position-relative aquí -->
                                             <input type="text" id="tagInputArtist"
                                                 class="rounded-3 border-3 border-primary px-4 w-100 py-2"
-                                                placeholder="Escribe una etiqueta y presiona Enter">
+                                                placeholder="Escribe una etiqueta y presiona Enter o Tab para autocompletar">
                                             <div id="tagSuggestionsArtist"
                                                 class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
                                             </div>
@@ -229,155 +237,236 @@
                 Tu navegador no soporta la reproducción de video.
             </video>
         </div>
+        <style>
+            .character-tooltip {
+                position: relative;
+                display: inline-block;
+                cursor: pointer;
+            }
 
-        <div class="row">
-            <p><strong>Subido el :</strong> {{ mediafile.uploaded_at }} <strong>por</strong> <a
-                    href="{% url 'index:userProfile' mediafile.user.username %}">{{ mediafile.user.username }}</a></p>
-            <a href="{% url 'index:detailsAbout' 'artist' mediafile.artist.name %}"><strong>Artista: </strong>
-                {{mediafile.artist}}</a>
-            Agregar para personajes
+            .character-tooltip .preview-image {
+                visibility: hidden;
+                width: 150px;
+                background-color: #fff;
+                border: 1px solid #ddd;
+                border-radius: 0.5rem;
+                padding: 5px;
+                position: absolute;
+                z-index: 10;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                transition: all 0.2s ease-in-out;
+            }
 
+            .character-tooltip:hover .preview-image {
+                visibility: visible;
+            }
+        </style>
 
-            <!--  -->
-            <style>
-                /* Contenedor del ícono: tamaño fijo para que no salte el layout */
-                .btn-like .position-relative {
-                    width: 24px;
-                    height: 24px;
-                }
+        <!-- Archivo  -->
+        <div class="row gy-3">
 
-                /* Ambos íconos superpuestos */
-                .like-icon {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    transition: opacity 0.3s ease;
-                    /* transición de la opacidad */
-                    will-change: opacity;
-                    /* mejora el rendimiento */
-                }
+            <!-- Info de subida -->
+            <div class="col-12">
+                <p class="mb-1 text-muted">
+                    <strong>Subido el:</strong>
+                    {{ mediafile.uploaded_at|date:"d \d\e F \d\e Y \a \l\a\s H:i" }}
+                    {% if mediafile.user %}
+                    <strong>por</strong>
+                    <a href="{% url 'index:userProfile' mediafile.user.username %}">{{ mediafile.user.username }}</a>
+                    {% else %}
+                    <span class="text-danger">Sin usuario</span>
+                    {% endif %}
+                </p>
 
-                /* Opcional: efecto hover en el botón */
-                .btn-like:hover .like-icon {
-                    transform: scale(1.2);
-                    transition: transform 0.2s ease;
-                }
-            </style>
+            </div>
 
-            <div class="mb-3">
-                <label class="form-label">Likes: </label>
+            <!-- Artista -->
+            <div class="col-12">
+                <p class="mb-1">
+                    <strong>Artista:</strong>
+                    {% if mediafile.artist %}
+                    <a href="{% url 'index:detailsAbout' 'artist' mediafile.artist.name %}">
+                        {{ mediafile.artist }}
+                    </a>
+                    {% else %}
+                    <span class="text-danger">Sin artista</span>
+                    {% endif %}
+                </p>
+
+            </div>
+            <!-- Personajes -->
+            <div class="col-12">
+                {% if mediafile.character.exists %}
+                <p class="mb-1"><strong>Personajes:</strong></p>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for char in mediafile.character.all %}
+                    <div class="character-tooltip">
+                        <a href="{% url 'index:detailsAbout' 'character' char.name %}"
+                            class="d-inline-block rounded-pill bg-sexto text-black text-decoration-none py-2 px-4">
+                            {{ char.name }}
+                        </a>
+                        <div class="preview-image text-center">
+                            <img src="{{ char.image.url }}" alt="{{ char.name }}" class="img-fluid rounded" />
+                            <div class="small mt-1">{{ char.name }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+                {% else %}
+                <p class="text-danger">Sin personajes</p>
+                {% endif %}
+
+            </div>
+            <!-- Likes -->
+            <div class="col-12">
+                <label class="form-label">Likes:</label>
                 <button class="btn btn-like p-0 border-0 bg-transparent d-flex align-items-center gap-2"
                     data-model="{{ mediafile.tipo_objeto }}" data-id="{{ mediafile.id }}">
-
                     <div class="position-relative">
-                        <!-- Ícono: Like -->
-
+                        <!-- Ícono Like -->
                         <img src="{% static 'img/Liked.png' %}" alt="Liked"
-                            class="like-icon liked position-absolute top-0 start-0 transition-opacity"
+                            class="like-icon liked position-absolute top-0 start-0"
                             style="{% if not mediafile.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: opacity 0.3s ease;" />
 
-                        <!-- Ícono: Not Liked -->
+                        <!-- Ícono Not Liked -->
                         <img src="{% static 'img/Likend.png' %}" alt="Not Liked"
-                            class="like-icon not-liked position-absolute top-0 start-0 transition-opacity"
+                            class="like-icon not-liked position-absolute top-0 start-0"
                             style="{% if mediafile.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: opacity 0.3s ease;" />
                     </div>
-
                     <span class="like-count text-black">{{ mediafile.total_likes }}</span>
                 </button>
             </div>
 
-            <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    document.querySelectorAll('.btn-like').forEach(function (button) {
-                        button.addEventListener('click', function () {
-                            const model = button.getAttribute('data-model');
-                            const id = button.getAttribute('data-id');
+            <!-- Tags -->
+            <div class="col-12">
+                <p class="mb-1"><strong>Tags:</strong></p>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for tag in mediafile.tags.all %}
+                    <a href="{% url 'index:filtered_media' 'tag' tag.name %}"
+                        class="badge bg-secondary text-decoration-none">{{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
 
-                            fetch(`/toggle-like/${model}/${id}/`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRFToken': getCookie('csrftoken'),
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                },
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.liked !== undefined) {
-                                        button.querySelector('.like-count').textContent = data.total_likes;
-
-                                        const likedIcon = button.querySelector('.liked');
-                                        const notLikedIcon = button.querySelector('.not-liked');
-
-                                        if (data.liked) {
-                                            likedIcon.style.opacity = '1';
-                                            notLikedIcon.style.opacity = '0';
-                                        } else {
-                                            likedIcon.style.opacity = '0';
-                                            notLikedIcon.style.opacity = '1';
-                                        }
-                                    }
-                                });
-                        });
-                    });
-
-                    function getCookie(name) {
-                        let cookieValue = null;
-                        if (document.cookie && document.cookie !== '') {
-                            document.cookie.split(';').forEach(function (cookie) {
-                                cookie = cookie.trim();
-                                if (cookie.startsWith(name + '=')) {
-                                    cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
-                                }
-                            });
-                        }
-                        return cookieValue;
-                    }
-                });
-            </script>
-
-            <!--  -->
-            <p><strong>Tags:</strong>
-                {% for tag in mediafile.tags.all %}
-                <span class="badge bg-secondary">{{ tag.name }}</span>
-                {% endfor %}
-            </p>
-
-            <a href="{{ mediafile.file }}" class="btn btn-primary" download>Download</a>
+            <!-- Botón de descarga -->
+            <div class="col-12">
+                <a href="{{ mediafile.file }}" class="btn btn-primary">Download</a>
+            </div>
 
         </div>
-        <div class="row mb-5">
-            <div class="col-12">
-                <h2>Comentarios</h2>
-            </div>
-            <div class="col-12">
-                <p>Agregar comentario</p>
-            </div>
-            <form class="row" method="post" id="comentarioForm">
 
-                {% csrf_token %}
-                <div class="col-9">
-                    {{ form.comentario }}
-                </div>
-                <div class="col-3">
-                    <button class="btn btn-primary" type="submit">Enviar</button>
-                </div>
-            </form>
+        <!-- Info del archivo -->
+        <!-- Comentarios -->
+        <div class="row my-5">
             <div class="col-12">
-                <div id="comentariosContainer" class="col-12">
-                    {% for comentario in comentarios %}
-                    <div class="py-3 border-bottom">
-                        <p><a href="{% url 'index:userProfile' comentario.usuario.username %}">
-                                {{ comentario.usuario }}</a> {{comentario.uploaded_at}}</p>
-                        <p>{{ comentario.comentario }}</p>
+                <h2 class="mb-3 border-bottom pb-2">💬 Comentarios</h2>
+            </div>
+
+            <!-- Agregar comentario -->
+            <div class="col-12 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Agrega tu comentario</h5>
+                        <form class="row" method="post" id="comentarioForm">
+                            {% csrf_token %}
+                            <div class="col-md-9 mb-2 mb-md-0">
+                                {{ form.comentario }}
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <button class="btn btn-primary w-100" type="submit">Enviar ✉️</button>
+                            </div>
+                        </form>
                     </div>
+                </div>
+            </div>
+
+            <!-- Lista de comentarios -->
+            <div class="col-12 mt-4">
+                <div id="comentariosContainer">
+                    {% for comentario in comentarios %}
+                    <div class="card mb-3 shadow-sm border-start border-5 border-primary comentario">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <a href="{% url 'index:userProfile' comentario.usuario.username %}"
+                                    class="fw-bold text-decoration-none text-primary">
+                                    {{ comentario.usuario }}
+                                </a>
+                                <small class="text-muted">{{ comentario.uploaded_at }}</small>
+                            </div>
+                            <p class="mb-0">{{ comentario.comentario }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">Sé el primero en comentar 😃</p>
                     {% endfor %}
                 </div>
 
+                <!-- Controles de paginación -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <button id="prevBtn" class="btn btn-outline-primary">⬅ Anterior</button>
+                    <span id="pageIndicator" class="fw-bold"></span>
+                    <button id="nextBtn" class="btn btn-outline-primary">Siguiente ➡</button>
+                </div>
             </div>
+            <style>
+                .comentario {
+                    display: none;
+                }
+            </style>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const comentarios = document.querySelectorAll(".comentario");
+                    const prevBtn = document.getElementById("prevBtn");
+                    const nextBtn = document.getElementById("nextBtn");
+                    const pageIndicator = document.getElementById("pageIndicator");
+
+                    const itemsPerPage = 10;
+                    let currentPage = 1;
+                    const totalPages = Math.ceil(comentarios.length / itemsPerPage);
+
+                    function mostrarPagina(pagina) {
+                        const start = (pagina - 1) * itemsPerPage;
+                        const end = start + itemsPerPage;
+
+                        comentarios.forEach((comentario, index) => {
+                            comentario.style.display = index >= start && index < end ? "block" : "none";
+                        });
+
+                        // Actualiza indicador
+                        pageIndicator.textContent = `Página ${pagina} de ${totalPages}`;
+
+                        // Habilita o deshabilita botones
+                        prevBtn.disabled = pagina === 1;
+                        nextBtn.disabled = pagina === totalPages;
+                    }
+
+                    // Listeners
+                    prevBtn.addEventListener("click", () => {
+                        if (currentPage > 1) {
+                            currentPage--;
+                            mostrarPagina(currentPage);
+                        }
+                    });
+
+                    nextBtn.addEventListener("click", () => {
+                        if (currentPage < totalPages) {
+                            currentPage++;
+                            mostrarPagina(currentPage);
+                        }
+                    });
+
+                    // Mostrar página inicial
+                    mostrarPagina(currentPage);
+                });
+            </script>
+
         </div>
 
+        <!-- Comentairios -->
     </div>
 
 
@@ -402,12 +491,18 @@
                 .then(data => {
                     if (!data.error) {
                         const nuevoComentario = `
-        <div class="py-3 border-bottom">
-          <p><a href="#">${data.usuario}</a> ${data.fecha}</p>
-          <p>${data.texto}</p>
+    <div class="card mb-3 shadow-sm border-start border-5 border-primary">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <a href="#" class="fw-bold text-decoration-none text-primary">${data.usuario}</a>
+          <small class="text-muted">${data.fecha}</small>
         </div>
-      `;
-                        document.getElementById('comentariosContainer').innerHTML += nuevoComentario;
+        <p class="mb-0">${data.texto}</p>
+      </div>
+    </div>
+  `;
+                        document.getElementById("comentariosContainer").insertAdjacentHTML('afterbegin', nuevoComentario);
+
                         form.reset();
                     } else {
                         alert('Hubo un error: ' + data.error);
@@ -633,4 +728,79 @@
 
 
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.btn-like').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const model = button.getAttribute('data-model');
+                    const id = button.getAttribute('data-id');
+
+                    fetch(`/toggle-like/${model}/${id}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.liked !== undefined) {
+                                button.querySelector('.like-count').textContent = data.total_likes;
+
+                                const likedIcon = button.querySelector('.liked');
+                                const notLikedIcon = button.querySelector('.not-liked');
+
+                                if (data.liked) {
+                                    likedIcon.style.opacity = '1';
+                                    notLikedIcon.style.opacity = '0';
+                                } else {
+                                    likedIcon.style.opacity = '0';
+                                    notLikedIcon.style.opacity = '1';
+                                }
+                            }
+                        });
+                });
+            });
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    document.cookie.split(';').forEach(function (cookie) {
+                        cookie = cookie.trim();
+                        if (cookie.startsWith(name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+                        }
+                    });
+                }
+                return cookieValue;
+            }
+        });
+    </script>
+    <style>
+        /* Contenedor del ícono: tamaño fijo para que no salte el layout */
+        .btn-like .position-relative {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Ambos íconos superpuestos */
+        .like-icon {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.3s ease;
+            /* transición de la opacidad */
+            will-change: opacity;
+            /* mejora el rendimiento */
+        }
+
+        /* Opcional: efecto hover en el botón */
+        .btn-like:hover .like-icon {
+            transform: scale(1.2);
+            transition: transform 0.2s ease;
+        }
+    </style>
+
     {% endblock %}

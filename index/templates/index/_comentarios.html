@@ -1,0 +1,46 @@
+<div class="row my-5">
+    <div class="col-12">
+        <h2 class="mb-3 border-bottom pb-2">💬 Comentarios</h2>
+    </div>
+
+    <!-- Agregar comentario -->
+    <div class="col-12 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Agrega tu comentario</h5>
+                <form class="row" method="post" id="comentarioForm"
+                    data-url="{% url 'index:ajax_add_comment' mediafile.id %}">
+                    {% csrf_token %}
+                    <div class="col-md-9 mb-2 mb-md-0">
+                        {{ form.comentario }}
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <button class="btn btn-primary w-100" type="submit">Enviar ✉️</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de comentarios -->
+    <div class="col-12 mt-4">
+        <div id="comentariosContainer">
+            {% for comentario in comentarios %}
+            <div class="card mb-3 shadow-sm border-start border-5 border-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <a href="{% url 'index:userProfile' comentario.usuario.username %}"
+                            class="fw-bold text-decoration-none text-primary">
+                            {{ comentario.usuario }}
+                        </a>
+                        <small class="text-muted">{{ comentario.uploaded_at }}</small>
+                    </div>
+                    <p class="mb-0">{{ comentario.comentario }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-muted">Sé el primero en comentar 😃</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>

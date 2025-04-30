@@ -47,6 +47,9 @@ class User(AbstractUser):
     """Custom user model using username and password only."""
 
     username = models.CharField("Usuario", max_length=15, unique=True, null=False, blank=False)
+    image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
+    banner = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
+
     email = None  
     REQUIRED_FIELDS = []
     objects = UserManager()
@@ -87,7 +90,7 @@ class Character(models.Model):
     social_media = models.JSONField(blank=True, null=True)
     birthdate = models.DateField(blank=True, null=True)
     likes = models.ManyToManyField(User, related_name='liked_character', blank=True)
-
+    
     def total_likes(self):
         return self.likes.count()
     def __str__(self):

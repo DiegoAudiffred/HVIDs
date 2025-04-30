@@ -8,7 +8,7 @@ from db.models import *
 class UploadComicForm(forms.ModelForm):
     class Meta:
         model = Comic
-        fields = ['name', 'artist', 'tags', 'game', 'character','user','hide','image']
+        fields = ['name', 'artist', 'tags', 'game', 'character','user','hide','image','user']
     def __init__(self, *args, **kwargs):
             super(UploadComicForm, self).__init__(*args, **kwargs)
 
@@ -30,6 +30,9 @@ class UploadComicForm(forms.ModelForm):
             self.fields['character'].required = False
             self.fields['character'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
+            self.fields['user'].required = False
+            self.fields['user'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
+
             self.fields['tags'].required = False
             self.fields['tags'].widget = forms.CheckboxSelectMultiple()
             self.fields['tags'].queryset = Tags.objects.all()  # Obtén todas las opciones de tags disponibles
@@ -50,7 +53,7 @@ class UploadElementForm(forms.ModelForm):
     )
     class Meta:
         model = MediaFile
-        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image','hide']
+        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image','hide','user']
         
         widgets = {
             'file': forms.ClearableFileInput(attrs={'accept': 'video/*'}),
@@ -72,6 +75,9 @@ class UploadElementForm(forms.ModelForm):
 
         self.fields['file'].required = True
         self.fields['file'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Archivo*', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1','type':'file', 'name':'file', 'accept':'video/*'})
+
+        self.fields['user'].required = False
+        self.fields['user'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
         self.fields['image'].required = False
         self.fields['image'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2 from-control', 'placeholder': ' Miniatura', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
@@ -270,7 +276,7 @@ class addUserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'is_staff', 'is_superuser']
+        fields = ['username', 'password', 'is_staff', 'is_superuser','image','banner']
 
     def __init__(self, *args, **kwargs):
         super(addUserForm, self).__init__(*args, **kwargs)
