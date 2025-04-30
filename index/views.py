@@ -1,4 +1,6 @@
 import datetime
+from typing import Counter
+from django.utils.formats import date_format
 
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
@@ -88,10 +90,32 @@ def show(request):
         med.save()  # Guardar cada instancia actualizada
     
     return redirect('index:index')  # Redirigir correctamente
+
 @login_required(login_url='/login/')  # ruta de la vista login
 def userProfile(request,username):
     user = User.objects.get(username=username)
 
+    if request.method == 'POST':
+        print("entro")
+        form = addUserForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            # guarda campos del formulario
+            form.save()
+            return redirect('index:userProfile', user.id)
+
+
+    
+   
+    formUser = addUserForm(instance=user)
+
+    media_files = MediaFile.objects.filter(hide=False,user=user)
+    comics = Comic.objects.filter(hide=False,user=user)
+    # Combinar y ordenar
+    combined_media = sorted(
+        chain(media_files, comics),
+        key=lambda x: x.uploaded_at,
+        reverse=True
+    )[:10]
     allThigs={ 'mediafiles': user.liked_mediafiles.all(),
     'artists': user.liked_artist.all(),
     'comics': user.liked_comic.all(),
@@ -99,24 +123,34 @@ def userProfile(request,username):
     'games': user.liked_game.all(),
     }
 
-    favTags=[]
-    for name,thing in allThigs.items():
-      # print(name,thing)
-       for file in thing:
+    
+    total_likes = sum(qs.count() for qs in allThigs.values())
+
+
+    favTags = []
+    for _, thing in allThigs.items():
+        for file in thing:
             for tag in file.tags.all():
                 favTags.append(tag)
-    #print(favTags[:5]) 
-    favTags = favTags[:5]
+
+    # Obtener las 5 etiquetas más comunes
+    top5_tags = Counter(favTags).most_common(5)
+
+    # Si solo quieres los objetos tag (sin las cantidades)
+    top5_tags = [tag for tag, count in top5_tags]
     sidebar_context = get_sidebar_context()
+
     context = {
-       
+    'combined_media':combined_media,  
     'mediafiles': user.liked_mediafiles.all(),
     'artists': user.liked_artist.all(),
     'comics': user.liked_comic.all(),
     'characters': user.liked_character.all(),
     'games': user.liked_game.all(),
     'user': user,
-    'favTags':favTags,
+    'favTags':top5_tags,
+    'total_likes':total_likes,
+    'formUser':formUser,
             **sidebar_context
 
 }
@@ -365,6 +399,7 @@ def watchContent(request, id):
                 return redirect('index:watchContent', mediafile.id)
     mediafile.liked_by_user = request.user.is_authenticated and mediafile.likes.filter(id=request.user.id).exists()
     comentarios = Comentario.objects.filter(mediaFileID=mediafile)
+    comentarios = reversed(comentarios)
     sidebar_data = get_sidebar_context()
     return render(request, 'index/watchContent.html', {
         'mediafile': mediafile,
@@ -410,6 +445,7 @@ def watchComic(request, id):
             return redirect('index:watchComic', comic.id)
     comic.liked_by_user = request.user.is_authenticated and comic.likes.filter(id=request.user.id).exists()
     comentarios = Comentario.objects.filter(comicID=comic)
+    comentarios = reversed(comentarios)
     comic_pages = ComicPage.objects.filter(comic=comic).order_by('order')
     sidebar_data = get_sidebar_context()
     return render(request, 'index/watchComic.html', {
@@ -502,11 +538,14 @@ def ajax_add_comment(request, id):
 
         comentario.save()
 
+        fecha_formateada = comentario.uploaded_at.strftime("%d de %B de %Y a las %H:%M")
+
         return JsonResponse({
-            'usuario': str(comentario.usuario),
-            'fecha': comentario.uploaded_at.strftime('%d/%m/%Y %H:%M'),
-            'texto': comentario.comentario
-        })
+    'usuario': str(comentario.usuario),
+    'fecha': fecha_formateada,
+    'texto': comentario.comentario
+})
+
     return JsonResponse({'error': 'Comentario no válido'}, status=400)
 
 

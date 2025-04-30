@@ -2,155 +2,325 @@
 {% load static %}
 {% block body %}
 
-<h2 class="mt-4 mb-4">Los favoritos de {{user}}❤️</h2>
-{% for tag in favTags %}
-<a href="{% url 'index:filtered_media' 'tag' tag.name %}" class="btn btn-sexto rounded rounded-pill">{{tag.name}}
-</a>
+<div class="container-fluid  my-4">
 
-{% endfor %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Perfil de {{ user }}</h2>
 
-<!-- MediaFiles -->
-<h3 class="mt-4">MediaFiles</h3>
-{% if mediafiles %}
-<div class="row">
-    {% for item in mediafiles %}
-    <div class="col-md-3 mb-4">
-        <a href="{% url 'index:watchContent' item.id %}" class="text-decoration-none text-dark">
-            <!-- Completa el href -->
-            <div class="card shadow-sm h-100">
-                {% if item.image %}
+            <!-- Banner para móviles (pantallas < 768px) -->
+            <div class="d-lg-none position-relative rounded overflow-hidden"
+                style="height: 230px; background-image: url('{% if user.banner %}{{ user.banner.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}'); background-size: cover; background-position: center;">
 
-                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                <img src="{% if user.image %}{{ user.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
+                    alt="{{ user.username }}"
+                    class="position-absolute top-0 start-0 m-2 border border-white rounded-circle shadow"
+                    style="width: 90px; height: 90px; object-fit: cover;">
 
-                {% else %}
-
-                <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top"
-                    alt="{{ item.name }}">
-
+                {% if request.user == user %}
+                <button type="button" class="btn btn-light position-absolute top-0 end-0 m-2 p-1 shadow rounded-circle"
+                    data-bs-toggle="modal" data-bs-target="#perfilModal">
+                    <img src="{% static 'img/edit.png' %}" alt="Opciones" style="width: 24px; height: 24px;">
+                </button>
                 {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+
+                <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-50 text-white p-2">
+                    <h6 class="mb-1">{{ user.username }}</h6>
+                    <small><strong>Publicaciones:</strong> {{ combined_media|length }}</small><br>
+                    <small><strong>Likes:</strong> {{ total_likes }}</small>
+                    <small class="d-flex flex-wrap align-items-center mb-2">
+                        <strong class="me-2">Tags favoritos:</strong>
+                        {% for tag in favTags %}
+                        <a href="{% url 'index:filtered_media' 'tag' tag.name %}"
+                            class="btn btn-sm btn-outline-tercero rounded-pill py-0 px-2 btn-sexto me-1 mb-1"
+                            style="font-size: 0.75rem; line-height: 1.2;">
+                            {{ tag.name }}
+                        </a>
+                        {% endfor %}
+                    </small>
+                    <small><strong>Miembro desde:</strong> {{ user.date_joined }}</small>
+
                 </div>
             </div>
-        </a>
-    </div>
-    {% endfor %}
-</div>
-{% else %}
-<p>No has dado like a ningún MediaFile.</p>
-{% endif %}
 
-<!-- Artistas -->
-<h3 class="mt-4">Artistas</h3>
-{% if artists %}
-<div class="row">
-    {% for item in artists %}
-    <div class="col-md-3 mb-4">
-        <a href="{% url 'index:detailsAbout' 'artist' item.name %}" class="text-decoration-none text-dark">
-            <div class="card shadow-sm h-100">
-                {% if item.image %}
+            <!-- Banner para pantallas medianas o mayores (≥ 768px) -->
+            <div class="d-none d-lg-block position-relative rounded overflow-hidden"
+                style="height: 340px; background-image: url('{% if user.banner %}{{ user.banner.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}'); background-size: cover; background-position: center;">
 
-                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
+                <!-- Imagen de perfil -->
+                <img src="{% if user.image %}{{ user.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
+                    alt="{{ user.username }}"
+                    class="position-absolute top-0 start-0 m-4 border border-white rounded-circle shadow"
+                    style="width: 200px; height: 200px; object-fit: cover;">
 
-                {% else %}
-
-                <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top"
-                    alt="{{ item.name }}">
-
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                <!-- Información del perfil en la parte superior derecha -->
+                <div class="position-absolute top-0 end-0 m-4 bg-dark bg-opacity-50 text-white p-3 rounded w-50">
+                    <h4>{{ user.username }}</h4>
+                    <p class="d-flex flex-wrap align-items-center mb-2">
+                        <strong class="me-2">Tags favoritos:</strong>
+                        {% for tag in favTags %}
+                        <a href="{% url 'index:filtered_media' 'tag' tag.name %}"
+                            class="btn btn-sm btn-outline-tercero rounded-pill py-0 px-2 btn-sexto me-1 mb-1"
+                            style="font-size: 0.75rem; line-height: 1.2;">
+                            {{ tag.name }}
+                        </a>
+                        {% endfor %}
+                    </p>
+                    <p><strong>Miembro desde:</strong> {{ user.date_joined }}</p>
+                    <p><strong>Publicaciones:</strong> {{ combined_media|length }}</p>
+                    <p><strong>Likes dados:</strong> {{ total_likes }}</p>
                 </div>
-            </div>
-        </a>
-    </div>
-    {% endfor %}
-</div>
-{% else %}
-<p>No has dado like a ningún artista.</p>
-{% endif %}
 
-<!-- Cómics -->
-<h3 class="mt-4">Cómics</h3>
-{% if comics %}
-<div class="row">
-    {% for item in comics %}
-    <div class="col-md-3 mb-4">
-        <a href="{% url 'index:watchComic' item.id %}" class="text-decoration-none text-dark">
-            <div class="card shadow-sm h-100">
-                {% if item.image %}
-
-                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
-
-                {% else %}
-
-                <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top"
-                    alt="{{ item.name }}">
-
+                <!-- Botón de editar al fondo a la derecha -->
+                {% if request.user == user %}
+                <button type="button" class="btn btn-light position-absolute top-0 end-0 m-3 p-2 shadow rounded-circle"
+                    data-bs-toggle="modal" data-bs-target="#perfilModal">
+                    <img src="{% static 'img/edit.png' %}" alt="Opciones" style="width: 30px; height: 30px;">
+                </button>
                 {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
-                </div>
             </div>
-        </a>
+
+        </div>
     </div>
-    {% endfor %}
-</div>
-{% else %}
-<p>No has dado like a ningún cómic.</p>
-{% endif %}
 
-<!-- Personajes -->
-<h3 class="mt-4">Personajes</h3>
-{% if characters %}
-<div class="row">
-    {% for item in characters %}
-    <div class="col-md-3 mb-4">
-        <a href="{% url 'index:detailsAbout' 'character' item.name %}" class="text-decoration-none text-dark">
-            <div class="card shadow-sm h-100">
-                {% if item.image %}
-
-                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
-
-                {% else %}
-
-                <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top"
-                    alt="{{ item.name }}">
-
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+    <!-- Modal -->
+    <div class="modal fade" id="perfilModal" tabindex="-1" aria-labelledby="perfilModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="perfilModalLabel">Opciones del perfil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-            </div>
-        </a>
-    </div>
-    {% endfor %}
-</div>
-{% else %}
-<p>No has dado like a ningún personaje.</p>
-{% endif %}
 
-<!-- Juegos -->
-<h3 class="mt-4">Juegos</h3>
-{% if games %}
-<div class="row">
-    {% for item in games %}
-    <div class="col-md-3 mb-4">
-        <a href="{% url 'index:detailsAbout' 'game' item.name %}" class="text-decoration-none text-dark">
-            <div class="card shadow-sm h-100">
-                {% if item.image %}
-                <img src="{{ item.image.url }}" class="card-img-top" alt="{{ item.name }}">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
-                </div>
+                <form method="post" enctype="multipart/form-data" action="{% url 'index:userProfile' user %}">
+                    {% csrf_token %}
+
+                    <div class="modal-body">
+                        <!-- Aquí puedes poner acciones como cambiar imagen, banner, etc -->
+                        {{formUser.username}}
+                        {{formUser.password}}
+                        {{formUser.image}}
+                        {{formUser.banner}}
+
+
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">Guardar
+                                cambios</button>
+                        </div>
+                    </div>
+                </form>
+
             </div>
-        </a>
+        </div>
     </div>
-    {% endfor %}
+
+
+    {% if combined_media %}
+    <h4>Subidos por {{user}}</h4>
+
+    <div class="row">
+        {% for item in combined_media %}
+        <div class="col-lg-4 col-md-6 mb-4 col-12">
+            <a href="{% if item.tipo_objeto == 'comic' %} {% url 'index:watchComic' item.id %} {% else %} {% url 'index:watchContent' item.id %} {% endif %}"
+                class="text-decoration-none text-dark">
+                <div class="card shadow-sm h-100">
+                    {% if item.image %}
+                    <img src="{{ item.image.url }}" class="card-img-top img-fixed" alt="{{ item.name }}" style="width: 100%;
+                    height: 300px; /* o el alto que desees */
+                    object-fit: cover;">
+                    {% else %}
+                    <img src="{% static 'img/noImage.jpg' %}" class="card-img-top img-fixed" style="width: 100%;
+                    height: 300px; /* o el alto que desees */
+                    object-fit: cover;" alt="Previsualización">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <p>Este usuario no ha subido nada aun unu</p>
+    {% endif %}
+    <!-- Tags -->
+
+
+
+    <!-- Tags -->
+
+    <!-- MediaFiles -->
+    <h3 class="mt-4">MediaFiles</h3>
+    {% if mediafiles %}
+    <div class="row">
+        {% for item in mediafiles %}
+        <div class="col-lg-4 col-md-6 mb-4 col-12">
+            <a href="{% url 'index:watchContent' item.id %}" class="text-decoration-none text-dark">
+                <!-- Completa el href -->
+                <div class="card shadow-sm h-100">
+                    {% if item.image %}
+
+                    <img src="{{ item.image.url }}" class="card-img-top img-fixed" alt="{{ item.name }}" style="width: 100%;
+                    height: 300px; object-fit: cover;">
+
+                    {% else %}
+
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top img-fixed"
+                        style="width: 100%;
+                    height: 300px; /* o el alto que desees */
+                    object-fit: cover;" alt="{{ item.name }}">
+
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No has dado like a ningún MediaFile.</p>
+    {% endif %}
+
+    <!-- Artistas -->
+    <h3 class="mt-4">Artistas</h3>
+    {% if artists %}
+    <div class="row">
+        {% for item in artists %}
+        <div class="col-lg-4 col-md-6 mb-4 col-12">
+            <a href="{% url 'index:detailsAbout' 'artist' item.name %}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm h-100">
+                    {% if item.image %}
+
+                    <img src="{{ item.image.url }}" class="card-img-top img-fixed" alt="{{ item.name }}" style="width: 100%;
+                    height: 300px; /* o el alto que desees */
+                    object-fit: cover;">
+
+                    {% else %}
+
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top img-fixed"
+                        style="width: 100%;
+                    height: 300px; /* o el alto que desees */
+                    object-fit: cover;" alt="{{ item.name }}">
+
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No has dado like a ningún artista.</p>
+    {% endif %}
+
+    <!-- Cómics -->
+    <h3 class="mt-4">Cómics</h3>
+    {% if comics %}
+    <div class="row">
+        {% for item in comics %}
+        <div class="col-lg-4 col-md-6 mb-4 col-12">
+            <a href="{% url 'index:watchComic' item.id %}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm h-100">
+                    {% if item.image %}
+
+                    <img src="{{ item.image.url }}" class="card-img-top img-fixed" alt="{{ item.name }}" style="width: 100%;
+                    height: 300px; /* o el alto que desees */
+                    object-fit: cover;">
+
+                    {% else %}
+
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top img-fixed"
+                        style="width: 100%;
+                    height: 300px; /* o el alto que desees */
+                    object-fit: cover;" alt="{{ item.name }}">
+
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No has dado like a ningún cómic.</p>
+    {% endif %}
+
+    <!-- Personajes -->
+    <h3 class="mt-4">Personajes</h3>
+    {% if characters %}
+    <div class="row">
+        {% for item in characters %}
+        <div class="col-lg-4 col-md-6 mb-4 col-12">
+            <a href="{% url 'index:detailsAbout' 'character' item.name %}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm h-100">
+                    {% if item.image %}
+
+                    <img src="{{ item.image.url }}" class="card-img-top img-fixed" alt="{{ item.name }}" style="width: 100%;
+                    height: 300px; /* o el alto que desees */
+                    object-fit: cover;">
+
+                    {% else %}
+
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top img-fixed"
+                        style="width: 100%;
+                    height: 300px; /* o el alto que desees */
+                    object-fit: cover;" alt="{{ item.name }}">
+
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No has dado like a ningún personaje.</p>
+    {% endif %}
+
+    <!-- Juegos -->
+    <h3 class="mt-4">Juegos</h3>
+    {% if games %}
+    <div class="row">
+        {% for item in games %}
+        <div class="col-lg-4 col-md-6 mb-4 col-12">
+            <a href="{% url 'index:detailsAbout' 'game' item.name %}" class="text-decoration-none text-dark">
+                <div class="card shadow-sm h-100">
+                    {% if item.image %}
+                    <img src="{{ item.image.url }}" class="card-img-top img-fixed" alt="{{ item.name }}" style="width: 100%;
+                    height: 300px; /* o el alto que desees */
+                    object-fit: cover;">
+
+                    {% else %}
+
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top img-fixed"
+                        style="width: 100%;
+                    height: 300px; /* o el alto que desees */
+                    object-fit: cover;" alt="{{ item.name }}">
+
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No has dado like a ningún juego.</p>
+    {% endif %}
 </div>
-{% else %}
-<p>No has dado like a ningún juego.</p>
-{% endif %}
 
 {% endblock %}
