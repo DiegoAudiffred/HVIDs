@@ -305,6 +305,7 @@ class addUserForm(forms.ModelForm):
         return user
 
 
+
 class editUserForm(forms.ModelForm):
     password = forms.CharField(
         label='Contraseña',
@@ -316,8 +317,8 @@ class editUserForm(forms.ModelForm):
     )
 
     class Meta:
-        model = User  # usa get_user_model() si prefieres
-        fields = ['username', 'password', 'image', 'banner']
+        model = User
+        fields = ['username', 'image', 'banner']  # ← ¡Ojo! No incluimos 'password'
 
     def __init__(self, *args, **kwargs):
         super(editUserForm, self).__init__(*args, **kwargs)
@@ -333,11 +334,13 @@ class editUserForm(forms.ModelForm):
         password = self.cleaned_data.get('password')
         if password:
             user.set_password(password)
+        else:
+            # Preserva el hash de contraseña actual si no se cambia
+            user.password = self.instance.password
+
         if commit:
             user.save()
         return user
-
-    
 
  
 

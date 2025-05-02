@@ -109,7 +109,7 @@ def userProfile(request,username):
                     login(request, user)
 
                 
-            return redirect('index:userProfile', user)
+            return redirect('index:userProfile', updated_user.username)
         else:
             print(form.errors)
             

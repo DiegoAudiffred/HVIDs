@@ -309,7 +309,12 @@
                             {{ char.name }}
                         </a>
                         <div class="preview-image text-center">
+                            {% if char.image %}
                             <img src="{{ char.image.url }}" alt="{{ char.name }}" class="img-fluid rounded" />
+                            {% else %}
+                                                        <img src="{% static 'img/noImage.jpg' %}" alt="{{ char.name }}" class="img-fluid rounded" />
+
+                            {% endif %}
                             <div class="small mt-1">{{ char.name }}</div>
                         </div>
                     </div>
