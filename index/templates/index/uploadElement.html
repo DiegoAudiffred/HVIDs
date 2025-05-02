@@ -166,15 +166,18 @@
 
         <!-- Subida de imágenes -->
         <div class="row p-2">
-            <div class="col-12">
-                <label>Agregar páginas:</label>
-                <div id="comicPagesPreview" class="d-flex flex-wrap gap-2"></div>
-                <input type="file" id="comicImageInput" accept="image/*" style="display:none" name="comicImages"
-                    multiple>
-                <div id="uploadBox" class="border border-primary text-center py-5" style="cursor:pointer;">
+            Agregar páginas:
+
+            <input type="file" id="comicImageInput" accept="image/*" style="display:none" name="comicImages" multiple>
+            <div id="comicPagesPreview" class="d-flex flex-wrap gap-2 my-2">
+                <div id="uploadBox" class="border border-primary text-center py-5 col-md-2 col-12"
+                    style="cursor:pointer;">
                     <strong>+</strong><br>Agregar imagen
                 </div>
+
             </div>
+
+
         </div>
 
         <div class="row p-2 justify-content-end">
@@ -194,7 +197,7 @@
     const imageInput = document.getElementById("comicImageInput");
     const previewContainer = document.getElementById("comicPagesPreview");
 
-    const selectedImages = [];
+    let selectedImages = [];
 
     uploadBox.addEventListener("click", () => {
         imageInput.click();
@@ -202,30 +205,47 @@
 
     imageInput.addEventListener("change", function () {
         for (let file of this.files) {
+            // Verificamos que no esté repetido (opcional)
+            if (selectedImages.some(f => f.name === file.name && f.size === file.size)) continue;
+
             selectedImages.push(file);
 
             const reader = new FileReader();
             reader.onload = function (e) {
+                const wrapper = document.createElement("div");
+                wrapper.classList.add("text-center");
+                wrapper.style.position = "relative";
+
                 const img = document.createElement("img");
                 img.src = e.target.result;
                 img.style.width = "100px";
-                img.style.margin = "5px";
-                img.classList.add("border");
-                previewContainer.appendChild(img);
+                img.style.height = "100px";
+
+                img.classList.add("border", "rounded", "col-2");
+
+                const removeBtn = document.createElement("button");
+                removeBtn.textContent = "Eliminar";
+                removeBtn.type = "button";
+                removeBtn.classList.add("btn", "btn-sm", "btn-danger", "mt-1", "border", "border-3", "border-primary");
+                removeBtn.style.display = "block";
+                removeBtn.style.margin = "0 auto";
+
+                removeBtn.addEventListener("click", () => {
+                    // Eliminar del array de selectedImages
+                    selectedImages = selectedImages.filter(f => f !== file);
+                    wrapper.remove(); // Eliminar del DOM
+                });
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(removeBtn);
+                previewContainer.appendChild(wrapper);
             };
             reader.readAsDataURL(file);
         }
+
+        // Limpiar input para poder subir la misma imagen de nuevo si se desea
+        this.value = "";
     });
-    item.addEventListener("click", () => {
-        addTag(item.textContent);
-        tagInput.value = "";
-        tagSuggestions.classList.add("d-none");
-        tagInput.focus();  // 👈 volver a enfocar
-    });
-
-
-
-
 </script>
 
 <!-- SCRIPT de mostrar formulario Comic/Video (opcional si manejas tabs) -->

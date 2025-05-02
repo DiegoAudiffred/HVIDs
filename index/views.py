@@ -1,7 +1,11 @@
 import datetime
+from io import BytesIO
+from pyexpat.errors import messages
+import subprocess
 from typing import Counter
 from django.utils.formats import date_format
 from django.contrib.auth import authenticate, login
+from django.core.files import File
 
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
@@ -228,11 +232,31 @@ def adminPage(request):
 
 
         elif form_type == 'user_form':
-            formUser = addUserForm(request.POST, request.FILES)
-            if formUser.is_valid():
-                formUser.save()
-                
-                return redirect('index:adminPage')
+            username = request.POST.get("username")
+            password = request.POST.get("password")
+            staff = request.POST.get("is_staff") == 'on'
+            superuser = request.POST.get("is_superuser") == 'on'
+        
+            try:
+                user = User.objects.get(username=username)
+                if password:
+                    user.set_password(password)
+                user.is_staff = staff
+                user.is_superuser = superuser
+                user.save()
+        
+            except User.DoesNotExist:
+                formUser = addUserForm(request.POST, request.FILES)
+                if formUser.is_valid():
+                    user = formUser.save(commit=False)
+                    if password:
+                        user.set_password(password)
+                    user.is_staff = staff
+                    user.is_superuser = superuser
+                    user.save()
+        
+            return redirect('index:adminPage')
+
         elif form_type == 'game_form':
             formGame = addGameForm(request.POST, request.FILES)
             if formGame.is_valid():
@@ -438,6 +462,8 @@ def watchComic(request, id):
                         if tag:
                             obj, _ = Tags.objects.get_or_create(name=tag.upper())
                             mediafile.tags.add(obj)
+               
+
                 return redirect('index:watchComic', comic.id)
         elif 'comentario' in request.POST:
             form_comentario = addComentariosForm(request.POST)
@@ -452,6 +478,33 @@ def watchComic(request, id):
             current = ComicPage.objects.filter(comic=comic).count()
             for i, img in enumerate(images, start=1):
                 ComicPage(comic=comic, image=img, order=current + i).save()
+            file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.id]))
+                
+            texto = (
+    f"🎬 <b>¡{len(images)} Nuevas imagenes subidas!</b>\n"
+    f"📤 <i>Cortesía de</i> <b>{comic.user}</b>\n\n"
+    f"📎 <b>Nombre:</b> <a href='{file_url}'>{comic.name}</a>\n"
+    f"📺 <i>Haz clic en el nombre para verlo o descargarlo.</i>\n\n"
+    f"🔞 <i>Contenido variado: anime, series, y más...</i>"
+)
+            # construye image_url absoluto si existe
+            if hasattr(comic, 'image') and comic.image:
+                image_path = comic.image.path  # <-- Path local físico
+                print(image_path)
+            else:
+                image_path = None
+
+            if image_path:
+                with Image.open(image_path) as img:
+                    img.thumbnail((1280, 1280))
+                    temp = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+                    img.save(temp, format='JPEG')
+                    temp.close()
+                    image_path = temp.name  # esto ya es un path que puedes mandar
+
+            print('DEBUG: enviando Telegram', texto, image_path)
+            resp = enviar_telegram_mensaje(texto, image_path)
+            print('DEBUG: respuesta Telegram', resp)
             return redirect('index:watchComic', comic.id)
     comic.liked_by_user = request.user.is_authenticated and comic.likes.filter(id=request.user.id).exists()
     comentarios = Comentario.objects.filter(comicID=comic)
@@ -640,18 +693,46 @@ def uploadElement(request):
             if form.is_valid():
                 media = form.save(commit=False)
                 media.user = request.user
-
-                # renombrado de archivo
+        
                 uploaded_file = request.FILES['file']
                 base_name, ext = os.path.splitext(uploaded_file.name)
+                ext = ext.lower()
                 upload_dir = datetime.datetime.now().strftime("media_files/%Y%m%d/")
-                final_name = f"{base_name}{ext}"
+                os.makedirs(os.path.join(settings.MEDIA_ROOT, upload_dir), exist_ok=True)
+        
+                final_name = f"{base_name}.mp4"  # fuerza mp4 al final
                 count = 1
                 while default_storage.exists(os.path.join(upload_dir, final_name)):
-                    final_name = f"{base_name}_{count}{ext}"
+                    final_name = f"{base_name}_{count}.mp4"
                     count += 1
-                uploaded_file.name = final_name
-                media.file = uploaded_file
+        
+                save_path = os.path.join(settings.MEDIA_ROOT, upload_dir, final_name)
+        
+                if ext != ".mp4":
+                    # Guardar archivo temporal
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_input:
+                        for chunk in uploaded_file.chunks():
+                            temp_input.write(chunk)
+                        temp_input_path = temp_input.name
+        
+                    # Convertir a MP4 con ffmpeg
+                    subprocess.run([
+                        "ffmpeg", "-i", temp_input_path, "-c:v", "libx264", "-crf", "23", "-preset", "medium", save_path
+                    ], check=True)
+        
+                    # Eliminar temporal
+                    os.remove(temp_input_path)
+        
+                    # Asignar archivo convertido a media.file
+                    with open(save_path, 'rb') as f:
+                        media.file.save(final_name, File(f), save=False)
+                    if os.path.exists(save_path):
+                        os.remove(save_path)    
+                else:
+                    # Si ya es .mp4, guardarlo tal cual
+                    uploaded_file.name = final_name
+                    media.file = uploaded_file
+        
                 media.save()
                 form.save_m2m()
 
