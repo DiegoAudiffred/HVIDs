@@ -236,9 +236,9 @@
             <div class="card h-100 rounded-bottom rounded-4">
 
                 {% if mediafile.tipo_objeto == 'comic' %}
-                <a href="{% url 'index:watchComic' mediafile.id %}" class="text-decoration-none text-tercero ">
+                <a href="{% url 'index:watchComic' mediafile.name %}" class="text-decoration-none text-tercero ">
                     {% else %}
-                    <a href="{% url 'index:watchContent' mediafile.id %}">
+                    <a href="{% url 'index:watchContent' mediafile.name %}">
                         {% endif %}
 
                         {% if mediafile.image %}

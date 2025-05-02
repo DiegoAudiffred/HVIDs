@@ -386,7 +386,7 @@ def multi_search_results(request):
 
 @login_required(login_url='/login/')  
 def deleteComic(request,id):
-    com = Comic.objects.get(id=id)
+    com = Comic.objects.get(name=id)
     com.delete()
     return redirect('index:index')  # Redirigir correctamente
 
@@ -398,7 +398,7 @@ def deleteVideo(request,id):
 
 def deleteComicImage(request, id):
     com = ComicPage.objects.get(id=id)
-    comic_id = com.comic.id  
+    comic_id = com.comic.name  
     com.delete()
     return redirect('index:watchComic', comic_id)
 
@@ -406,7 +406,7 @@ def deleteComicImage(request, id):
 
 @login_required(login_url='/login/')
 def watchContent(request, id):
-    mediafile = get_object_or_404(MediaFile, id=id)
+    mediafile = get_object_or_404(MediaFile, name=id)
     formVideo = UploadElementForm(instance=mediafile)
     form = addComentariosForm()
     if request.method == 'POST':
@@ -422,7 +422,7 @@ def watchContent(request, id):
                         if tag:
                             obj, _ = Tags.objects.get_or_create(name=tag.upper())
                             mediafile.tags.add(obj)
-                return redirect('index:watchContent', mediafile.id)
+                return redirect('index:watchContent', mediafile.name)
         elif 'comentario' in request.POST:
             form = addComentariosForm(request.POST, request.FILES)
             if form.is_valid():
@@ -430,7 +430,7 @@ def watchContent(request, id):
                 comentario.usuario = request.user
                 comentario.mediaFileID = mediafile
                 comentario.save()
-                return redirect('index:watchContent', mediafile.id)
+                return redirect('index:watchContent', mediafile.name)
     mediafile.liked_by_user = request.user.is_authenticated and mediafile.likes.filter(id=request.user.id).exists()
     comentarios = Comentario.objects.filter(mediaFileID=mediafile)
     comentarios = reversed(comentarios)
@@ -445,7 +445,7 @@ def watchContent(request, id):
 
 @login_required(login_url='/login/')
 def watchComic(request, id):
-    comic = get_object_or_404(Comic, id=id)
+    comic = get_object_or_404(Comic, name=id)
     form_comentario = addComentariosForm()
     form_page = ComicPageForm()
     formComic = UploadComicForm(instance=comic)
@@ -464,7 +464,7 @@ def watchComic(request, id):
                             mediafile.tags.add(obj)
                
 
-                return redirect('index:watchComic', comic.id)
+                return redirect('index:watchComic', comic.name)
         elif 'comentario' in request.POST:
             form_comentario = addComentariosForm(request.POST)
             if form_comentario.is_valid():
@@ -472,13 +472,13 @@ def watchComic(request, id):
                 c.usuario = request.user
                 c.comicID = comic
                 c.save()
-                return redirect('index:watchComic', comic.id)
+                return redirect('index:watchComic', comic.name)
         images = request.FILES.getlist('images')
         if images:
             current = ComicPage.objects.filter(comic=comic).count()
             for i, img in enumerate(images, start=1):
                 ComicPage(comic=comic, image=img, order=current + i).save()
-            file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.id]))
+            file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.name]))
                 
             texto = (
     f"🎬 <b>¡{len(images)} Nuevas imagenes subidas!</b>\n"
@@ -505,7 +505,7 @@ def watchComic(request, id):
             print('DEBUG: enviando Telegram', texto, image_path)
             resp = enviar_telegram_mensaje(texto, image_path)
             print('DEBUG: respuesta Telegram', resp)
-            return redirect('index:watchComic', comic.id)
+            return redirect('index:watchComic', comic.name)
     comic.liked_by_user = request.user.is_authenticated and comic.likes.filter(id=request.user.id).exists()
     comentarios = Comentario.objects.filter(comicID=comic)
     comentarios = reversed(comentarios)
@@ -744,7 +744,7 @@ def uploadElement(request):
 
                 # notificación
               # ... dentro de uploadElement, tras media.save() y tags ...
-                file_url = request.build_absolute_uri(reverse('index:watchContent', args=[media.id]))
+                file_url = request.build_absolute_uri(reverse('index:watchContent', args=[media.name]))
                 texto = (
     f"🎬 <b>¡Nuevo video subido!</b>\n"
     f"📤 <i>Cortesía de</i> <b>{media.user}</b>\n\n"
@@ -784,7 +784,7 @@ def uploadElement(request):
                         obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
                         comic.tags.add(obj)
             
-                file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.id]))
+                file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.name]))
                 texto = (
                     f"🎬 <b>¡Nuevo imagén subida!</b>\n"
                     f"📤 <i>Cortesía de</i> <b>{comic.user}</b>\n\n"
