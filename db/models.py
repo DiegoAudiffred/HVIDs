@@ -46,6 +46,8 @@ class User(AbstractUser):
     username = models.CharField("Usuario", max_length=15, unique=True, null=False, blank=False)
     image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
     banner = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
+    can_upload=models.BooleanField(default=False)
+    can_edit=models.BooleanField(default=False)
 
     email = None  
     REQUIRED_FIELDS = []

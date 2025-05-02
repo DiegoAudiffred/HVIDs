@@ -54,7 +54,7 @@
                     style="width: 200px; height: 200px; object-fit: cover;">
 
                 <!-- Información del perfil en la parte superior derecha -->
-                <div class="position-absolute top-0 end-0 m-4 bg-dark bg-opacity-50 text-white p-3 rounded w-50">
+                <div class="position-absolute top-0 end-0 m-5 bg-tercero bg-opacity-75 text-white p-3 rounded w-50">
                     <h4>{{ user.username }}</h4>
                     <p class="d-flex flex-wrap align-items-center mb-2">
                         <strong class="me-2">Tags favoritos:</strong>
@@ -73,7 +73,8 @@
 
                 <!-- Botón de editar al fondo a la derecha -->
                 {% if request.user == user %}
-                <button type="button" class="btn btn-light position-absolute top-0 end-0 m-3 p-2 shadow rounded-circle"
+                <button type="button"
+                    class="btn btn-light position-absolute top-0 end-0 p-2 shadow rounded-circle bg-quinto bg-opacity-50"
                     data-bs-toggle="modal" data-bs-target="#perfilModal">
                     <img src="{% static 'img/edit.png' %}" alt="Opciones" style="width: 30px; height: 30px;">
                 </button>
@@ -97,15 +98,59 @@
 
                     <div class="modal-body">
                         <!-- Aquí puedes poner acciones como cambiar imagen, banner, etc -->
-                        {{formUser.username}}
-                        {{formUser.password}}
-                        {{formUser.image}}
-                        {{formUser.banner}}
+                        <div class="text-center">
+                            Nombre del usuario:
+                            {{formUser.username}}
+                        </div>
+                        <div class="text-center">
+                            Contraseña del usuario:
+                            {{formUser.password}}
 
+                        </div>
+                        <div class="text-center">
+                            Imagen de perfil
+                            <label for="imageInput1" style="cursor: pointer;">
+                                {% if user.image %}
+                                <img src="{{user.image.url}}" alt="Previsualización"
+                                    class="img-thumbnail d-block imagePreview w-100 h-auto"
+                                    style="max-height: 500px; object-fit: contain;" data-preview-id="1">
+                                {% else %}
+                                <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"
+                                    class="img-thumbnail d-block imagePreview w-100 h-auto"
+                                    style="max-height: 500px; object-fit: contain;" data-preview-id="1">
+                                {% endif %}
+                            </label>
+                            <input type="file" name="image" id="imageInput1" accept="image/*" class="d-none imageInput"
+                                data-preview-id="1">
+
+
+                        </div>
+                        <div class="text-center">
+                            Imagen del banner
+                            <label for="imageInput2" style="cursor: pointer;">
+
+                                {% if user.banner %}
+
+                                <img src="{{user.banner.url}}" alt="Previsualización"
+                                    class="img-thumbnail d-block imagePreview w-100 h-auto"
+                                    style="max-height: 500px; object-fit: contain;" data-preview-id="2">
+                                {% else %}
+                                <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"
+                                    class="img-thumbnail d-block imagePreview w-100 h-auto"
+                                    style="max-height: 500px; object-fit: contain;" data-preview-id="2">
+                                {% endif %}
+                            </label>
+
+                            <input type="file" name="banner" id="imageInput2" accept="image/*" class="d-none imageInput"
+                                data-preview-id="2">
+
+
+                        </div>
 
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-secondary text-white"
+                                data-bs-dismiss="modal">Cerrar</button>
                             <button type="submit" class="btn btn-primary">Guardar
                                 cambios</button>
                         </div>
@@ -322,5 +367,32 @@
     <p>No has dado like a ningún juego.</p>
     {% endif %}
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const imageInputs = document.querySelectorAll('.imageInput');
 
+        imageInputs.forEach(input => {
+            input.addEventListener('change', function () {
+                const previewId = this.dataset.previewId;
+                const imagePreview = document.querySelector(`.imagePreview[data-preview-id="${previewId}"]`);
+                const file = this.files[0];
+
+                if (file && imagePreview) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.classList.remove('d-none');
+                    };
+
+                    reader.readAsDataURL(file);
+                } else if (imagePreview) {
+                    imagePreview.src = "#";
+                    imagePreview.classList.add('d-none');
+                }
+            });
+        });
+    });
+
+</script>
 {% endblock %}

@@ -231,11 +231,24 @@
                 }
             </style>
 
-            <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" crossorigin="anonymous"
+            <!-- 
+    <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" crossorigin="anonymous"
                 data-setup='{}'>
-                <source src="{% url 'index:media_stream' mediafile.id %}" type="video/mp4" />
+                <source src="{{ mediafile.file.url }}" type="video/mp4" />
                 Tu navegador no soporta la reproducción de video.
+            </video> -->
+
+
+            <!--    <video id="my-video" controls preload="auto">
+                <source src="http://localhost:8001/{{ mediafile.file.name|slice:" 15:"|urlencode }}"
+                    type="video/webm" />
+                <source src="http://localhost:8001/{{ mediafile.file.name|slice:" 15:"|urlencode }}" type="video/mp4" />
+            </video> -->
+            <video controls class="video-js vjs-default-skin">
+                <source src="{% url 'index:media_stream' mediafile.id %}" type="video/mp4">
+                Tu navegador no soporta video.
             </video>
+
         </div>
         <style>
             .character-tooltip {
@@ -275,12 +288,19 @@
                     {{ mediafile.uploaded_at|date:"d \d\e F \d\e Y \a \l\a\s H:i" }}
                     {% if mediafile.user %}
                     <strong>por</strong>
+                    {% if mediafile.user.image %}
+                    <img src="{{ mediafile.user.image.url}}" alt="Imagen de usuario" class="rounded-circle me-2"
+                        style="width: 40px; height: 40px; object-fit: cover;">
                     <a href="{% url 'index:userProfile' mediafile.user.username %}">{{ mediafile.user.username }}</a>
+                    {% else %}
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Imagen de usuario" class="rounded-circle me-2"
+                        style="width: 40px; height: 40px; object-fit: cover;">
+                    <a href="{% url 'index:userProfile' mediafile.user.username %}">{{ mediafile.user.username }}</a>
+                    {% endif %}
                     {% else %}
                     <span class="text-danger">Sin usuario</span>
                     {% endif %}
                 </p>
-
             </div>
 
             <!-- Artista -->
@@ -312,7 +332,7 @@
                             {% if char.image %}
                             <img src="{{ char.image.url }}" alt="{{ char.name }}" class="img-fluid rounded" />
                             {% else %}
-                                                        <img src="{% static 'img/noImage.jpg' %}" alt="{{ char.name }}" class="img-fluid rounded" />
+                            <img src="{% static 'img/noImage.jpg' %}" alt="{{ char.name }}" class="img-fluid rounded" />
 
                             {% endif %}
                             <div class="small mt-1">{{ char.name }}</div>
@@ -396,10 +416,22 @@
                     <div class="card mb-3 shadow-sm border-start border-5 border-primary comentario">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <a href="{% url 'index:userProfile' comentario.usuario.username %}"
-                                    class="fw-bold text-decoration-none text-primary">
-                                    {{ comentario.usuario }}
-                                </a>
+                                <div class="d-flex align-items-center">
+                                    {% if comentario.usuario.image %}
+                                    <img src="{{ comentario.usuario.image.url }}" alt="Imagen de usuario"
+                                        class="rounded-circle me-2" alt="Imagen de usuario" class="rounded-circle me-2"
+                                        style="width: 30px; height: 30px; object-fit: cover;">
+                                    {% else %}
+                                    <img src="{% static 'img/noImage.jpg' %}" alt="Imagen de usuario"
+                                        class="rounded-circle me-2" alt="Imagen de usuario" class="rounded-circle me-2"
+                                        style="width: 30px; height: 30px; object-fit: cover;">
+                                    {% endif %}
+
+                                    <a href="{% url 'index:userProfile' comentario.usuario.username %}"
+                                        class="fw-bold text-decoration-none text-primary">
+                                        {{ comentario.usuario }}
+                                    </a>
+                                </div>
                                 <small class="text-muted">{{ comentario.uploaded_at }}</small>
                             </div>
                             <p class="mb-0">{{ comentario.comentario }}</p>
@@ -496,16 +528,26 @@
                 .then(data => {
                     if (!data.error) {
                         const nuevoComentario = `
-    <div class="card mb-3 shadow-sm border-start border-5 border-primary">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <a href="#" class="fw-bold text-decoration-none text-primary">${data.usuario}</a>
-          <small class="text-muted">${data.fecha}</small>
+  <div class="card mb-3 shadow-sm border-start border-5 border-primary">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="d-flex align-items-center">
+          {% if user.image %}
+            <img src="{{ user.image.url }}" alt="Imagen de usuario"
+                 class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
+          {% else %}
+            <img src="{% static 'img/noImage.jpg' %}" alt="Imagen de usuario"
+                 class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
+          {% endif %}
+          <a href="#" class="fw-bold text-decoration-none text-primary mb-0">${data.usuario}</a>
         </div>
-        <p class="mb-0">${data.texto}</p>
+        <small class="text-muted">${data.fecha}</small>
       </div>
+      <p class="mb-0">${data.texto}</p>
     </div>
-  `;
+  </div>
+`;
+
                         document.getElementById("comentariosContainer").insertAdjacentHTML('afterbegin', nuevoComentario);
 
                         form.reset();
