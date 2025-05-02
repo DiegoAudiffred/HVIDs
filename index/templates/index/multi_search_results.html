@@ -86,9 +86,9 @@
       <div class="card h-100">
 
         {% if mediafile.tipo_objeto == 'comic' %}
-        <a href="{% url 'index:watchComic' mediafile.id %}">
+        <a href="{% url 'index:watchComic' mediafile.name %}">
           {% else %}
-          <a href="{% url 'index:watchContent' mediafile.id %}">
+          <a href="{% url 'index:watchContent' mediafile.name %}">
             {% endif %}
 
             {% if mediafile.image %}
