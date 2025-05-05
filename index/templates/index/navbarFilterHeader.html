@@ -3,67 +3,55 @@
 
 {% block body %}
 <style>
-    .card-img-top {
-        width: 100%;
-        height: 200px;
-        /* Ajusta la altura según tus necesidades */
-        object-fit: cover;
-        /* Para asegurar que la imagen se ajuste sin deformarse */
+    .perspective-container {
+        perspective: 1000px;
+    }
+</style>
+<style>
+    .rainbow-hover {
+        position: relative;
+        transition: transform 0.5s ease;
+        transform-style: preserve-3d;
+        border-radius: 1rem;
     }
 
-    .card {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
+    .rainbow-hover:hover {
+        transform: rotateZ(3deg);
     }
 
-    .card-body {
-        flex: 1;
-    }
-
-    .overlay-svg {
+    /* Marco animado */
+    .rainbow-hover::before {
+        content: "";
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-        /* Asegura que el SVG esté sobre la imagen */
-    }
-
-    .blurred {
-        filter: blur(15px);
-        transition: filter 1.0s;
-    }
-
-    .blurred:hover {
-        filter: none;
-    }
-</style>
-<style>
-    .card {
+        inset: 0;
+        border-radius: inherit;
+        padding: 3px;
+        background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet, red);
+        background-size: 400% 400%;
+        animation: rainbow-border 4s linear infinite;
+        -webkit-mask:
+            linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
+        -webkit-mask-composite: destination-out;
+        mask-composite: exclude;
+        pointer-events: none;
         opacity: 0;
-        transform: scale(0.9);
+        transition: opacity 0.3s ease;
+        z-index: 1;
     }
 
-    .card.animate {
-        animation: zoomIn 1.5s ease forwards;
+    .rainbow-hover:hover::before {
+        opacity: 1;
     }
 
-    @keyframes zoomIn {
-        to {
-            opacity: 1;
-            transform: scale(1);
+    @keyframes rainbow-border {
+        0% {
+            background-position: 0% 50%;
         }
-    }
-</style>
 
-
-
-<style>
-    .card:hover {
-        box-shadow: 0 0 15px #ff69b4, 0 0 30px #ff69b4;
-        border: 2px solid #ff69b4;
-        transition: all 0.4s ease;
+        100% {
+            background-position: 100% 50%;
+        }
     }
 </style>
 <div class="container-fluid mt-4 ">
@@ -83,8 +71,8 @@
         {% endif %}
         {% for mediafile in media_files %}
         <div
-            class="col-12 col-lg-6 col-xl-3 {% if mediafile.tipo_objeto == 'comic' or mediafile.tipo_objeto == 'mediafile' %} col-xxl-4 {% else %} col-xxl-2 {% endif %} my-3">
-            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-shadow transition">
+            class="col-12 col-lg-6 col-xl-3 {% if mediafile.tipo_objeto == 'comic' or mediafile.tipo_objeto == 'mediafile' %} col-xxl-4 {% else %} col-xxl-2 {% endif %} my-3 perspective-container">
+            <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-shadow rainbow-hover">
 
                 {% if mediafile.tipo_objeto == 'comic' %}
                 <a href="{% url 'index:watchComic' mediafile.name %}">
@@ -137,14 +125,7 @@
                                     {% endif %}
                                 </div>
 
-                                {% if mediafile.tipo_objeto == 'mediafile' and mediafile.file %}
-                                <div class="card-footer bg-transparent border-0 text-center pb-3">
-                                    <a href="{{ mediafile.file.url }}" class="btn btn-outline-primary btn-sm"
-                                        target="_blank">
-                                        <i class="bi bi-download"></i> Descargar
-                                    </a>
-                                </div>
-                                {% endif %}
+
             </div>
         </div>
         {% endfor %}
