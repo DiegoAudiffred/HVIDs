@@ -3,12 +3,55 @@
 
 {% block body %}
 <style>
-    .card {
+    .perspective-container {
+        perspective: 1000px;
+    }
+</style>
+<style>
+    .rainbow-hover {
+        position: relative;
         transition: transform 0.5s ease;
+        transform-style: preserve-3d;
+        border-radius: 1rem;
     }
 
-    .card:hover {
-        transform: scale(1.1) rotate(-1deg);
+    .rainbow-hover:hover {
+        transform: rotateZ(3deg);
+    }
+
+    /* Marco animado */
+    .rainbow-hover::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 3px;
+        background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, violet, red);
+        background-size: 400% 400%;
+        animation: rainbow-border 4s linear infinite;
+        -webkit-mask:
+            linear-gradient(#fff 0 0) content-box,
+            linear-gradient(#fff 0 0);
+        -webkit-mask-composite: destination-out;
+        mask-composite: exclude;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 1;
+    }
+
+    .rainbow-hover:hover::before {
+        opacity: 1;
+    }
+
+    @keyframes rainbow-border {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        100% {
+            background-position: 100% 50%;
+        }
     }
 </style>
 
@@ -232,8 +275,8 @@
 
         {% endif %}
         {% for mediafile in contenido %}
-        <div class="col-12 col-lg-6 col-xl-3 col-xxl-3  my-2">
-            <div class="card h-100 rounded-bottom rounded-4">
+        <div class="col-12 col-lg-6 col-xl-3 col-xxl-3  my-2 perspective-container">
+            <div class="card h-100 rounded-bottom rounded-4 rainbow-hover">
 
                 {% if mediafile.tipo_objeto == 'comic' %}
                 <a href="{% url 'index:watchComic' mediafile.name %}" class="text-decoration-none text-tercero ">
@@ -276,15 +319,7 @@
                     </a>
 
 
-                    {% if mediafile.tipo_objeto == 'mediafile' and mediafile.file %}
-                    <div class="card-footer text-center">
-                        <a href="{{ mediafile.file.url }}" class="btn btn-primary text-white"
-                            target="_blank">Descargar</a>
 
-
-
-                    </div>
-                    {% endif %}
             </div>
         </div>
         {% endfor %}
