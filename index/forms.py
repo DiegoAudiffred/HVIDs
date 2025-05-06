@@ -8,7 +8,7 @@ from db.models import *
 class UploadComicForm(forms.ModelForm):
     class Meta:
         model = Comic
-        fields = ['name', 'artist', 'tags', 'game', 'character','user','hide','image','user']
+        fields = ['name', 'artist', 'tags', 'game', 'character','user','hide','image','user','nsfw']
     def __init__(self, *args, **kwargs):
             super(UploadComicForm, self).__init__(*args, **kwargs)
 
@@ -20,6 +20,7 @@ class UploadComicForm(forms.ModelForm):
 }
             self.fields['hide'].widget.attrs.update(checkbox_style)
 
+            self.fields['nsfw'].widget.attrs.update(checkbox_style)
 
             self.fields['artist'].required = False
             self.fields['artist'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
@@ -53,13 +54,17 @@ class UploadElementForm(forms.ModelForm):
     )
     class Meta:
         model = MediaFile
-        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image','hide','user']
+        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image','hide','user','nsfw']
         
         widgets = {
             'file': forms.ClearableFileInput(attrs={'accept': 'video/*'}),
         }
     def __init__(self, *args, **kwargs):
         super(UploadElementForm, self).__init__(*args, **kwargs)
+        checkbox_style = {
+    'class': 'form-check-input fs-2 my-0',  # Tamaño más grande + margen derecho y vertical
+}
+        self.fields['nsfw'].widget.attrs.update(checkbox_style)
 
         self.fields['name'].required = True
         self.fields['name'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
@@ -82,9 +87,7 @@ class UploadElementForm(forms.ModelForm):
         self.fields['image'].required = False
         self.fields['image'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2 from-control', 'placeholder': ' Miniatura', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
       # Estilos personalizados para las checkboxes
-        checkbox_style = {
-    'class': 'form-check-input fs-2 my-0',  # Tamaño más grande + margen derecho y vertical
-}
+    
         self.fields['hide'].widget.attrs.update(checkbox_style)
 
         # Asegúrate de que el campo de tags está usando CheckboxSelectMultiple correctamente.
