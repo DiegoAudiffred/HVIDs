@@ -220,7 +220,6 @@
                 img.src = e.target.result;
                 img.style.width = "100px";
                 img.style.height = "100px";
-
                 img.classList.add("border", "rounded", "col-2");
 
                 const removeBtn = document.createElement("button");
@@ -233,7 +232,11 @@
                 removeBtn.addEventListener("click", () => {
                     // Eliminar del array de selectedImages
                     selectedImages = selectedImages.filter(f => f !== file);
-                    wrapper.remove(); // Eliminar del DOM
+
+                    // Eliminar del DOM
+                    wrapper.remove();
+
+                    console.log('Imagen eliminada. Lista de imágenes:', selectedImages); // Para depuración
                 });
 
                 wrapper.appendChild(img);
@@ -242,11 +245,9 @@
             };
             reader.readAsDataURL(file);
         }
-
-        // Limpiar input para poder subir la misma imagen de nuevo si se desea
-        this.value = "";
     });
 </script>
+
 
 <!-- SCRIPT de mostrar formulario Comic/Video (opcional si manejas tabs) -->
 <script>

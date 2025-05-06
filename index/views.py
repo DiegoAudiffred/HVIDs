@@ -771,7 +771,9 @@ def uploadElement(request):
             formComic = UploadComicForm(request.POST)
             if formComic.is_valid():
                 comic = formComic.save(commit=False)
-                comic.image = request.FILES.getlist('comicImages')[0]
+                images = request.FILES.getlist('comicImages')
+                print("DEBUG: imágenes recibidas", images)
+                comic.image = images[0]
                 comic.user = request.user
                 comic.save()
                 formComic.save_m2m()
