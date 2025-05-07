@@ -162,7 +162,7 @@ class MediaFile(models.Model):
     image = models.ImageField(upload_to='media_files/thumbnails/%Y%m%d/', blank=True, null=True)
     #isVideo = models.BooleanField(default=True)
     likes = models.ManyToManyField(User, related_name='liked_mediafiles', blank=True)
-    nsfw = models.BooleanField(default=False)
+    #nsfw = models.BooleanField(default=False)
 
     def total_likes(self):
         return self.likes.count()
@@ -216,7 +216,7 @@ class Comic(models.Model):
     #isVideo = models.BooleanField(default=False)
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
     likes = models.ManyToManyField(User, related_name='liked_comic', blank=True)
-    nsfw = models.BooleanField(default=False)
+    #nsfw = models.BooleanField(default=False)
 
     def total_likes(self):
         return self.likes.count()

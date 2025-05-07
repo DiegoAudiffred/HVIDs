@@ -280,11 +280,19 @@
 
           {% if request.user.is_authenticated %}
           <li class="col-6 nav-item">
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+              style="font-size: 25px;" href="{% url 'index:userProfile' request.user.username %}">
+            <img src="{% static 'img/profileImageLogoPNG.png' %}" class="img-fluid mb-1"
+                style="max-width: 75px; height: 75px;">
+            Ver perfil
+          </a>
+        </li>
+          <li class="col-6 nav-item">
             <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
               style="font-size: 25px;" href="{% url 'login:logout' %}">
               <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid mb-1"
                 style="max-width: 75px; height: 75px;">
-              Salir
+              Cerrar Sesión
             </a>
           </li>
           {% endif %}

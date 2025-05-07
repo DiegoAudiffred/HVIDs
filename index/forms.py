@@ -8,7 +8,7 @@ from db.models import *
 class UploadComicForm(forms.ModelForm):
     class Meta:
         model = Comic
-        fields = ['name', 'artist', 'tags', 'game', 'character','user','hide','image','user','nsfw']
+        fields = ['name', 'artist', 'tags', 'game', 'character','user','hide','image','user']
     def __init__(self, *args, **kwargs):
             super(UploadComicForm, self).__init__(*args, **kwargs)
 
@@ -20,7 +20,7 @@ class UploadComicForm(forms.ModelForm):
 }
             self.fields['hide'].widget.attrs.update(checkbox_style)
 
-            self.fields['nsfw'].widget.attrs.update(checkbox_style)
+            #self.fields['nsfw'].widget.attrs.update(checkbox_style)
 
             self.fields['artist'].required = False
             self.fields['artist'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
@@ -54,7 +54,7 @@ class UploadElementForm(forms.ModelForm):
     )
     class Meta:
         model = MediaFile
-        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image','hide','user','nsfw']
+        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image','hide','user']
         
         widgets = {
             'file': forms.ClearableFileInput(attrs={'accept': 'video/*'}),
@@ -64,7 +64,7 @@ class UploadElementForm(forms.ModelForm):
         checkbox_style = {
     'class': 'form-check-input fs-2 my-0',  # Tamaño más grande + margen derecho y vertical
 }
-        self.fields['nsfw'].widget.attrs.update(checkbox_style)
+        #self.fields['nsfw'].widget.attrs.update(checkbox_style)
 
         self.fields['name'].required = True
         self.fields['name'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
