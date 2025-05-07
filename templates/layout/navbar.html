@@ -138,6 +138,7 @@
             <img src="{% static 'img/YoutubeLogoNew.png' %}" class="img-fluid icon-navbar mb-1">Descargar
           </a>
         </li>
+        {% if request.user.can_upload %}
 
         <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
@@ -145,6 +146,7 @@
             <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid icon-navbar mb-1">Subir Archivo
           </a>
         </li>
+        {% endif %}
         {% if user.is_superuser and user.is_staff %}
         <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
@@ -165,11 +167,31 @@
         </li>
         <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-            style="font-size: 1.2vw;" href="{% url 'login:logout' %}">
+            style="font-size: 1.2vw; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#logoutModal">
             <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid icon-navbar mb-1">
             Cerrar Sesión
           </a>
         </li>
+
+        <!-- Modal de Confirmación -->
+        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="logoutModalLabel">¿Confirmar cierre de sesión?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body text-center">
+                ¿Estás seguro de que deseas cerrar sesión, <strong>{{ request.user }}</strong>?
+              </div>
+              <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Cancelar</button>
+                <a href="{% url 'login:logout' %}" class="btn btn-primary">Cerrar Sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {% endif %}
 
 
@@ -183,7 +205,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-tercero d-block d-lg-none">
   <div class="container-fluid px-4">
-    <a class="navbar-brand mx-auto text-center text-primary fw-bold" href="{% url 'index:index' %}?show_all=true"
+    <a class="navbar-brand mx-auto text-center text-primary fw-bold" href="{% url 'index:index' %}"
       style="font-size: 24px;">
       <img id="logo" src="{% static 'img/LogoHvids.png' %}" alt="Previsualización" class="d-block"
         style="max-width: 175px;" data-preview-id="2">
@@ -197,13 +219,7 @@
 
       <ul class="navbar-nav row g-0">
         <div class="row w-100 mx-0">
-          <li class="col-6 nav-item">
-            <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-              style="font-size: 25px;" href="{% url 'index:index' %}">
-              <img src="{% static 'img/InicioLogo.png' %}" class="img-fluid mb-1" style="max-width: 75px; height:75px;">
-              Inicio
-            </a>
-          </li>
+
 
           <li class="col-6 nav-item">
             <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
@@ -257,7 +273,7 @@
               Descargas
             </a>
           </li>
-
+          {% if request.user.can_upload %}
           <li class="col-6 nav-item">
             <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
               style="font-size: 25px;" href="{% url 'index:uploadElement' %}">
@@ -266,7 +282,7 @@
               Subir
             </a>
           </li>
-
+          {% endif %}
           {% if user.is_superuser and user.is_staff %}
           <li class="col-6 nav-item">
             <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
@@ -280,19 +296,19 @@
 
           {% if request.user.is_authenticated %}
           <li class="col-6 nav-item">
-          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
               style="font-size: 25px;" href="{% url 'index:userProfile' request.user.username %}">
-            <img src="{% static 'img/profileImageLogoPNG.png' %}" class="img-fluid mb-1"
+              <img src="{% static 'img/profileImageLogoPNG.png' %}" class="img-fluid mb-1"
                 style="max-width: 75px; height: 75px;">
-            Ver perfil
-          </a>
-        </li>
+              Ver perfil
+            </a>
+          </li>
           <li class="col-6 nav-item">
             <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
               style="font-size: 25px;" href="{% url 'login:logout' %}">
               <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid mb-1"
                 style="max-width: 75px; height: 75px;">
-              Cerrar Sesión
+              Cerrar
             </a>
           </li>
           {% endif %}

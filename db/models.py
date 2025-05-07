@@ -49,7 +49,7 @@ class User(AbstractUser):
     username = models.CharField("Usuario", max_length=15, unique=True, null=False, blank=False)
     image = models.ImageField(upload_to="uploads/gallery/", blank=True, null=True)
     banner = models.ImageField(upload_to="uploads/gallery/", blank=True, null=True)
-    can_upload = models.BooleanField(default=False)
+    can_upload = models.BooleanField(default=True)
     can_edit = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
@@ -213,7 +213,6 @@ class Comic(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     character= models.ManyToManyField(Character, blank=True)
     image = models.ImageField(upload_to='media_files/comicPortraits/', blank=True, null=True)
-    #isVideo = models.BooleanField(default=False)
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
     likes = models.ManyToManyField(User, related_name='liked_comic', blank=True)
     #nsfw = models.BooleanField(default=False)

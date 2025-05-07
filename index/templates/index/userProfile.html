@@ -163,7 +163,7 @@
 
 
     {% if combined_media %}
-    <h4>Subidos por {{user}}</h4>
+    <h4>Recientes subidos por {{user}}</h4>
 
     <div class="row">
         {% for item in combined_media %}
@@ -187,6 +187,10 @@
             </a>
         </div>
         {% endfor %}
+        <div class="col-12">
+            <a href="">Ver todos los subidos</a>
+
+        </div>
     </div>
 
     {% else %}
@@ -199,7 +203,7 @@
     <!-- Tags -->
 
     <!-- MediaFiles -->
-    <h3 class="mt-4">MediaFiles</h3>
+    <h3 class="mt-4">Videos Recientemente Gustados</h3>
     {% if mediafiles %}
     <div class="row">
         {% for item in mediafiles %}
@@ -228,12 +232,16 @@
         </div>
         {% endfor %}
     </div>
+    <div class="col-12">
+        <a href="">Ver todos los likes de videos</a>
+
+    </div>
     {% else %}
-    <p>No has dado like a ningún MediaFile.</p>
+    <p>Nada que mostrar.</p>
     {% endif %}
 
     <!-- Artistas -->
-    <h3 class="mt-4">Artistas</h3>
+    <h3 class="mt-4">Artistas Recientemente Gustados</h3>
     {% if artists %}
     <div class="row">
         {% for item in artists %}
@@ -262,12 +270,16 @@
         </div>
         {% endfor %}
     </div>
+    <div class="col-12">
+        <a href="">Ver todos los likes de artistas</a>
+
+    </div>
     {% else %}
-    <p>No has dado like a ningún artista.</p>
+    <p>Nada que mostrar.</p>
     {% endif %}
 
     <!-- Cómics -->
-    <h3 class="mt-4">Cómics</h3>
+    <h3 class="mt-4">Imagenes Recientemente Gustadas</h3>
     {% if comics %}
     <div class="row">
         {% for item in comics %}
@@ -296,12 +308,16 @@
         </div>
         {% endfor %}
     </div>
+    <div class="col-12">
+        <a href="">Ver todos los likes de imagenes</a>
+
+    </div>
     {% else %}
-    <p>No has dado like a ningún cómic.</p>
+    <p>Nada que mostrar.</p>
     {% endif %}
 
     <!-- Personajes -->
-    <h3 class="mt-4">Personajes</h3>
+    <h3 class="mt-4">Personajes Recientemente Gustados</h3>
     {% if characters %}
     <div class="row">
         {% for item in characters %}
@@ -330,12 +346,16 @@
         </div>
         {% endfor %}
     </div>
+    <div class="col-12">
+        <a href="">Ver todos los likes de personajes</a>
+
+    </div>
     {% else %}
-    <p>No has dado like a ningún personaje.</p>
+    <p>Nada que mostrar.</p>
     {% endif %}
 
     <!-- Juegos -->
-    <h3 class="mt-4">Juegos</h3>
+    <h3 class="mt-4">Juegos Recientemente Gustados</h3>
     {% if games %}
     <div class="row">
         {% for item in games %}
@@ -363,8 +383,12 @@
         </div>
         {% endfor %}
     </div>
+    <div class="col-12">
+        <a href="">Ver todos los likes de juegos</a>
+
+    </div>
     {% else %}
-    <p>No has dado like a ningún juego.</p>
+    <p>Nada que mostrar.</p>
     {% endif %}
 </div>
 <script>
