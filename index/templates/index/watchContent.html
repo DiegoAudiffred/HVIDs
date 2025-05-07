@@ -28,6 +28,8 @@
             <h1>{{ mediafile.name }}</h1>
 
         </div>
+        {% if request.user.can_edit or request.user == mediafile.user %}
+
         <div class="col-lg-2 col-6 ">
             <button class="btn btn-quinto w-100 my-2 my-lg-0" data-bs-toggle="modal"
                 data-bs-target="#imageFileEdit">Editar</button>
@@ -107,7 +109,6 @@
                                             NSFW? *
                                         </div>
                                         <div class="col-md-9 col-12 my-auto">
-                                            {{ formComic.nsfw }}
                                         </div>
                                     </div>
 
@@ -223,7 +224,7 @@
                 </div>
             </div>
         </div>
-
+        {% endif %}
 
 
         <div class="media-container"> <!-- Video -->
@@ -252,10 +253,47 @@
                     type="video/webm" />
                 <source src="http://localhost:8001/{{ mediafile.file.name|slice:" 15:"|urlencode }}" type="video/mp4" />
             </video> -->
+            {% if is_audio %}
+            <div class="d-flex justify-content-center mt-4">
+                <div class="position-relative" style="display: inline-block;">
+                    {% if mediafile.image %}
+                    <img id="audio-image" src="{{ mediafile.image.url }}" alt="Imagen del audio" class="img-fluid"
+                        style="max-width: 400px; cursor: pointer;">
+                    {% endif %}
+
+                    <!-- Reproductor de audio centrado abajo -->
+                    <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2">
+                        <audio id="audio-player" controls>
+                            <source src="{% url 'index:media_stream' mediafile.id %}" type="audio/mpeg">
+                            Tu navegador no soporta audio.
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JavaScript para controlar play/pause con la imagen -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const audio = document.getElementById('audio-player');
+                    const image = document.getElementById('audio-image');
+
+                    image.addEventListener('click', function () {
+                        if (audio.paused) {
+                            audio.play();
+                        } else {
+                            audio.pause();
+                        }
+                    });
+                });
+            </script>
+
+            {% else %}
             <video controls class="video-js vjs-default-skin">
                 <source src="{% url 'index:media_stream' mediafile.id %}" type="video/mp4">
                 Tu navegador no soporta video.
             </video>
+            {% endif %}
+
 
         </div>
         <style>

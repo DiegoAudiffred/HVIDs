@@ -129,13 +129,14 @@ def userProfile(request,username):
         chain(media_files, comics),
         key=lambda x: x.uploaded_at,
         reverse=True
-    )[:10]
-    allThigs={ 'mediafiles': user.liked_mediafiles.all(),
-    'artists': user.liked_artist.all(),
-    'comics': user.liked_comic.all(),
-    'characters': user.liked_character.all(),
-    'games': user.liked_game.all(),
-    }
+    )[:9]
+    allThigs = {
+    'mediafiles': user.liked_mediafiles.all()[:9],
+    'artists': user.liked_artist.all()[:9],
+    'comics': user.liked_comic.all()[:9],
+    'characters': user.liked_character.all()[:9],
+    'games': user.liked_game.all()[:9],
+}
 
     
     total_likes = sum(qs.count() for qs in allThigs.values())
@@ -431,6 +432,9 @@ def watchContent(request, id):
                 comentario.mediaFileID = mediafile
                 comentario.save()
                 return redirect('index:watchContent', mediafile.name)
+    is_audio = False
+    if mediafile.file.name.lower().endswith('.mp3'):
+        is_audio = True        
     mediafile.liked_by_user = request.user.is_authenticated and mediafile.likes.filter(id=request.user.id).exists()
     comentarios = Comentario.objects.filter(mediaFileID=mediafile)
     comentarios = reversed(comentarios)
@@ -440,6 +444,8 @@ def watchContent(request, id):
         'comentarios': comentarios,
         'form': form,
         'formVideo': formVideo,
+            'is_audio': is_audio,
+
         **sidebar_data,
     })
 
@@ -680,11 +686,17 @@ def filtered_media(request, filter_type, string):
     return render(request, 'index/index.html', context)
 
 
-import mimetypes
+AUDIO_FORMATS = ['.mp3', '.wav', '.ogg', '.aac', '.flac']
+from django.contrib.auth.decorators import login_required, user_passes_test
 
+def can_upload_check(user):
+    return user.is_authenticated and getattr(user, 'can_upload', False)
+
+@user_passes_test(can_upload_check, login_url='/login/')
 @login_required(login_url='/login/')
 def uploadElement(request):
 
+  
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
@@ -693,77 +705,98 @@ def uploadElement(request):
             if form.is_valid():
                 media = form.save(commit=False)
                 media.user = request.user
-        
+
                 uploaded_file = request.FILES['file']
                 base_name, ext = os.path.splitext(uploaded_file.name)
                 ext = ext.lower()
+                is_audio = ext in AUDIO_FORMATS
+
                 upload_dir = datetime.datetime.now().strftime("media_files/%Y%m%d/")
                 os.makedirs(os.path.join(settings.MEDIA_ROOT, upload_dir), exist_ok=True)
-        
-                final_name = f"{base_name}.mp4"  # fuerza mp4 al final
+
+                # Define el nombre final según tipo
+                if is_audio:
+                    final_name = f"{base_name}{ext}"
+                else:
+                    final_name = f"{base_name}.mp4"
+
                 count = 1
                 while default_storage.exists(os.path.join(upload_dir, final_name)):
-                    final_name = f"{base_name}_{count}.mp4"
+                    if is_audio:
+                        final_name = f"{base_name}_{count}{ext}"
+                    else:
+                        final_name = f"{base_name}_{count}.mp4"
                     count += 1
-        
+
                 save_path = os.path.join(settings.MEDIA_ROOT, upload_dir, final_name)
-        
-                if ext != ".mp4":
-                    # Guardar archivo temporal
+
+                if not is_audio and ext != ".mp4":
                     with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_input:
                         for chunk in uploaded_file.chunks():
                             temp_input.write(chunk)
                         temp_input_path = temp_input.name
-        
-                    # Convertir a MP4 con ffmpeg
+
                     subprocess.run([
                         "ffmpeg", "-i", temp_input_path, "-c:v", "libx264", "-crf", "23", "-preset", "medium", save_path
                     ], check=True)
-        
-                    # Eliminar temporal
+
                     os.remove(temp_input_path)
-        
-                    # Asignar archivo convertido a media.file
+
                     with open(save_path, 'rb') as f:
                         media.file.save(final_name, File(f), save=False)
+
                     if os.path.exists(save_path):
-                        os.remove(save_path)    
+                        os.remove(save_path)
                 else:
-                    # Si ya es .mp4, guardarlo tal cual
                     uploaded_file.name = final_name
                     media.file = uploaded_file
-        
+
+                # Guardar imagen manualmente si viene
+                if 'image' in request.FILES:
+                    media.image = request.FILES['image']
+
                 media.save()
                 form.save_m2m()
 
-                # tags
+                # Añadir tags
                 for tag in request.POST.get('tags_selectedVideo', '').split(','):
                     if tag.strip():
                         obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
                         media.tags.add(obj)
 
-                # notificación
-              # ... dentro de uploadElement, tras media.save() y tags ...
+                # Notificación a Telegram
                 file_url = request.build_absolute_uri(reverse('index:watchContent', args=[media.name]))
                 texto = (
-    f"🎬 <b>¡Nuevo video subido!</b>\n"
-    f"📤 <i>Cortesía de</i> <b>{media.user}</b>\n\n"
-    f"📎 <b>Nombre:</b> <a href='{file_url}'>{media.name}</a>\n"
-    f"📺 <i>Haz clic en el nombre para verlo o descargarlo.</i>\n\n"
-    f"🔞 <i>Contenido variado: anime, series, y más...</i>"
-)
-                
-                # construye image_url absoluto si existe
-                if hasattr(media, 'image') and media.image:
-                    image_path = media.image.path  # <-- Path local físico
-                else:
-                    image_path = None
+                    f"🎬 <b>¡Nuevo video subido!</b>\n"
+                    f"📤 <i>Cortesía de</i> <b>{media.user}</b>\n\n"
+                    f"📎 <b>Nombre:</b> <a href='{file_url}'>{media.name}</a>\n"
+                    f"📺 <i>Haz clic en el nombre para verlo o descargarlo.</i>\n\n"
+                    f"🔞 <i>Contenido variado: anime, series, y más...</i>"
+                )
 
-                
+                image_path = None
+
+                if media.image and hasattr(media.image, 'path') and os.path.exists(media.image.path):
+                    try:
+                        with Image.open(media.image.path) as img:
+                            # Verifica y convierte si no es RGB
+                            if img.mode != 'RGB':
+                                img = img.convert('RGB')
+
+                            # Redimensionar si es muy grande (máximo ancho/alto 1280x1280, Telegram friendly)
+                            max_size = (1280, 1280)
+                            img.thumbnail(max_size)
+
+                            # Guardar imagen temporal en JPEG
+                            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as temp_img:
+                                img.save(temp_img.name, format='JPEG', quality=85)
+                                image_path = temp_img.name
+                    except Exception as e:
+                        print(f"❌ Error al procesar la imagen para Telegram: {e}")
+
                 print('DEBUG: enviando Telegram', texto, image_path)
                 resp = enviar_telegram_mensaje(texto, image_path)
                 print('DEBUG: respuesta Telegram', resp)
-
 
                 return redirect('index:index')
 
@@ -960,7 +993,11 @@ def get_items(request, type):
 
 from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
+@login_required(login_url='/login/')
 def delete_item(request, type, id):
+    if not (request.user.is_superuser and request.user.is_staff):
+        return JsonResponse({'error': 'Acceso no autorizado'}, status=403)
+
     model_map = {
         'tags': Tags,
         'artists': Artist,
@@ -968,15 +1005,16 @@ def delete_item(request, type, id):
         'users': User,
         'games': Game
     }
+
     Model = model_map.get(type)
     if Model and request.method == 'DELETE':
         if Model.objects.count() <= 1:
-            return JsonResponse({'error': 'No se puede eliminar el último usuario'}, status=400)
-        else:          
+            return JsonResponse({'error': 'No se puede eliminar el último elemento'}, status=400)
+        else:
             Model.objects.filter(id=id).delete()
-        return JsonResponse({'success': True})
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+            return JsonResponse({'success': True})
 
+    return JsonResponse({'error': 'Solicitud inválida'}, status=400)
 
 
 import os

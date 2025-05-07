@@ -76,7 +76,8 @@
                     </div>
                 </div>
                 <div class="col-1">
-                    {% if request.user.is_staff and request.user.is_superuser %}
+
+                    {% if request.user.is_staff and request.user.is_superuser and request.user.can_edit %}
                     <a href="{% url 'index:edit_objeto' resultado.tipo_objeto resultado.id %}">
                         <img src="{% static 'img/edit.png' %}" style="max-width: 30px;" alt="Editar">
                     </a>
