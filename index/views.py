@@ -728,28 +728,31 @@ def uploadElement(request):
                         final_name = f"{base_name}_{count}.mp4"
                     count += 1
 
-                save_path = os.path.join(settings.MEDIA_ROOT, upload_dir, final_name)
+                #save_path = os.path.join(settings.MEDIA_ROOT, upload_dir, final_name)
 
-                if not is_audio and ext != ".mp4":
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_input:
-                        for chunk in uploaded_file.chunks():
-                            temp_input.write(chunk)
-                        temp_input_path = temp_input.name
+                #if not is_audio and ext != ".mp4":
+                #    with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_input:
+                #        for chunk in uploaded_file.chunks():
+                #            temp_input.write(chunk)
+                #        temp_input_path = temp_input.name
+#
+                #    # Convertir a MP4
+                #    subprocess.run([
+                #        "ffmpeg", "-i", temp_input_path, "-c:v", "libx264", "-crf", "23", "-preset", "medium", save_path
+                #    ], check=True)
+#
+                #    os.remove(temp_input_path)  # Elimina el archivo temporal original
+#
+                #    # Guardar el archivo convertido en la base de datos (Django FileField)
+                #    with open(save_path, 'rb') as f:
+                #        media.file.save(final_name, File(f), save=False)
+#
+                #    os.remove(save_path)  # Elimina el archivo .mp4 local tras guardarlo
+                #else:
+                uploaded_file.name = final_name
+                media.file = uploaded_file
 
-                    subprocess.run([
-                        "ffmpeg", "-i", temp_input_path, "-c:v", "libx264", "-crf", "23", "-preset", "medium", save_path
-                    ], check=True)
 
-                    os.remove(temp_input_path)
-
-                    with open(save_path, 'rb') as f:
-                        media.file.save(final_name, File(f), save=False)
-
-                    if os.path.exists(save_path):
-                        os.remove(save_path)
-                else:
-                    uploaded_file.name = final_name
-                    media.file = uploaded_file
 
                 # Guardar imagen manualmente si viene
                 if 'image' in request.FILES:
