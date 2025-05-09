@@ -3,7 +3,10 @@
 
 {% block body %}
 <div class="container-fluid  mt-4">
-  <h1>Descargar Video de YouTube</h1>
+  <div class="row">
+    <h1>Descargar Video de YouTube</h1>
+    <a href="{% url 'index:viewDownloadedVideos' %}">Videos descargados</a>
+  </div>
   <form method="post" id="download-form">
     {% csrf_token %}
     <div class="row align-items-end">
@@ -56,6 +59,7 @@
     <div class="alert alert-danger">{{ error }}</div>
     {% endif %}
   </div>
+
 </div>
 
 <script>

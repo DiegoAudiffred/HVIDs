@@ -97,6 +97,11 @@ def show(request):
     return redirect('index:index')  # Redirigir correctamente
 
 @login_required(login_url='/login/')  # ruta de la vista login
+def userProfileLikes(request,username,filter):
+
+    return redirect('index:userProfile', request.user.username)
+
+@login_required(login_url='/login/')  # ruta de la vista login
 def userProfile(request,username):
     user = User.objects.get(username=username)
 
@@ -526,6 +531,39 @@ def watchComic(request, id):
         'formComic':    formComic,
         **sidebar_data
     })
+
+from django.core.paginator import Paginator
+from django.conf import settings
+from django.shortcuts import render
+import os
+
+def viewDownloadedVideos(request):
+    media_path = settings.MEDIA_ROOT
+    archivos = []
+
+    if os.path.exists(media_path):
+        archivos = [f for f in os.listdir(media_path)
+                    if os.path.isfile(os.path.join(media_path, f))]
+
+    archivos.sort(reverse=True)
+    paginator = Paginator(archivos, 10)  # 10 archivos por página
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'index/view_downloaded_videos.html', {
+        'archivos': page_obj,
+        'MEDIA_URL': settings.MEDIA_URL,
+    })
+
+def delete_file(request, filename):
+    if request.method == 'POST':
+        file_path = os.path.join(settings.MEDIA_ROOT, filename)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            os.remove(file_path)
+            return redirect('view_downloaded_videos')
+        return HttpResponse("Archivo no encontrado", status=404)
+    return HttpResponse("Método no permitido", status=405)
 
 
 @login_required(login_url='/login/')
