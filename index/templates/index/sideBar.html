@@ -113,7 +113,8 @@
     <h5 class="px-3 text-truncate" style="max-width: 100%;">
       <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
         href="{% url 'index:filtered_media' 'tag' tag.name %}">
-        {{ tag.name }}
+        {{ tag.name }} ({{ tag.num_mediafiles }})
+
       </a>
     </h5>
     {% endfor %}
