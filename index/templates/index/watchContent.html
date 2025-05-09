@@ -288,10 +288,19 @@
             </script>
 
             {% else %}
-            <video controls class="video-js vjs-default-skin">
+            <video controls class="video-js vjs-default-skin" id="video-player-{{ mediafile.id }}">
                 <source src="{% url 'index:media_stream' mediafile.id %}" type="video/mp4">
                 Tu navegador no soporta video.
             </video>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const video = document.getElementById('video-player-{{ mediafile.id }}');
+                    if (video) {
+                        video.volume = 0.2;
+                    }
+                });
+            </script>
             {% endif %}
 
 

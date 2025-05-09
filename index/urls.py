@@ -36,6 +36,9 @@ urlpatterns = [
     path('deleteVideo/<int:id>',views.deleteVideo,name="deleteVideo"),
     path('toggle-like/<str:model>/<int:pk>/', views.toggle_like, name='toggle_like'),
     path('comic/page/deleteComicImage/<int:id>', views.deleteComicImage, name='deleteComicImage'),
+    path('descargas/', views.viewDownloadedVideos, name='viewDownloadedVideos'),
+    path('descargas/eliminar/<str:filename>/', views.delete_file, name='delete_file'),
+    path('profile/<str:username>',views.userProfile, name='userProfile'),
+    path('profile/<str:username>/verLikes<str:filter>/',views.userProfileLikes, name='userProfileLikes'),
 
-    path('profile/<str:username>',views.userProfile, name='userProfile')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
