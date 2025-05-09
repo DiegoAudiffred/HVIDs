@@ -54,7 +54,7 @@ def get_sidebar_context():
 
 from itertools import chain
 
-@login_required(login_url='/login/')  # ruta de la vista login
+@login_required(login_url='/login/')
 def index(request):
     user = request.user
 
@@ -62,15 +62,18 @@ def index(request):
     show_all = request.GET.get('show_all') == 'true'
 
     if show_all:
-        # Obtener TODO, sin importar si está oculto
         media_files = MediaFile.objects.all()
         comics = Comic.objects.all()
     else:
-        # Solo mostrar los que no están ocultos
         media_files = MediaFile.objects.filter(hide=False)
         comics = Comic.objects.filter(hide=False)
 
-    # Combinar y ordenar
+    # Añadir atributos is_video e is_audio
+    for mf in media_files:
+        ext = os.path.splitext(mf.file.name)[1].lower()
+        mf.is_video = ext in ['.mp4', '.webm']
+        mf.is_audio = ext in ['.mp3', '.ogg']
+
     combined_media = sorted(
         chain(media_files, comics),
         key=lambda x: x.uploaded_at,
