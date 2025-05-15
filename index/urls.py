@@ -19,11 +19,16 @@ urlpatterns = [
     path("uploadElement/", views.uploadElement, name='uploadElement'),
 
     path("detailsAbout/<str:filtro>/<str:valor>/", views.detailsAbout, name='detailsAbout'),
+    path('posts/', views.posts_recientes, name='posts_recientes'),
+    path('notificaciones/mencionar/', views.mencionar_usuario, name='mencionar_usuario'),
+    path('notificaciones/count/', views.notificaciones_count, name='notificaciones_count'),
+    path('notificaciones/obtener/', views.obtener_notificaciones, name='obtener_notificaciones'),
 
     path('adminPage/', views.adminPage, name='adminPage'),
     path("video/<str:id>/", views.watchContent, name='watchContent'),
     path('comic/<str:id>/', views.watchComic, name='watchComic'),
     path('edit/<str:tipo>/<int:pk>/', views.edit_objeto, name='edit_objeto'),
+    path('crear-post/', views.crear_post, name='crear_post'),
 
     path("navbarFilterHeader/", views.navbarFilterHeader, name='navbarFilterHeader'),
     path('autocomplete/', views.autocomplete, name='autocomplete'),

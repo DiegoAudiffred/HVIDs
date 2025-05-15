@@ -1,0 +1,179 @@
+{% extends 'layout/layout.html' %}
+{% load static %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row"> <a href="{% url 'index:crear_post' %}" class="btn btn-success mb-3">Crear nuevo post</a>
+
+        {% for post in posts %}
+        <div class="col-12 col-lg-6 col-xl-4 col-xxl-4 my-3 d-flex">
+            <div class="card w-100 shadow-sm rounded-4 overflow-hidden hover-shadow rainbow-hover border border-3 d-flex flex-column h-100"
+                style="min-height: 500px;"> <!-- ajusta el min-height si necesitas -->
+
+                <!-- Título -->
+                <h5 class="card-title fw-bold text-truncate m-2 text-primary">{{ post.name }}</h5>
+
+                <!-- Usuario -->
+                <div class="d-flex align-items-center px-3 mb-2">
+                    <a href="{% url 'index:userProfile' post.user.username %}"
+                        class="text-decoration-none text-dark d-flex align-items-center">
+                        {% if post.user.image %}
+                        <img src="{{ post.user.image.url }}" class="rounded-circle me-2"
+                            style="width: 40px; height: 40px; object-fit: cover;" alt="{{ post.user.username }}">
+                        {% else %}
+                        <img src="{% static 'img/default-user.jpg' %}" class="rounded-circle me-2"
+                            style="width: 40px; height: 40px; object-fit: cover;" alt="Sin foto">
+                        {% endif %}
+                        <span class="fw-semibold">{{ post.user.username }}</span>
+                    </a>
+                </div>
+
+
+                <!-- Modal Bootstrap para imagen -->
+
+                <!-- Contenido -->
+                <div class="card-body d-flex flex-column bg-white text-primary flex-grow-1">
+
+                    <!-- Descripción -->
+                    <p class="card-text text-muted small mb-2 flex-grow-1">{{ post.description }}</p>
+                    <!-- Imagen solo si existe -->
+                    {% if post.images.all %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for image in post.images.all %}
+                        <div class="position-relative text-start">
+                            <img src="{{ image.image.url }}" alt="{{ post.name }} Thumbnail {{ forloop.counter }}"
+                                class="img-fluid rounded cursor-pointer" style="max-height: 50px; cursor: pointer;"
+                                data-bs-toggle="modal" data-bs-target="#imageModal{{ post.id }}_{{ forloop.counter }}">
+                        </div>
+
+                        <!-- Modal para imagen -->
+                        <div class="modal fade" id="imageModal{{ post.id }}_{{ forloop.counter }}" tabindex="-1"
+                            aria-labelledby="imageModalLabel{{ post.id }}_{{ forloop.counter }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content bg-transparent border-0">
+                                    <div class="modal-body text-center p-0">
+                                        <img src="{{ image.image.url }}" class="img-fluid rounded" alt="Imagen grande">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+
+                    <!-- Likes -->
+                    <ul class="list-unstyled small mb-2">
+                        <li><button class="btn btn-like p-0 border-0 bg-transparent d-flex align-items-center gap-2"
+                                data-model="{{ post.tipo_objeto }}" data-id="{{ post.id }}">
+                                <div class="position-relative">
+                                    <!-- Ícono Like -->
+                                    <img src="{% static 'img/Liked.png' %}" alt="Liked"
+                                        class="like-icon liked position-absolute top-0 start-0"
+                                        style="{% if not post.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: opacity 0.3s ease;" />
+
+                                    <!-- Ícono Not Liked -->
+                                    <img src="{% static 'img/Likend.png' %}" alt="Not Liked"
+                                        class="like-icon not-liked position-absolute top-0 start-0"
+                                        style="{% if post.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: opacity 0.3s ease;" />
+                                </div>
+                                <span class="like-count text-black">{{ post.total_likes }}</span>
+                            </button>
+                        </li>
+                    </ul>
+
+
+                    <!-- Fecha -->
+                    <p class="card-text text-muted small mb-0 mt-auto">Subido: {{ post.uploaded_at|date:"d M Y H:i" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        {% if forloop.counter|divisibleby:4 %}
+    </div>
+    <div class="row">
+        {% endif %}
+        {% endfor %}
+
+
+
+
+    </div>
+</div>
+
+<style>
+    /* Contenedor del ícono: tamaño fijo para que no salte el layout */
+    .btn-like .position-relative {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Ambos íconos superpuestos */
+    .like-icon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transition: opacity 0.3s ease;
+        /* transición de la opacidad */
+        will-change: opacity;
+        /* mejora el rendimiento */
+    }
+
+    /* Opcional: efecto hover en el botón */
+    .btn-like:hover .like-icon {
+        transform: scale(1.2);
+        transition: transform 0.2s ease;
+    }
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.btn-like').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const model = button.getAttribute('data-model');
+                const id = button.getAttribute('data-id');
+
+                fetch(`/toggle-like/${model}/${id}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.liked !== undefined) {
+                            button.querySelector('.like-count').textContent = data.total_likes;
+
+                            const likedIcon = button.querySelector('.liked');
+                            const notLikedIcon = button.querySelector('.not-liked');
+
+                            if (data.liked) {
+                                likedIcon.style.opacity = '1';
+                                notLikedIcon.style.opacity = '0';
+                            } else {
+                                likedIcon.style.opacity = '0';
+                                notLikedIcon.style.opacity = '1';
+                            }
+                        }
+                    });
+            });
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                document.cookie.split(';').forEach(function (cookie) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+                    }
+                });
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %}

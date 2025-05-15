@@ -364,3 +364,13 @@ class addGameForm(forms.ModelForm):
             'placeholder': ' Introduce los tags del personaje',
             'rows': '1'
         })
+
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['name', 'description']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Describe tu post'}),
+          
+        }
