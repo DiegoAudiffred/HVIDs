@@ -486,7 +486,13 @@ def watchComic(request, id):
                 c.usuario = request.user
                 c.comicID = comic
                 c.save()
+
+                # 🚨 Agregar lógica de menciones
+                comic_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.name]))
+                procesar_menciones(c.comentario, request.user, comic_url)
+
                 return redirect('index:watchComic', comic.name)
+
         images = request.FILES.getlist('images')
         if images:
             current = ComicPage.objects.filter(comic=comic).count()
@@ -535,10 +541,34 @@ def watchComic(request, id):
         **sidebar_data
     })
 
-from django.core.paginator import Paginator
-from django.conf import settings
-from django.shortcuts import render
-import os
+def procesar_menciones(comentario_texto, autor, comic_url):
+    print("📝 Texto del comentario:", comentario_texto)
+    menciones = re.findall(r'@(\w+)', comentario_texto)
+    print("🔍 Menciones encontradas:", menciones)
+
+    for username in menciones:
+        try:
+            destinatario = User.objects.get(username=username)
+            print(f"👤 Usuario encontrado: {destinatario.username}")
+
+            if destinatario == autor:
+                print("⚠️ Usuario se mencionó a sí mismo, se omite")
+                continue
+
+            Notificacion.objects.create(
+                destinatario=destinatario,
+                emisor=autor,
+                mensaje=f"📢 {autor.username} te mencionó en un comentario.",
+                url=comic_url
+            )
+            print(f"✅ Notificación creada para {destinatario.username}")
+
+        except User.DoesNotExist:
+            print(f"❌ Usuario '{username}' no encontrado")
+        except Exception as e:
+            print("❌ Error inesperado al crear la notificación:", e)
+
+
 
 def viewDownloadedVideos(request):
     media_path = settings.MEDIA_ROOT
@@ -1170,3 +1200,86 @@ def download_video(request):
     # render normal
     context.update(sidebar_context)
     return render(request, 'index/download.html', context)
+
+def posts_recientes(request):
+    posts = Post.objects.select_related('user').prefetch_related('likes', 'images').filter(hide=False).order_by('-uploaded_at')[:20]
+    sidebar_context = get_sidebar_context()
+
+    if request.user.is_authenticated:
+        user = request.user
+        for post in posts:
+            post.liked_by_user = post.likes.filter(id=user.id).exists()
+    else:
+        for post in posts:
+            post.liked_by_user = False
+
+    context = {
+        'posts': posts,
+        **sidebar_context
+    }   
+    return render(request, 'index/recentPosts.html', context)
+
+
+def crear_post(request):
+    sidebar_context = get_sidebar_context()
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user  # Establece el autor
+            post.save()
+            form.save_m2m()  # Guarda relaciones ManyToMany (tags)
+
+            # Procesar múltiples imágenes
+            for imagen in request.FILES.getlist('imagenes'):
+                PostImage.objects.create(post=post, image=imagen)
+
+            return redirect('index:posts_recientes')  # Redirige a tus posts
+    else:
+        form = PostForm()
+
+    context = {
+        'form': form,
+        **sidebar_context
+    }
+    return render(request, 'index/createPost.html', context)
+
+
+
+def mencionar_usuario(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        comentario = data.get('comentario')
+        comic_id = data.get('comic_id')
+
+        try:
+            mencionado = User.objects.get(username=username)
+            Notificacion.objects.create(
+                destinatario=mencionado,
+                emisor=request.user,
+
+                mensaje=f"Te mencionaron en un comentario: \"{comentario}\"",
+                url=reverse('index:watchComic', args=[comic_id])
+            )
+
+            return JsonResponse({'status': 'ok'})
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'error', 'msg': 'Usuario no existe'})        
+@login_required
+def notificaciones_count(request):
+    cantidad = Notificacion.objects.filter(destinatario=request.user, leida=False).count()
+    return JsonResponse({'count': cantidad})
+
+@login_required
+def obtener_notificaciones(request):
+    notificaciones = Notificacion.objects.filter(destinatario=request.user).order_by('-fecha')[:10]
+    data = [{
+        'id': n.id,
+        'mensaje': n.mensaje,  # Asegúrate de tener este campo
+        'leida': n.leida,
+        'fecha': n.fecha.strftime('%d/%m/%Y %H:%M'),
+    } for n in notificaciones]
+
+    return JsonResponse({'notificaciones': data})

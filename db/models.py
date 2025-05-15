@@ -226,6 +226,32 @@ class Comic(models.Model):
     def tipo_objeto(self):
         return "comic"
 
+
+class Post(models.Model):
+    name = models.CharField(max_length=100, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    description = models.CharField(max_length=500)
+    #tags = models.ManyToManyField('Tags', blank=True)
+    hide = models.BooleanField(default=False)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    likes = models.ManyToManyField(User, related_name='liked_post', blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def total_likes(self):
+        return self.likes.count()
+
+    @property
+    def tipo_objeto(self):
+        return "post"
+
+
+class PostImage(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='media_files/postImages/')
+
+    
 def comic_page_upload_to(instance, filename):
     comic_id = instance.comic.id if instance.comic.id else 'temp'
     filename = os.path.basename(filename)
@@ -245,3 +271,14 @@ class Comentario(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     comentario = models.CharField(max_length=400,blank=True, null=True)
+    
+class Notificacion(models.Model):
+    destinatario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notificaciones')
+    emisor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    mensaje = models.TextField()
+    leida = models.BooleanField(default=False)
+    fecha = models.DateTimeField(auto_now_add=True)
+    url = models.URLField(blank=True, null=True)  # Para redireccionar desde la notificación
+
+    def __str__(self):
+        return f"Notificación para {self.destinatario}"

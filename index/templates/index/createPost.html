@@ -1,0 +1,19 @@
+{% extends 'layout/layout.html' %}
+{% load static %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2>Crear nuevo post</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <label for="imagenes">Imágenes:</label>
+        <input type="file" name="imagenes" multiple class="form-control" required>
+
+        <button type="submit" class="btn btn-primary mt-3">Crear Post</button>
+    </form>
+
+
+</div>
+{% endblock %}
