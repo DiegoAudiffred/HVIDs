@@ -1248,18 +1248,22 @@ def crear_post(request):
     sidebar_context = get_sidebar_context()
 
     if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.user = request.user  # Establece el autor
-            post.save()
-            form.save_m2m()  # Guarda relaciones ManyToMany (tags)
+      form = PostForm(request.POST, request.FILES)
+      imagenes = request.FILES.getlist('imagenes')
 
-            # Procesar múltiples imágenes
-            for imagen in request.FILES.getlist('imagenes'):
-                PostImage.objects.create(post=post, image=imagen)
+      if len(imagenes) > 5:
+          form.add_error(None, "Solo puedes subir un máximo de 5 imágenes.")
+      elif form.is_valid():
+          post = form.save(commit=False)
+          post.user = request.user
+          post.save()
+          form.save_m2m()
 
-            return redirect('index:posts_recientes')  # Redirige a tus posts
+          for imagen in imagenes:
+              PostImage.objects.create(post=post, image=imagen)
+
+          return redirect('index:posts_recientes')
+
     else:
         form = PostForm()
 

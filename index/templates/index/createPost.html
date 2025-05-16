@@ -2,18 +2,114 @@
 {% load static %}
 
 {% block body %}
-<div class="container mt-4">
-    <h2>Crear nuevo post</h2>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-body">
+            <h2 class="card-title mb-4 text-primary">Crear nuevo post</h2>
+            <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                {% csrf_token %}
 
-        <label for="imagenes">Imágenes:</label>
-        <input type="file" name="imagenes" multiple class="form-control" required>
+                <div class="mb-3">
+                    <label for="{{ form.name.id_for_label }}" class="form-label fw-bold">Título</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <div class="text-danger small">{{ form.name.errors }}</div>
+                    {% endif %}
+                </div>
 
-        <button type="submit" class="btn btn-primary mt-3">Crear Post</button>
-    </form>
+                <div class="mb-3">
+                    <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">Descripción </label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                    <div class="text-danger small">{{ form.description.errors }}</div>
+                    {% endif %}
+                    <style>
+                        #comentarioEditable:empty::before {
+                            content: attr(placeholder);
+                            color: #888;
+                            pointer-events: none;
+                        }
+                    </style>
 
+                    <!-- Campo oculto que realmente se envía al backend -->
+                    <input type="hidden" name="comentario" id="id_description">
+                </div>
 
+                <div class="mb-3">
+                    <label for="imagenes" class="form-label fw-bold">Imágenes</label>
+                    <input type="file" name="imagenes" id="imagenes" multiple
+                        class="form-control border border-2 border-primary" required>
+                    <small class="form-text text-muted">Puedes subir hasta <strong>6 imágenes</strong>.</small>
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg shadow-sm">Crear nota</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.getElementById('imagenes').addEventListener('change', function () {
+        if (this.files.length > 6) {
+            alert("Solo puedes subir un máximo de 6 imágenes.");
+            this.value = "";
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editor = document.getElementById('comentarioEditable');
+        const inputOculto = document.getElementById('id_comentario');
+
+        let ultimaTextoPlano = '';
+
+        editor.addEventListener('input', function () {
+            const textoPlano = editor.innerText;
+
+            if (textoPlano !== ultimaTextoPlano) {
+                ultimaTextoPlano = textoPlano;
+
+                const textoHTML = textoPlano.replace(/(@\w+)/g, '<span class="mencion">$1</span>');
+
+                editor.innerHTML = textoHTML;
+
+                const range = document.createRange();
+                range.selectNodeContents(editor);
+                range.collapse(false);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+
+            // Copia texto plano sin estilos
+            inputOculto.value = textoPlano;
+        });
+    });
+</script>
+<style>
+    .mencion {
+        color: #007bff;
+        /* azul */
+        font-weight: bold;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.comentario p').forEach(function (parrafo) {
+            const textoPlano = parrafo.textContent;
+
+            const textoHTML = textoPlano.replace(/@(\w+)/g, function (match, username) {
+                const url = `/profile/${username}`;  // Ruta basada en tu URL Django
+                return `<a href="${url}" class="mencion">@${username}</a>`;
+            });
+
+            parrafo.innerHTML = textoHTML;
+        });
+    });
+</script>
+
 {% endblock %}

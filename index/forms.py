@@ -374,3 +374,15 @@ class PostForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Describe tu post'}),
           
         }
+    def __init__(self, *args, **kwargs):
+            super(PostForm, self).__init__(*args, **kwargs)
+
+            self.fields['name'].widget.attrs.update({
+    'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+    'placeholder': 'Introduce el nombre de la nota'
+})
+
+            self.fields['description'].widget.attrs.update({
+    'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+    'placeholder': 'Descripción del post'
+})

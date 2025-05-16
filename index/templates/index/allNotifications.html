@@ -7,20 +7,22 @@
     <div class="row row-cols-1 gy-3">
         {% for n in noti %}
         <div class="col">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-0 hover-shadow transition">
                 <div class="row g-0">
                     {% if n.imagen_url %}
-                    <div class="col-md-2">
-                        <img src="{{ n.imagen_url }}" class="img-fluid rounded-start" alt="Imagen"
-                            style="max-height: 150px; object-fit: contain;">
+                    <div class="col-md-3 d-flex align-items-center justify-content-center bg-light p-2">
+                        <img src="{{ n.imagen_url }}" class="img-fluid rounded shadow-sm border" alt="Imagen"
+                            style="height: 150px; width: 100%; object-fit: cover;">
                     </div>
                     {% endif %}
-                    <div class="{% if n.imagen_url %}col-md-10{% else %}col-12{% endif %}">
+                    <div class="{% if n.imagen_url %}col-md-9{% else %}col-12{% endif %}">
                         <div class="card-body">
                             <p class="card-text">{{ n.mensaje }}</p>
-                            <p class="card-text"><small class="text-muted">{{ n.fecha|date:"d M Y H:i" }}</small></p>
+                            <p class="card-text">
+                                <small class="text-muted">{{ n.fecha|date:"d M Y H:i" }}</small>
+                            </p>
                             {% if n.url_objeto %}
-                            <a href="{{ n.url_objeto }}" class="btn btn-sm btn-primary">Ver más</a>
+                            <a href="{{ n.url_objeto }}" class="btn btn-sm btn-outline-primary">Ver más</a>
                             {% endif %}
                         </div>
                     </div>
@@ -32,4 +34,12 @@
         {% endfor %}
     </div>
 </div>
+
+<style>
+    .card:hover {
+        transform: scale(1.01);
+        transition: transform 0.2s ease-in-out;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    }
+</style>
 {% endblock %}

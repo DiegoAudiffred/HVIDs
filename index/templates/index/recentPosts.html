@@ -3,7 +3,7 @@
 
 {% block body %}
 <div class="container mt-4">
-    <div class="row"> <a href="{% url 'index:crear_post' %}" class="btn btn-success mb-3">Crear nuevo post</a>
+    <div class="row"> <a href="{% url 'index:crear_post' %}" class="btn btn-primary mb-3">Crear nueva nota</a>
 
         {% for post in posts %}
         <div class="col-12 col-lg-6 col-xl-4 col-xxl-4 my-3 d-flex">
@@ -32,10 +32,10 @@
                 <!-- Modal Bootstrap para imagen -->
 
                 <!-- Contenido -->
-                <div class="card-body d-flex flex-column bg-white text-primary flex-grow-1">
+                <div class="card-body d-flex flex-column bg-sexto text-primary flex-grow-1">
 
                     <!-- Descripción -->
-                    <p class="card-text text-muted small mb-2 flex-grow-1">{{ post.description }}</p>
+                    <p class="card-text text-tercero small mb-2 flex-grow-1">{{ post.description }}</p>
                     <!-- Imagen solo si existe -->
                     {% if post.images.all %}
                     <div class="d-flex flex-wrap gap-2">
@@ -174,6 +174,58 @@
             }
             return cookieValue;
         }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editor = document.getElementById('comentarioEditable');
+        const inputOculto = document.getElementById('id_comentario');
+
+        let ultimaTextoPlano = '';
+
+        editor.addEventListener('input', function () {
+            const textoPlano = editor.innerText;
+
+            if (textoPlano !== ultimaTextoPlano) {
+                ultimaTextoPlano = textoPlano;
+
+                const textoHTML = textoPlano.replace(/(@\w+)/g, '<span class="mencion">$1</span>');
+
+                editor.innerHTML = textoHTML;
+
+                const range = document.createRange();
+                range.selectNodeContents(editor);
+                range.collapse(false);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+
+            // Copia texto plano sin estilos
+            inputOculto.value = textoPlano;
+        });
+    });
+</script>
+<style>
+    .mencion {
+        color: #007bff;
+        /* azul */
+        font-weight: bold;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.comentario p').forEach(function (parrafo) {
+            const textoPlano = parrafo.textContent;
+
+            const textoHTML = textoPlano.replace(/@(\w+)/g, function (match, username) {
+                const url = `/profile/${username}`;  // Ruta basada en tu URL Django
+                return `<a href="${url}" class="mencion">@${username}</a>`;
+            });
+
+            parrafo.innerHTML = textoHTML;
+        });
     });
 </script>
 {% endblock %}
