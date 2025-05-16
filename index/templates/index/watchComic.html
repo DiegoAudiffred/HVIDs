@@ -569,13 +569,7 @@
     <div class="col-12">
       <h2 class="mb-3 border-bottom pb-2">💬 Comentarios</h2>
     </div>
-    <style>
-      .mencion {
-        color: #0d6efd;
-        /* Bootstrap primary */
-        font-weight: bold;
-      }
-    </style>
+
     <!-- Agregar comentario -->
     <div class="col-12 mb-3">
       <div class="card shadow-sm">
@@ -1012,95 +1006,7 @@
 
 </script>
 
-<script>
-  /*document.addEventListener('DOMContentLoaded', () => {
-      // Obtener referencia al form y al div editable
-      const form = document.getElementById('comentarioForm');
-      const comentarioEditable = document.getElementById('comentarioEditable');
-      const comentarioOculto = document.getElementById('comentarioOculto');
-  
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-  
-        // Copiar contenido editable al input hidden para enviarlo en el form
-        comentarioOculto.value = comentarioEditable.innerText.trim();
-  
-        if (comentarioOculto.value === '') {
-          alert('El comentario no puede estar vacío.');
-          return;
-        }
-  
-        const formData = new FormData(form);
-        formData.append('tipo_objeto', '{{ mediafile.tipo_objeto }}');  // Si lo necesitas
-  
-        fetch("{% url 'index:ajax_add_comment' mediafile.id %}", {
-          method: 'POST',
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-          },
-          body: formData
-        })
-          .then(response => response.json())
-          .then(data => {
-            if (!data.error) {
-              // Construir el nuevo comentario con los datos recibidos
-              const nuevoComentario = `
-    <div class="card mb-3 shadow-sm border-start border-5 border-primary comentario">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div class="d-flex align-items-center">
-            {% if user.image %}
-              <img src="{{ user.image.url }}" alt="Imagen de usuario"
-                   class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
-            {% else %}
-              <img src="{% static 'img/noImage.jpg' %}" alt="Imagen de usuario"
-                   class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
-            {% endif %}
-            <a href="#" class="fw-bold text-decoration-none text-primary mb-0">${data.usuario}</a>
-          </div>
-          <small class="text-muted">${data.fecha}</small>
-        </div>
-        <p class="mb-0">${data.texto}</p>
-      </div>
-    </div>
-  `;
-  
-              // Insertar el nuevo comentario al inicio
-              document.getElementById("comentariosContainer").insertAdjacentHTML('afterbegin', nuevoComentario);
-  
-              // Limpiar el formulario
-              comentarioEditable.innerText = '';
-              form.reset();
-  
-              // Notificar menciones
-              const menciones = data.texto.match(/@(\w+)/g); // Busca @usuario
-              if (menciones) {
-                menciones.forEach(mencion => {
-                  const username = mencion.substring(1); // Quitar @
-                  fetch(`/notificaciones/mencionar/`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({
-                      username: username,
-                      comentario: data.texto,
-                      comic_id: '{{ mediafile.id }}'
-                    })
-                  });
-                });
-              }
-            } else {
-              alert('Hubo un error: ' + data.error);
-            }
-          })
-          .catch(err => alert("Error al enviar el comentario."));
-      });
-    });*/
 
-
-</script>
 <style>
   /* Contenedor del ícono: tamaño fijo para que no salte el layout */
   .btn-like .position-relative {
@@ -1176,13 +1082,7 @@
   });
 
 </script>
-<style>
-  .mencion {
-    color: #007bff;
-    /* Azul */
-    font-weight: bold;
-  }
-</style>
+
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {

@@ -10,6 +10,7 @@ from django.core.files import File
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
 from django.urls import reverse
+import urllib
 from db.models import *
 from .forms import *
 from django.http import JsonResponse
@@ -433,13 +434,21 @@ def watchContent(request, id):
                             mediafile.tags.add(obj)
                 return redirect('index:watchContent', mediafile.name)
         elif 'comentario' in request.POST:
-            form = addComentariosForm(request.POST, request.FILES)
-            if form.is_valid():
-                comentario = form.save(commit=False)
-                comentario.usuario = request.user
-                comentario.mediaFileID = mediafile
-                comentario.save()
+            form_comentario = addComentariosForm(request.POST, request.FILES)
+            if form_comentario.is_valid():
+                c = form_comentario.save(commit=False)
+                c.usuario = request.user
+                c.mediaFileID = mediafile
+                c.save()
+                # Pasamos el objeto 'comic' directamente sin url ni tipo
+                procesar_menciones(
+                    comentario_texto=c.comentario,
+                    autor=request.user,
+                    contenido_obj=mediafile
+                )
                 return redirect('index:watchContent', mediafile.name)
+         
+                  
     is_audio = False
     if mediafile.file.name.lower().endswith('.mp3'):
         is_audio = True        
@@ -482,16 +491,21 @@ def watchComic(request, id):
         elif 'comentario' in request.POST:
             form_comentario = addComentariosForm(request.POST)
             if form_comentario.is_valid():
-                c = form_comentario.save(commit=False)
-                c.usuario = request.user
-                c.comicID = comic
-                c.save()
+                    c = form_comentario.save(commit=False)
+                    c.usuario = request.user
+                    c.comicID = comic
+                    c.save()
 
-                # 🚨 Agregar lógica de menciones
-                comic_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.name]))
-                procesar_menciones(c.comentario, request.user, comic_url)
+                    # Pasamos el objeto 'comic' directamente sin url ni tipo
+                    procesar_menciones(
+                        comentario_texto=c.comentario,
+                        autor=request.user,
+                        contenido_obj=comic
+                    )
 
-                return redirect('index:watchComic', comic.name)
+                    return redirect('index:watchComic', comic.name)
+
+
 
         images = request.FILES.getlist('images')
         if images:
@@ -541,10 +555,19 @@ def watchComic(request, id):
         **sidebar_data
     })
 
-def procesar_menciones(comentario_texto, autor, comic_url):
+
+
+def procesar_menciones(comentario_texto, autor, contenido_obj):
     print("📝 Texto del comentario:", comentario_texto)
     menciones = re.findall(r'@(\w+)', comentario_texto)
     print("🔍 Menciones encontradas:", menciones)
+
+    if contenido_obj is None:
+        print("⚠️ No se proporcionó un objeto de contenido válido.")
+        return
+
+    content_type = ContentType.objects.get_for_model(contenido_obj.__class__)
+    object_id = contenido_obj.id
 
     for username in menciones:
         try:
@@ -558,15 +581,16 @@ def procesar_menciones(comentario_texto, autor, comic_url):
             Notificacion.objects.create(
                 destinatario=destinatario,
                 emisor=autor,
-                mensaje=f"📢 {autor.username} te mencionó en un comentario.",
-                url=comic_url
+                mensaje=f"📢 {autor.username} te mencionó en un comentario: {comentario_texto}",
+                content_type=content_type,
+                object_id=object_id
             )
             print(f"✅ Notificación creada para {destinatario.username}")
 
         except User.DoesNotExist:
             print(f"❌ Usuario '{username}' no encontrado")
         except Exception as e:
-            print("❌ Error inesperado al crear la notificación:", e)
+            print(f"❌ Error inesperado al crear la notificación: {e}")
 
 
 
@@ -1247,39 +1271,107 @@ def crear_post(request):
 
 
 
-def mencionar_usuario(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        username = data.get('username')
-        comentario = data.get('comentario')
-        comic_id = data.get('comic_id')
-
-        try:
-            mencionado = User.objects.get(username=username)
-            Notificacion.objects.create(
-                destinatario=mencionado,
-                emisor=request.user,
-
-                mensaje=f"Te mencionaron en un comentario: \"{comentario}\"",
-                url=reverse('index:watchComic', args=[comic_id])
-            )
-
-            return JsonResponse({'status': 'ok'})
-        except User.DoesNotExist:
-            return JsonResponse({'status': 'error', 'msg': 'Usuario no existe'})        
 @login_required
 def notificaciones_count(request):
+    print(request.user)
     cantidad = Notificacion.objects.filter(destinatario=request.user, leida=False).count()
     return JsonResponse({'count': cantidad})
 
+
+
+
 @login_required
 def obtener_notificaciones(request):
-    notificaciones = Notificacion.objects.filter(destinatario=request.user).order_by('-fecha')[:10]
-    data = [{
-        'id': n.id,
-        'mensaje': n.mensaje,  # Asegúrate de tener este campo
-        'leida': n.leida,
-        'fecha': n.fecha.strftime('%d/%m/%Y %H:%M'),
-    } for n in notificaciones]
+    notificaciones = Notificacion.objects.filter(destinatario=request.user, leida=False).order_by('-fecha')[:10]
+    data = []
+
+    for n in notificaciones:
+        imagen = None
+        url = None
+
+        # Obtener objeto relacionado
+        contenido = n.contenido_objeto
+        if contenido:
+            model_name = contenido._meta.model_name
+
+            if model_name == 'comic':
+                # Construir url para el comic
+                url = reverse('index:watchComic', args=[contenido.name])
+                if hasattr(contenido, 'image') and contenido.image:
+                    imagen = contenido.image.url
+
+            elif model_name == 'mediafile':
+                # Construir url para el mediafile
+                url = reverse('index:watchContent', args=[contenido.name])
+                if hasattr(contenido, 'image') and contenido.image:
+                    imagen = contenido.image.url
+        
+        # Si no tiene objeto relacionado o no tiene URL, url queda None o ""
+        if not url:
+            url = ""
+
+        data.append({
+            'id': n.id,
+            'mensaje': n.mensaje,
+            'leida': n.leida,
+            'fecha': n.fecha.strftime('%d/%m/%Y %H:%M'),
+            'url': url,
+            'imagen': imagen,
+        })
 
     return JsonResponse({'notificaciones': data})
+
+
+@login_required
+@require_POST
+def marcar_leida(request):
+    notificacion_id = request.POST.get('id')
+    print(notificacion_id)
+    try:
+        noti = Notificacion.objects.get(id=notificacion_id, destinatario=request.user)
+        noti.leida = True
+        noti.save()
+        return JsonResponse({'success': True})
+    except Notificacion.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Notificación no encontrada'}, status=404)
+
+
+
+
+
+@login_required
+
+
+def pastNotifications(request):
+    sidebar_context = get_sidebar_context()
+    user = request.user
+
+    noti = Notificacion.objects.filter(destinatario=user).order_by('-fecha')
+    #print(noti)
+    for n in noti:
+        # Añadir imagen si existe
+        if n.contenido_objeto and hasattr(n.contenido_objeto, 'image'):
+              
+            try:
+                n.imagen_url = n.contenido_objeto.image.url
+              
+            except Exception:
+                n.imagen_url = None
+        else:
+            n.imagen_url = None
+
+        # Construir URL para "Ver más" según el tipo de contenido relacionado
+        n.url_objeto = None
+        if n.contenido_objeto:
+            model_name = n.contenido_objeto._meta.model_name
+            if model_name == 'comic':
+                n.url_objeto = reverse('index:watchComic', args=[n.contenido_objeto.name])
+            elif model_name == 'mediafile':
+                n.url_objeto = reverse('index:watchContent', args=[n.contenido_objeto.name])  # Cambia según tu URL real
+
+    context = {
+        **sidebar_context,
+        'user': user,
+        'noti': noti,
+    }
+    return render(request, 'index/allNotifications.html', context)

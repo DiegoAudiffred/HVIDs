@@ -10,7 +10,10 @@ from moviepy import VideoFileClip
 from PIL import Image
 import os
 import tempfile
-
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.db import models
+from django.contrib.auth.models import User
 class UserManager(BaseUserManager):
     """Define a model manager for User model with a username field instead of an email."""
 
@@ -278,7 +281,11 @@ class Notificacion(models.Model):
     mensaje = models.TextField()
     leida = models.BooleanField(default=False)
     fecha = models.DateTimeField(auto_now_add=True)
-    url = models.URLField(blank=True, null=True)  # Para redireccionar desde la notificación
+
+    # Campos para GenericForeignKey
+    content_type = models.ForeignKey(ContentType, on_delete=models.SET_NULL, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    contenido_objeto = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
         return f"Notificación para {self.destinatario}"

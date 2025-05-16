@@ -20,7 +20,7 @@ urlpatterns = [
 
     path("detailsAbout/<str:filtro>/<str:valor>/", views.detailsAbout, name='detailsAbout'),
     path('posts/', views.posts_recientes, name='posts_recientes'),
-    path('notificaciones/mencionar/', views.mencionar_usuario, name='mencionar_usuario'),
+   # path('notificaciones/mencionar/', views.mencionar_usuario, name='mencionar_usuario'),
     path('notificaciones/count/', views.notificaciones_count, name='notificaciones_count'),
     path('notificaciones/obtener/', views.obtener_notificaciones, name='obtener_notificaciones'),
 
@@ -29,6 +29,7 @@ urlpatterns = [
     path('comic/<str:id>/', views.watchComic, name='watchComic'),
     path('edit/<str:tipo>/<int:pk>/', views.edit_objeto, name='edit_objeto'),
     path('crear-post/', views.crear_post, name='crear_post'),
+    path('notificaciones/marcar_leida/', views.marcar_leida, name='marcar_leida'),
 
     path("navbarFilterHeader/", views.navbarFilterHeader, name='navbarFilterHeader'),
     path('autocomplete/', views.autocomplete, name='autocomplete'),
@@ -45,5 +46,5 @@ urlpatterns = [
     path('descargas/eliminar/<str:filename>/', views.delete_file, name='delete_file'),
     path('profile/<str:username>',views.userProfile, name='userProfile'),
     path('profile/<str:username>/verLikes<str:filter>/',views.userProfileLikes, name='userProfileLikes'),
-
+    path('pastNotifications/',views.pastNotifications, name='pastNotifications'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

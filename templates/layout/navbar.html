@@ -195,23 +195,32 @@
         </style>
         {% if request.user.is_authenticated %}
         <li class="nav-item flex-fill text-center position-relative">
+          <!-- Enlace al perfil -->
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
             style="font-size: 1.2vw;" href="{% url 'index:userProfile' request.user.username %}">
             <img src="{% static 'img/profileImageLogoPNG.png' %}" class="img-fluid icon-navbar mb-1">
             Ver perfil
-            <span class="badge-custom" id="notificacion-badge" style="display: none;">0</span>
           </a>
+
+          <!-- Badge de notificaciones FUERA del <a> -->
+          <span class="badge-custom" id="notificacion-badge"
+            style="display: none; position: absolute; top: 5px; right: 10%; cursor: pointer;">
+            0
+          </span>
+
           <!-- Panel de notificaciones -->
-          <div id="panel-notificaciones" class="position-absolute bg-white border rounded shadow p-3"
-            style="top: 70px; right: 0; width: 300px; display: none; z-index: 1000;">
-            <h6 class="fw-bold mb-2">Notificaciones</h6>
-            <div id="lista-notificaciones">
-              <p class="text-muted mb-0">Cargando...</p>
-            </div>
-          </div>
+
 
         </li>
 
+        <div id="panel-notificaciones" class="position-fixed bg-white border rounded shadow p-3 z-"
+          style="top: 70px; right: 150px; width: 350px; max-height: 400px; overflow: hidden; display: none; z-index: 2000;">
+          <h6 class="fw-bold mb-2">Notificaciones</h6>
+          <div id="lista-notificaciones" style="max-height: 340px; overflow-y: auto;">
+            <p class="text-muted mb-0">Cargando...</p>
+          </div>
+          <a href="{% url 'index:pastNotifications' %}">Ver notificaciones pasadas</a>
+        </div>
 
 
         <li class="nav-item flex-fill text-center">
@@ -374,7 +383,6 @@
     const badge = document.getElementById('notificacion-badge');
     const panel = document.getElementById('panel-notificaciones');
     const lista = document.getElementById('lista-notificaciones');
-    const link = badge.closest('a'); // o usa otro selector si prefieres
 
     async function actualizarNotificaciones() {
       try {
@@ -386,9 +394,8 @@
           badge.innerText = count;
           badge.style.display = 'inline-block';
         } else {
-          badge.style.display = 'none';
+          badge.style.display = 'inline-block';
         }
-
       } catch (e) {
         console.error("Error al actualizar el badge", e);
       }
@@ -401,22 +408,57 @@
         lista.innerHTML = '';
 
         if (data.notificaciones.length === 0) {
-          lista.innerHTML = '<p class="text-muted mb-0">No tienes notificaciones.</p>';
+          lista.innerHTML = '<p class="text-muted mb-0">No tienes notificaciones pendientes.</p>';
           return;
         }
 
         data.notificaciones.forEach(n => {
           const item = document.createElement('div');
-          item.classList.add('mb-2', 'small');
+          item.classList.add('mb-2', 'small', 'd-flex', 'align-items-center', 'justify-content-between');
+
           item.innerHTML = `
-            <div class="${n.leida ? '' : 'fw-bold'}">
-              ${n.mensaje}
-              <br><small class="text-muted">${n.fecha}</small>
-            </div>
-            <hr class="my-1">
-          `;
+    <a href="${n.url}" class="text-decoration-none text-dark flex-grow-1 me-2 ${n.leida ? '' : 'fw-bold'}">
+      <div>
+        ${n.mensaje}
+        <br><small class="text-muted">${n.fecha}</small>
+      </div>
+    </a>
+    ${n.imagen ? `<img src="${n.imagen}" alt="Imagen notificación" style="height: 60px; width: auto; border-radius: 5px;">` : ''}
+  `;
+
+          // Agregar evento click para marcar como leída
+          item.querySelector('a').addEventListener('click', async (e) => {
+            e.preventDefault(); // Para que no navegue inmediatamente
+
+            if (!n.leida) {
+              try {
+                const response = await fetch("{% url 'index:marcar_leida' %}", {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken'), // función que obtenga el csrftoken
+                  },
+                  body: new URLSearchParams({ id: n.id })
+                });
+                const result = await response.json();
+                if (result.success) {
+                  n.leida = true;
+                  item.querySelector('a').classList.remove('fw-bold');
+                  // Actualizar badge si quieres
+                  actualizarNotificaciones();
+                }
+              } catch (err) {
+                console.error('Error marcando como leída:', err);
+              }
+            }
+
+            // Finalmente navegar a la url
+            window.location.href = n.url;
+          });
+
           lista.appendChild(item);
         });
+
 
       } catch (error) {
         console.error('Error cargando notificaciones:', error);
@@ -424,10 +466,10 @@
       }
     }
 
-    // Mostrar/ocultar panel al hacer clic
-    link.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (panel.style.display === 'none') {
+    // Mostrar/ocultar panel al hacer clic en el badge
+    badge.addEventListener('click', function (e) {
+      e.stopPropagation();  // No cierra inmediatamente
+      if (panel.style.display === 'none' || panel.style.display === '') {
         cargarPanelNotificaciones();
         panel.style.display = 'block';
       } else {
@@ -437,12 +479,27 @@
 
     // Cierra el panel si se hace clic fuera
     document.addEventListener('click', function (e) {
-      if (!panel.contains(e.target) && !link.contains(e.target)) {
+      if (!panel.contains(e.target) && !badge.contains(e.target)) {
         panel.style.display = 'none';
       }
     });
 
     actualizarNotificaciones();
-    setInterval(actualizarNotificaciones, 15000);  // Actualiza cada 15 segundos
+    setInterval(actualizarNotificaciones, 15000);
   });
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
 </script>
