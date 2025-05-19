@@ -3,7 +3,8 @@
 
 {% block body %}
 <div class="container mt-4">
-    <div class="row"> <a href="{% url 'index:crear_post' %}" class="btn btn-primary mb-3">Crear nueva nota</a>
+    <div class="row">
+        <a href="{% url 'index:crear_post' %}" class="btn btn-primary mb-3">Crear nueva nota</a>
 
         {% for post in posts %}
         <div class="col-12 col-lg-6 col-xl-4 col-xxl-4 my-3 d-flex">
@@ -16,7 +17,7 @@
                 <!-- Usuario -->
                 <div class="d-flex align-items-center px-3 mb-2">
                     <a href="{% url 'index:userProfile' post.user.username %}"
-                        class="text-decoration-none text-dark d-flex align-items-center">
+                        class="text-decoration-none text-dark d-flex align-items-center mx-4 ">
                         {% if post.user.image %}
                         <img src="{{ post.user.image.url }}" class="rounded-circle me-2"
                             style="width: 40px; height: 40px; object-fit: cover;" alt="{{ post.user.username }}">
@@ -26,16 +27,31 @@
                         {% endif %}
                         <span class="fw-semibold">{{ post.user.username }}</span>
                     </a>
+                    {% if request.user == post.user %}
+                    <button class="btn mx-3 border border-3 btn-outline-secondary btn-primary text-white"
+                        onclick="enableEdit({{ post.id }})">Editar</button>
+
+                    {% endif %}
                 </div>
 
 
-                <!-- Modal Bootstrap para imagen -->
 
-                <!-- Contenido -->
                 <div class="card-body d-flex flex-column bg-sexto text-primary flex-grow-1">
 
-                    <!-- Descripción -->
-                    <p class="card-text text-tercero small mb-2 flex-grow-1">{{ post.description }}</p>
+                    <!-- Modo visualización -->
+                    <p class="card-text text-tercero small mb-2 flex-grow-1" id="desc-text-{{ post.id }}">
+                        {{ post.description }}</p>
+
+                    <form method="POST" action="{% url 'index:editar_post' post.id %}" class="d-none"
+                        id="edit-form-{{ post.id }}">
+                        {% csrf_token %}
+                        <textarea name="description" rows="4"
+                            class="form-control text-tercero bg-sexto border border-2 border-primary mb-2"
+                            maxlength="500" required>{{ post.description }}</textarea>
+                        <button type="submit" class="btn btn-primary btn-sm">Guardar</button>
+                        <button type="button" class="btn btn-secondary btn-sm text-white"
+                            onclick="cancelEdit({{ post.id }})">Cancelar</button>
+                    </form>
                     <!-- Imagen solo si existe -->
                     {% if post.images.all %}
                     <div class="d-flex flex-wrap gap-2">
@@ -90,16 +106,9 @@
             </div>
         </div>
 
-        {% if forloop.counter|divisibleby:4 %}
-    </div>
-    <div class="row">
-        {% endif %}
         {% endfor %}
-
-
-
-
     </div>
+
 </div>
 
 <style>
@@ -177,55 +186,16 @@
     });
 </script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const editor = document.getElementById('comentarioEditable');
-        const inputOculto = document.getElementById('id_comentario');
-
-        let ultimaTextoPlano = '';
-
-        editor.addEventListener('input', function () {
-            const textoPlano = editor.innerText;
-
-            if (textoPlano !== ultimaTextoPlano) {
-                ultimaTextoPlano = textoPlano;
-
-                const textoHTML = textoPlano.replace(/(@\w+)/g, '<span class="mencion">$1</span>');
-
-                editor.innerHTML = textoHTML;
-
-                const range = document.createRange();
-                range.selectNodeContents(editor);
-                range.collapse(false);
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-
-            // Copia texto plano sin estilos
-            inputOculto.value = textoPlano;
-        });
-    });
-</script>
-<style>
-    .mencion {
-        color: #007bff;
-        /* azul */
-        font-weight: bold;
+    function enableEdit(postId) {
+        document.getElementById(`desc-text-${postId}`).classList.add('d-none');
+        document.getElementById(`edit-form-${postId}`).classList.remove('d-none');
     }
-</style>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.comentario p').forEach(function (parrafo) {
-            const textoPlano = parrafo.textContent;
-
-            const textoHTML = textoPlano.replace(/@(\w+)/g, function (match, username) {
-                const url = `/profile/${username}`;  // Ruta basada en tu URL Django
-                return `<a href="${url}" class="mencion">@${username}</a>`;
-            });
-
-            parrafo.innerHTML = textoHTML;
-        });
-    });
+    function cancelEdit(postId) {
+        document.getElementById(`desc-text-${postId}`).classList.remove('d-none');
+        document.getElementById(`edit-form-${postId}`).classList.add('d-none');
+    }
 </script>
+
+
 {% endblock %}

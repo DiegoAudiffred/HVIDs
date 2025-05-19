@@ -63,38 +63,46 @@
         <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
             <button href=""
                 class="btn adminLink border border-3 dynamicQuery border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
-                data-type="tags" id="tags">Tags</a>
+                data-type="tags" id="tags">Tags</button>
 
         </div>
         <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
             <button href=""
                 class="btn adminLink border border-3 dynamicQuery border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
-                data-type="artists" id="artists">Artistas</a>
+                data-type="artists" id="artists">Artistas</button>
 
         </div>
         <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
             <button href=""
                 class="btn adminLink border border-3 dynamicQuery border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
-                data-type="chars" id="chars">Personajes</a>
-
-        </div>
-        <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
-            <button href=""
-                class="btn adminLink dynamicQuery border border-3  border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
-                data-type="users" id="users">Usuarios</a>
+                data-type="chars" id="chars">Personajes</button>
 
         </div>
         <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
             <button href=""
                 class="btn adminLink dynamicQuery border border-3 border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
-                data-type="games" id="games">Juegos</a>
+                data-type="games" id="games">Juegos</button>
 
         </div>
+        {% if user.is_superuser and user.is_staff %}
+
+        <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
+            <button href=""
+                class="btn adminLink dynamicQuery border border-3  border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
+                data-type="users" id="users">Usuarios</button>
+
+        </div>
+        {% endif %}
+
+        {% if user.is_superuser and user.is_staff %}
+
         <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
             <a href="{% url 'admin:index' %}"
-                class="btn adminLink  border border-3 border-tercero px-2 py-2 text-center text-primary fw-bold w-100">Admin</a>
+                class="btn adminLink  border border-3 border-tercero px-2 py-2 text-center text-primary fw-bold w-100">
+                Admin</a>
 
         </div>
+        {% endif %}
     </div>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -307,6 +315,7 @@
         <input type="hidden" name="tags_selectedChar" id="tagsSelectedChar">
 
     </form>
+    {% if user.is_superuser and user.is_staff %}
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -342,6 +351,8 @@
             </div>
         </div>
     </form>
+    {% endif %}
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="form_type" value="game_form">
@@ -401,6 +412,157 @@
     <div id="response-message" class="text-center mt-2 d-none fw-bold text-tercero"></div>
 
 </div>
+<!-- Modal de Confirmación Bootstrap -->
+<!-- Modal de Confirmación Bootstrap -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar este elemento?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmDeleteBtn" class="btn btn-primary">Sí, eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Lista de objetos -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const buttons = document.querySelectorAll(".dynamicQuery");
+        const container = document.getElementById("dynamic-container");
+        const messageDiv = document.getElementById("response-message");
+        let deleteTarget = null;
+
+        // Inicializa el modal de Bootstrap
+        const confirmModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+
+        // Botón de confirmar eliminación
+        document.getElementById("confirmDeleteBtn").addEventListener("click", async () => {
+            if (!deleteTarget) return;
+
+            const id = deleteTarget.getAttribute("data-id");
+            const type = deleteTarget.getAttribute("data-type");
+
+            const response = await fetch(`/delete-item/${type}/${id}/`, {
+                method: "DELETE"
+            });
+
+            const data = await response.json();
+
+            messageDiv.textContent = data.success ? "Elemento eliminado con éxito." : data.error;
+            messageDiv.classList.remove("d-none");
+            messageDiv.classList.add(data.success ? "text-success" : "text-danger");
+
+            if (data.success) {
+                deleteTarget.parentElement.remove();
+            }
+
+            setTimeout(() => {
+                messageDiv.classList.add("d-none");
+                messageDiv.textContent = "";
+            }, 4000);
+
+            confirmModal.hide();
+        });
+
+        // Cargar elementos dinámicos
+        buttons.forEach(btn => {
+            btn.addEventListener("click", async (e) => {
+                e.preventDefault();
+                const type = btn.getAttribute("data-type");
+
+                const response = await fetch(`/get-items/${type}/`);
+                const items = await response.json();
+
+                container.innerHTML = "";
+
+                items.forEach(item => {
+                    const div = document.createElement("div");
+                    div.className = "col-auto bg-primary border rounded-pill d-flex align-items-center px-4 py-2 m-2 text-white";
+
+                    let content = "";
+                    const isAdmin = item.current_user_is_admin;
+                    const displayText = type === "users" ? item.username : item.name;
+
+                    content += `<span class="me-2">${displayText}</span>`;
+
+                    if (isAdmin) {
+                        content += `<button class="btn-close btn-sm remove-tag" data-id="${item.id}" data-type="${type}"></button>`;
+                    }
+
+                    div.innerHTML = content;
+                    container.appendChild(div);
+                });
+            });
+        });
+
+        // Delegar evento para mostrar modal de confirmación
+        container.addEventListener("click", (e) => {
+            if (e.target.classList.contains("remove-tag")) {
+                e.preventDefault();
+                deleteTarget = e.target;
+                confirmModal.show();
+            }
+        });
+    });
+</script>
+
+
+<!-- Lista de objetos -->
+
+<!-- Forms -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Función para mostrar/ocultar forms
+        function toggleFormVisibility(formSelector) {
+            const all = ['#tagForm', '#artistForm', '#charForm', '#userForm', '#gameForm'];
+            all.forEach(sel => {
+                const f = document.querySelector(sel);
+                if (!f) return;
+                if (sel === formSelector) {
+                    f.classList.toggle('d-none');
+
+                } else {
+                    f.classList.add('d-none');
+
+
+                }
+            });
+        }
+
+        // Mapeo botón → form
+        const map = {
+            tags: '#tagForm',
+            artists: '#artistForm',
+            chars: '#charForm',
+            games: '#gameForm',
+            users: '#userForm'
+        };
+
+        // Asignar listener a cada botón
+        Object.entries(map).forEach(([btnId, formSel]) => {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    toggleFormVisibility(formSel);
+                });
+            }
+        });
+    });
+</script>
+<!-- Forms -->
+
+<!-- Social media buttons -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const buttons = document.querySelectorAll('#socialButtons button');
@@ -419,156 +581,6 @@
             });
         });
     });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const buttons = document.querySelectorAll(".dynamicQuery");
-
-        buttons.forEach(btn => {
-            btn.addEventListener("click", async (e) => {
-                e.preventDefault();
-                const type = btn.getAttribute("data-type");
-                const container = document.getElementById("dynamic-container");
-
-                // Llama al backend (ajusta URL según tu framework)
-                const response = await fetch(`/get-items/${type}/`);
-                const items = await response.json();
-
-                // Limpia el contenedor
-                container.innerHTML = "";
-
-                // Muestra cada ítem
-                items.forEach(item => {
-                    const div = document.createElement("div");
-                    div.className = "col-auto bg-primary border rounded-pill d-flex align-items-center px-4 py-2 m-2 text-white";
-
-                    if (type == "users") {
-                        div.innerHTML = `
-              <span class="me-2">${item.username}</span>
-              <button class="btn-close btn-sm remove-tag" data-id="${item.id}" data-type="${type}"></button>
-            `;
-
-                    } else {
-                        div.innerHTML = `
-              <span class="me-2">${item.name}</span>
-              <button class="btn-close btn-sm remove-tag" data-id="${item.id}" data-type="${type}"></button>
-            `;
-
-                    }
-                    container.appendChild(div);
-                });
-            });
-        });
-
-        // Evento para eliminar (delegado)
-        document.getElementById("dynamic-container").addEventListener("click", async (e) => {
-            if (e.target.classList.contains("remove-tag")) {
-                const id = e.target.getAttribute("data-id");
-                const type = e.target.getAttribute("data-type");
-
-                // Eliminar en el backend
-                const response = await fetch(`/delete-item/${type}/${id}/`, {
-                    method: "DELETE"
-                });
-
-                const data = await response.json();
-
-                // Mostrar respuesta en pantalla
-                const messageDiv = document.getElementById("response-message");
-                messageDiv.textContent = data.success ? "Elemento eliminado con éxito." : data.error;
-                messageDiv.classList.remove("d-none");
-                messageDiv.classList.add(data.success ? "text-success" : "text-danger");
-
-                // Solo eliminar del DOM si el backend respondió éxito
-                if (data.success) {
-                    e.target.parentElement.remove();
-                }
-                setTimeout(() => {
-                    messageDiv.classList.add("d-none");
-                    messageDiv.textContent = "";
-                }, 4000);
-            }
-        });
-
-    });
-</script>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const imageInputs = document.querySelectorAll('.imageInput');
-
-        imageInputs.forEach(input => {
-            input.addEventListener('change', function () {
-                const previewId = this.dataset.previewId;
-                const imagePreview = document.querySelector(`.imagePreview[data-preview-id="${previewId}"]`);
-                const file = this.files[0];
-
-                if (file && imagePreview) {
-                    const reader = new FileReader();
-
-                    reader.onload = function (e) {
-                        imagePreview.src = e.target.result;
-                        imagePreview.classList.remove('d-none');
-                    };
-
-                    reader.readAsDataURL(file);
-                } else if (imagePreview) {
-                    imagePreview.src = "#";
-                    imagePreview.classList.add('d-none');
-                }
-            });
-        });
-    });
-
-
-
-    document.getElementById('tags').onclick = function () {
-        toggleFormVisibility('#tagForm');
-    };
-
-    document.getElementById('artists').onclick = function () {
-        toggleFormVisibility('#artistForm');
-    };
-
-    document.getElementById('users').onclick = function () {
-        toggleFormVisibility('#userForm');
-    };
-
-    document.getElementById('chars').onclick = function () {
-        toggleFormVisibility('#charForm');
-    };
-
-    document.getElementById('games').onclick = function () {
-        toggleFormVisibility('#gameForm');
-    };
-
-    function toggleFormVisibility(formId) {
-        const forms = ['#tagForm', '#artistForm', '#charForm', '#userForm', '#gameForm'];
-        forms.forEach(function (form) {
-            const formElement = document.querySelector(form);
-            if (formElement && form !== formId) {
-                formElement.classList.add('d-none');
-                formElement.classList.remove('slide-down', 'slide-up');
-            }
-        });
-
-        const selectedForm = document.querySelector(formId);
-        if (selectedForm.classList.contains('d-none')) {
-            selectedForm.classList.remove('d-none');
-            selectedForm.classList.remove('slide-up');
-            selectedForm.classList.add('slide-down');
-        } else {
-            selectedForm.classList.remove('slide-down');
-            selectedForm.classList.add('slide-up');
-            setTimeout(() => {
-                selectedForm.classList.add('d-none');
-            }, 500);
-        }
-    }
-
-</script>
-<script>
     document.addEventListener('DOMContentLoaded', function () {
         const buttons = document.querySelectorAll('#socialButtons button');
         buttons.forEach(btn => {
@@ -590,6 +602,9 @@
         });
     });
 </script>
+<!-- Social media buttons -->
+
+<!-- Tags -->
 <script>
     function setupTagInput({ inputId, suggestionsId, containerId, hiddenInputId }) {
         const tagInput = document.getElementById(inputId);
@@ -731,4 +746,5 @@
 
 
 </script>
+<!-- Tags -->
 {% endblock %}

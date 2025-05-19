@@ -30,6 +30,7 @@ urlpatterns = [
     path('edit/<str:tipo>/<int:pk>/', views.edit_objeto, name='edit_objeto'),
     path('crear-post/', views.crear_post, name='crear_post'),
     path('notificaciones/marcar_leida/', views.marcar_leida, name='marcar_leida'),
+path('editar-post/<int:post_id>/', views.editar_post, name='editar_post'),
 
     path("navbarFilterHeader/", views.navbarFilterHeader, name='navbarFilterHeader'),
     path('autocomplete/', views.autocomplete, name='autocomplete'),

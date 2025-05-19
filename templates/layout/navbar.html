@@ -190,19 +190,18 @@
         <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
             style="font-size: 1.2vw;" href="{% url 'index:uploadElement' %}">
-            <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid icon-navbar mb-1">Subir Archivo
+            <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid icon-navbar mb-1">Subir
           </a>
         </li>
         {% endif %}
-        {% if user.is_superuser and user.is_staff %}
         <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
             style="font-size: 1.2vw;" href="{% url 'index:adminPage' %}">
             <img src="{% static 'img/settingsLogoNew2.png' %}" class="img-fluid icon-navbar mb-1">
-            Configuración
+            Settings
           </a>
         </li>
-        {% endif %}
+
 
         {% if request.user.is_authenticated %}
         <li class="nav-item flex-fill text-center position-relative">
@@ -229,7 +228,7 @@
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
             style="font-size: 1.2vw; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#logoutModal">
             <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid icon-navbar mb-1">
-            Cerrar Sesión
+            Logout
           </a>
         </li>
 
@@ -274,7 +273,8 @@
 <!-- navbar movil -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-tercero d-block d-lg-none">
   <div class="container-fluid px-4">
-    <a class="navbar-brand mx-auto text-center text-primary fw-bold" href="{% url 'index:index' %}" style="font-size: 24px;">
+    <a class="navbar-brand mx-auto text-center text-primary fw-bold" href="{% url 'index:index' %}"
+      style="font-size: 24px;">
       <img id="logo" src="{% static 'img/LogoHvids.png' %}" alt="Previsualización" class="d-block img-fluid"
         style="max-width: 40vw;" data-preview-id="2">
     </a>
@@ -288,31 +288,36 @@
       <ul class="navbar-nav me-auto mb-2 mb-lg-0 text-center w-100">
 
         <li class="nav-item">
-          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:navbarFilterHeader' %}?filter=Artistas">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular"
+            href="{% url 'index:navbarFilterHeader' %}?filter=Artistas">
             <img src="{% static 'img/AristLogo.png' %}" class="img-fluid icon-navbar mb-1">Artistas
           </a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:navbarFilterHeader' %}?filter=Juegos">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular"
+            href="{% url 'index:navbarFilterHeader' %}?filter=Juegos">
             <img src="{% static 'img/SeriesLogo.png' %}" class="img-fluid icon-navbar mb-1">Juegos
           </a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:navbarFilterHeader' %}?filter=Personajes">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular"
+            href="{% url 'index:navbarFilterHeader' %}?filter=Personajes">
             <img src="{% static 'img/CharacterLogo.png' %}" class="img-fluid icon-navbar mb-1">Personajes
           </a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:navbarFilterHeader' %}?filter=Videos">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular"
+            href="{% url 'index:navbarFilterHeader' %}?filter=Videos">
             <img src="{% static 'img/videosLogoNew.png' %}" class="img-fluid icon-navbar mb-1">Videos
           </a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:navbarFilterHeader' %}?filter=Comics">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular"
+            href="{% url 'index:navbarFilterHeader' %}?filter=Comics">
             <img src="{% static 'img/ImageLogoNew.png' %}" class="img-fluid icon-navbar mb-1">Imagenes
           </a>
         </li>
@@ -347,18 +352,20 @@
 
         {% if request.user.is_authenticated %}
         <li class="nav-item position-relative">
-          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:userProfile' request.user.username %}">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular"
+            href="{% url 'index:userProfile' request.user.username %}">
             <img src="{% static 'img/profileImageLogoPNG.png' %}" class="img-fluid icon-navbar mb-1">Ver perfil
           </a>
 
-                   <span class="badge-custom notificacion-badge" id="notificacion-badge-movil"
+          <span class="badge-custom notificacion-badge" id="notificacion-badge-movil"
             style="display: none; position: absolute; top: 5px; right: 10%; cursor: pointer;">
             0
           </span>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link text-sexto fw-bold fnBadComicRegular" data-bs-toggle="modal" data-bs-target="#logoutModal" style="cursor: pointer;">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" data-bs-toggle="modal" data-bs-target="#logoutModal"
+            style="cursor: pointer;">
             <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid icon-navbar mb-1">Cerrar Sesión
           </a>
         </li>
@@ -400,63 +407,63 @@
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const badgeEscritorio = document.getElementById('notificacion-badge');
-      const badgeMovil = document.getElementById('notificacion-badge-movil');
-    
-      const panelEscritorio = document.getElementById('panel-notificaciones');
-      const panelMovil = document.getElementById('panel-notificaciones-movil');
-    
-      const listaEscritorio = document.getElementById('lista-notificaciones');
-      const listaMovil = document.getElementById('lista-notificaciones-movil');
-    
-      // Obtiene el CSRF token
-      function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-          document.cookie.split(';').forEach(cookie => {
-            cookie = cookie.trim();
-            if (cookie.startsWith(name + '=')) {
-              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-            }
-          });
-        }
-        return cookieValue;
-      }
-    
-      // Actualiza el conteo en ambos badges
-      async function actualizarNotificaciones() {
-        try {
-          const response = await fetch("{% url 'index:notificaciones_count' %}");
-          const data = await response.json();
-          const count = data.count;
-    
-          [badgeEscritorio, badgeMovil].forEach(badge => {
-            badge.innerText = count;
-            badge.style.display = 'inline-block';
-          });
-        } catch (e) {
-          console.error("Error al actualizar el badge", e);
-        }
-      }
-    
-      // Carga notificaciones en el panel y lista que indique
-      async function cargarNotificaciones(panel, lista) {
-        try {
-          const res = await fetch("{% url 'index:obtener_notificaciones' %}");
-          const data = await res.json();
-          lista.innerHTML = '';
-    
-          if (data.notificaciones.length === 0) {
-            lista.innerHTML = '<p class="text-muted mb-0">No tienes notificaciones pendientes.</p>';
-            return;
+  document.addEventListener('DOMContentLoaded', function () {
+    const badgeEscritorio = document.getElementById('notificacion-badge');
+    const badgeMovil = document.getElementById('notificacion-badge-movil');
+
+    const panelEscritorio = document.getElementById('panel-notificaciones');
+    const panelMovil = document.getElementById('panel-notificaciones-movil');
+
+    const listaEscritorio = document.getElementById('lista-notificaciones');
+    const listaMovil = document.getElementById('lista-notificaciones-movil');
+
+    // Obtiene el CSRF token
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(cookie => {
+          cookie = cookie.trim();
+          if (cookie.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
           }
-    
-          data.notificaciones.forEach(n => {
-            const item = document.createElement('div');
-            item.classList.add('notificacion-item', 'mb-2', 'small', 'd-flex', 'align-items-center', 'justify-content-between');
-    
-            item.innerHTML = `
+        });
+      }
+      return cookieValue;
+    }
+
+    // Actualiza el conteo en ambos badges
+    async function actualizarNotificaciones() {
+      try {
+        const response = await fetch("{% url 'index:notificaciones_count' %}");
+        const data = await response.json();
+        const count = data.count;
+
+        [badgeEscritorio, badgeMovil].forEach(badge => {
+          badge.innerText = count;
+          badge.style.display = 'inline-block';
+        });
+      } catch (e) {
+        console.error("Error al actualizar el badge", e);
+      }
+    }
+
+    // Carga notificaciones en el panel y lista que indique
+    async function cargarNotificaciones(panel, lista) {
+      try {
+        const res = await fetch("{% url 'index:obtener_notificaciones' %}");
+        const data = await res.json();
+        lista.innerHTML = '';
+
+        if (data.notificaciones.length === 0) {
+          lista.innerHTML = '<p class="text-muted mb-0">No tienes notificaciones pendientes.</p>';
+          return;
+        }
+
+        data.notificaciones.forEach(n => {
+          const item = document.createElement('div');
+          item.classList.add('notificacion-item', 'mb-2', 'small', 'd-flex', 'align-items-center', 'justify-content-between');
+
+          item.innerHTML = `
               <a href="${n.url}" class="text-decoration-none text-dark flex-grow-1 me-2 ${n.leida ? '' : 'fw-bold'}">
                 <div>
                   ${n.mensaje}<br><small class="text-muted">${n.fecha}</small>
@@ -464,81 +471,81 @@
               </a>
               ${n.imagen ? `<img src="${n.imagen}" alt="Imagen notificación" style="height:60px;width:auto;border-radius:5px;">` : ''}
             `;
-    
-            // Marcar como leída
-            item.querySelector('a').addEventListener('click', async (e) => {
-              e.preventDefault();
-              if (!n.leida) {
-                try {
-                  const resp = await fetch("{% url 'index:marcar_leida' %}", {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/x-www-form-urlencoded',
-                      'X-CSRFToken': getCookie('csrftoken'),
-                    },
-                    body: new URLSearchParams({ id: n.id })
-                  });
-                  const result = await resp.json();
-                  if (result.success) {
-                    n.leida = true;
-                    item.querySelector('a').classList.remove('fw-bold');
-                    actualizarNotificaciones();
-                  }
-                } catch (err) {
-                  console.error('Error marcando como leída:', err);
+
+          // Marcar como leída
+          item.querySelector('a').addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (!n.leida) {
+              try {
+                const resp = await fetch("{% url 'index:marcar_leida' %}", {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                  },
+                  body: new URLSearchParams({ id: n.id })
+                });
+                const result = await resp.json();
+                if (result.success) {
+                  n.leida = true;
+                  item.querySelector('a').classList.remove('fw-bold');
+                  actualizarNotificaciones();
                 }
+              } catch (err) {
+                console.error('Error marcando como leída:', err);
               }
-              window.location.href = n.url;
-            });
-    
-            lista.appendChild(item);
+            }
+            window.location.href = n.url;
           });
-        } catch (err) {
-          console.error('Error cargando notificaciones:', err);
-          lista.innerHTML = '<p class="text-danger">Error al cargar notificaciones.</p>';
-        }
+
+          lista.appendChild(item);
+        });
+      } catch (err) {
+        console.error('Error cargando notificaciones:', err);
+        lista.innerHTML = '<p class="text-danger">Error al cargar notificaciones.</p>';
       }
-    
-      // Toggle panel escritorio
-      badgeEscritorio.addEventListener('click', function (e) {
-        e.stopPropagation();
-        if (panelEscritorio.style.display === 'block') {
-          panelEscritorio.style.display = 'none';
-        } else {
-          cargarNotificaciones(panelEscritorio, listaEscritorio);
-          panelEscritorio.style.display = 'block';
-          panelMovil.style.display = 'none';
-        }
-      });
-    
-      // Toggle panel móvil
-      badgeMovil.addEventListener('click', function (e) {
-        e.stopPropagation();
-        if (panelMovil.style.display === 'block') {
-          panelMovil.style.display = 'none';
-        } else {
-          cargarNotificaciones(panelMovil, listaMovil);
-          panelMovil.style.display = 'block';
-          panelEscritorio.style.display = 'none';
-        }
-      });
-    
-      // Cierra ambos paneles al clicar fuera
-      document.addEventListener('click', function (e) {
-        if (!panelEscritorio.contains(e.target) && !badgeEscritorio.contains(e.target)) {
-          panelEscritorio.style.display = 'none';
-        }
-        if (!panelMovil.contains(e.target) && !badgeMovil.contains(e.target)) {
-          panelMovil.style.display = 'none';
-        }
-      });
-    
-      // Inicializa
-      actualizarNotificaciones();
-      setInterval(actualizarNotificaciones, 15000);
+    }
+
+    // Toggle panel escritorio
+    badgeEscritorio.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (panelEscritorio.style.display === 'block') {
+        panelEscritorio.style.display = 'none';
+      } else {
+        cargarNotificaciones(panelEscritorio, listaEscritorio);
+        panelEscritorio.style.display = 'block';
+        panelMovil.style.display = 'none';
+      }
     });
-  
-    
+
+    // Toggle panel móvil
+    badgeMovil.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (panelMovil.style.display === 'block') {
+        panelMovil.style.display = 'none';
+      } else {
+        cargarNotificaciones(panelMovil, listaMovil);
+        panelMovil.style.display = 'block';
+        panelEscritorio.style.display = 'none';
+      }
+    });
+
+    // Cierra ambos paneles al clicar fuera
+    document.addEventListener('click', function (e) {
+      if (!panelEscritorio.contains(e.target) && !badgeEscritorio.contains(e.target)) {
+        panelEscritorio.style.display = 'none';
+      }
+      if (!panelMovil.contains(e.target) && !badgeMovil.contains(e.target)) {
+        panelMovil.style.display = 'none';
+      }
+    });
+
+    // Inicializa
+    actualizarNotificaciones();
+    setInterval(actualizarNotificaciones, 15000);
+  });
+
+
 
   function getCookie(name) {
     let cookieValue = null;

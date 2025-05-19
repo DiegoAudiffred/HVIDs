@@ -386,3 +386,26 @@ class PostForm(forms.ModelForm):
     'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
     'placeholder': 'Descripción del post'
 })
+            
+
+class EditPostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['description']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Describe tu post'}),
+          
+        }
+    def __init__(self, *args, **kwargs):
+        super(EditPostForm, self).__init__(*args, **kwargs)
+        self.fields['description'].widget.attrs.update({
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+            'placeholder': 'Descripción del post',
+            'maxlength': '500'  
+        })
+
+    def clean_description(self):
+        description = self.cleaned_data.get('description', '')
+        if len(description) > 500:
+            raise forms.ValidationError("La descripción no puede tener más de 500 caracteres.")
+        return description

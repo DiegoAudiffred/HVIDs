@@ -247,17 +247,17 @@ def adminPage(request):
             staff = request.POST.get("is_staff") == 'on'
             superuser = request.POST.get("is_superuser") == 'on'
         
-            try:
-                user = User.objects.get(username=username)
-                if password:
-                    user.set_password(password)
-                user.is_staff = staff
-                user.is_superuser = superuser
-                user.save()
-        
-            except User.DoesNotExist:
-                formUser = addUserForm(request.POST, request.FILES)
-                if formUser.is_valid():
+            #try:
+            #    user = User.objects.get(username=username)
+            #    if password:
+            #        user.set_password(password)
+            #    user.is_staff = staff
+            #    user.is_superuser = superuser
+            #    user.save()
+        #
+            #except User.DoesNotExist:
+            formUser = addUserForm(request.POST, request.FILES)
+            if formUser.is_valid():
                     user = formUser.save(commit=False)
                     if password:
                         user.set_password(password)
@@ -1065,8 +1065,6 @@ def tags_suggest(request):
     return JsonResponse(list(tags), safe=False)
 
 
-# views.py
-
 
 def get_items(request, type):
     model_map = {
@@ -1078,18 +1076,25 @@ def get_items(request, type):
     }
     Model = model_map.get(type)
 
-    if type =="users":
-        modelTypeName="username"
+    if type == "users":
+        modelTypeName = "username"
     else:    
-        modelTypeName="name"
+        modelTypeName = "name"
 
     if Model:
+        is_admin = request.user.is_authenticated and request.user.is_staff and request.user.is_superuser
         data = list(Model.objects.all().values('id', modelTypeName))
+
+        # Añadir la bandera para el frontend
+        for item in data:
+            item['current_user_is_admin'] = is_admin
+
         return JsonResponse(data, safe=False)
+
     return JsonResponse({'error': 'Invalid type'}, status=400)
 
 
-from django.views.decorators.csrf import csrf_exempt
+
 @csrf_exempt
 @login_required(login_url='/login/')
 def delete_item(request, type, id):
@@ -1236,13 +1241,21 @@ def posts_recientes(request):
     else:
         for post in posts:
             post.liked_by_user = False
-
     context = {
         'posts': posts,
         **sidebar_context
     }   
     return render(request, 'index/recentPosts.html', context)
 
+@login_required
+def editar_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id, user=request.user)
+
+    if request.method == 'POST':
+        form = EditPostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+    return redirect('index:posts_recientes')
 
 def crear_post(request):
     sidebar_context = get_sidebar_context()
