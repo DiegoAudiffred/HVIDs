@@ -1,0 +1,16 @@
+{% extends 'layout/layout.html' %}
+{% load static %}
+
+{% block body %}
+<div style="padding: 2rem; text-align: center;">
+    <h1>Ups... algo salió mal</h1>
+    <p>Ha ocurrido un error interno en el servidor.</p>
+
+    {% if request.user.is_superuser %}
+    <div style="margin-top: 2rem; padding: 1rem; border: 1px solid red; background-color: #ffe6e6;">
+        <h3>Detalles para administradores:</h3>
+        <pre style="text-align: left;">{{ exception }}</pre>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

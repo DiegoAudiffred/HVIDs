@@ -28,30 +28,35 @@ from django.http import FileResponse, HttpResponse, HttpResponseNotFound
 from django.conf import settings
 
 import requests
+@csrf_exempt
+def error_500(request):
+    try:
+        raise Exception("Error simulado para probar la vista 500.")
+    except Exception as e:
+        return render(request, 'index/500.html', {
+            'exception': e,
+        }, status=500)
 
+def error_404(request, exception):
+    return render(request, 'index/404.html', {
+        'exception': exception,
+    }, status=404)
+
+def get_top_items(model, related_fields, limit=5):
+    annotations = [Count(field) for field in related_fields]
+    queryset = model.objects.annotate(
+        num_mediafiles=sum(annotations)
+    ).order_by('-num_mediafiles')[:limit]
+    return queryset
 
 def get_sidebar_context():
-    popular_tags = Tags.objects.annotate(num_mediafiles=Count('mediafile')+Count('comic')).order_by('-num_mediafiles')[:5]
-
-    popular_artists = Artist.objects.annotate(num_mediafiles=Count('mediafile')+Count('comic')).order_by('-num_mediafiles')[:5]
-
-    popular_characters = Character.objects.annotate(num_mediafiles=Count('mediafile')+Count('comic')).order_by('-num_mediafiles')[:5]
-    
-    popular_games = Game.objects.annotate(num_mediafiles=Count('mediafile')+Count('comic')).order_by('-num_mediafiles')[:5]
-
-
-    #random_Tags = list(Tags.objects.all())
-    #random_items = random.sample(random_Tags, 3)
-    #random_item = random.choice(items)
-
     return {
-        'popular_tags': popular_tags,
-        'popular_artists': popular_artists,
-        'popular_characters':popular_characters,
-        'popular_games':popular_games,
+        'popular_tags': get_top_items(Tags, ['mediafile', 'comic']),
+        'popular_artists': get_top_items(Artist, ['mediafile', 'comic']),
+        'popular_characters': get_top_items(Character, ['mediafile', 'comic']),
+        'popular_games': get_top_items(Game, ['mediafile', 'comic']),
+    }
 
-        #'random_items':random_items
-        }
 
 from itertools import chain
 
@@ -91,98 +96,87 @@ def index(request):
 
     return render(request, 'index/index.html', context)
 
-
-def show(request):
-    media_files = MediaFile.objects.all()
-    for med in media_files:
-        med.hide = False
-        med.save()  # Guardar cada instancia actualizada
-    
-    return redirect('index:index')  # Redirigir correctamente
-
 @login_required(login_url='/login/')  # ruta de la vista login
 def userProfileLikes(request,username,filter):
 
     return redirect('index:userProfile', request.user.username)
 
-@login_required(login_url='/login/')  # ruta de la vista login
-def userProfile(request,username):
-    user = User.objects.get(username=username)
+
+@login_required(login_url='/login/')
+def userProfile(request, username):
+    # Obtener usuario o lanzar 404 si no existe
+    user = get_object_or_404(User, username=username)
+
+    # Seguridad: solo el dueño del perfil puede editarlo
+    if request.user != user and request.method == 'POST':
+        return redirect('index:userProfile', user.username)
 
     if request.method == 'POST':
-        print("entro")
         form = editUserForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             updated_user = form.save()
             password2 = form.cleaned_data.get('password')
         
             if password2:
-                user = authenticate(username=updated_user.username, password=password2)
-                if user is not None:
-                    login(request, user)
+                auth_user = authenticate(username=updated_user.username, password=password2)
+                if auth_user is not None:
+                    login(request, auth_user)
 
-                
             return redirect('index:userProfile', updated_user.username)
         else:
             print(form.errors)
             
-
-    
-   
     formUser = editUserForm(instance=user)
 
-    media_files = MediaFile.objects.filter(hide=False,user=user)
-    comics = Comic.objects.filter(hide=False,user=user)
-    # Combinar y ordenar
+    # Cargar media y comics subidos por el usuario
+    media_files = MediaFile.objects.filter(hide=False, user=user).prefetch_related('tags')
+    comics = Comic.objects.filter(hide=False, user=user).prefetch_related('tags')
+
+    # Combinar y ordenar por fecha
     combined_media = sorted(
         chain(media_files, comics),
         key=lambda x: x.uploaded_at,
         reverse=True
     )[:9]
+
+    # Mantener nombres esperados por el template
     allThigs = {
-    'mediafiles': user.liked_mediafiles.all()[:9],
-    'artists': user.liked_artist.all()[:9],
-    'comics': user.liked_comic.all()[:9],
-    'characters': user.liked_character.all()[:9],
-    'games': user.liked_game.all()[:9],
-}
+        'mediafiles': user.liked_mediafiles.all()[:9],
+        'artists': user.liked_artist.all()[:9],
+        'comics': user.liked_comic.all()[:9],
+        'characters': user.liked_character.all()[:9],
+        'games': user.liked_game.all()[:9],
+    }
 
-    
+
     total_likes = sum(qs.count() for qs in allThigs.values())
-
 
     favTags = []
     for _, thing in allThigs.items():
-        for file in thing:
-            for tag in file.tags.all():
-                favTags.append(tag)
+        for item in thing:
+            favTags.extend(item.tags.all())
 
-    # Obtener las 5 etiquetas más comunes
-    top5_tags = Counter(favTags).most_common(5)
+    top5_tags = [tag for tag, _ in Counter(favTags).most_common(5)]
 
-    # Si solo quieres los objetos tag (sin las cantidades)
-    top5_tags = [tag for tag, count in top5_tags]
     sidebar_context = get_sidebar_context()
 
     context = {
-    'combined_media':combined_media,  
-    'mediafiles': user.liked_mediafiles.all(),
-    'artists': user.liked_artist.all(),
-    'comics': user.liked_comic.all(),
-    'characters': user.liked_character.all(),
-    'games': user.liked_game.all(),
-    'user': user,
-    'favTags':top5_tags,
-    'total_likes':total_likes,
-    'formUser':formUser,
-            **sidebar_context
+        'combined_media': combined_media,
+        'mediafiles': allThigs['mediafiles'],
+        'artists': allThigs['artists'],
+        'comics': allThigs['comics'],
+        'characters': allThigs['characters'],
+        'games': allThigs['games'],
+        'user': user,
+        'favTags': top5_tags,
+        'total_likes': total_likes,
+        'formUser': formUser,
+        **sidebar_context
+    }
 
-}
-    
     return render(request, 'index/userProfile.html', context)
 
 @login_required(login_url='/login/')  # ruta de la vista login
-
 def toggle_like(request, model, pk):
     user = request.user
 
@@ -1290,7 +1284,6 @@ def crear_post(request):
 
 @login_required
 def notificaciones_count(request):
-    print(request.user)
     cantidad = Notificacion.objects.filter(destinatario=request.user, leida=False).count()
     return JsonResponse({'count': cantidad})
 
