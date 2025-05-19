@@ -323,7 +323,7 @@ def navbarFilterHeader(request):
     elif thing_to_filter == "Videos":
          media_files = MediaFile.objects.filter().order_by('-uploaded_at')
     elif thing_to_filter == "Comics":
-         media_files = Comic.objects.all
+         media_files = Comic.objects.filter().order_by('-uploaded_at')
     else:
         media_files = MediaFile.objects.filter().order_by('-uploaded_at')
 
@@ -1350,7 +1350,7 @@ def pastNotifications(request):
     sidebar_context = get_sidebar_context()
     user = request.user
 
-    noti = Notificacion.objects.filter(destinatario=user).order_by('-fecha')
+    noti = Notificacion.objects.filter(destinatario=user).order_by('-fecha')[:9]
     #print(noti)
     for n in noti:
         # Añadir imagen si existe

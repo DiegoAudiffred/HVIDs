@@ -16,7 +16,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CSRF_TRUSTED_ORIGINS = ['https://salchiis.loca.lt','https://convicted-implemented-thesis-harvest.trycloudflare.com']
+CSRF_TRUSTED_ORIGINS = ['https://salchiis.loca.lt','https://mpegs-cfr-hair-theater.trycloudflare.com']
 
 TELEGRAM_BOT_TOKEN = '8047736753:AAFm6CyvCj5cVaHOn4VSBluJTVqd7vXkRoc'
 TELEGRAM_GROUP_CHAT_ID = '-1002634693432'
@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-#k_%n4op@_(7eeqy_vuj=42mf)j(@xsxmz2f7-)qld+de$fj7=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.loca.lt','convicted-implemented-thesis-harvest.trycloudflare.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.loca.lt','mpegs-cfr-hair-theater.trycloudflare.com']
 
 
 # Application definition

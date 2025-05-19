@@ -214,7 +214,7 @@
           </a>
 
           <!-- Badge de notificaciones FUERA del <a> -->
-          <span class="badge-custom" id="notificacion-badge"
+          <span class="badge-custom notificacion-badge" id="notificacion-badge"
             style="display: none; position: absolute; top: 5px; right: 10%; cursor: pointer;">
             0
           </span>
@@ -270,234 +270,276 @@
 </div>
 
 
-<!-- navbar movil -->
 
+<!-- navbar movil -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-tercero d-block d-lg-none">
   <div class="container-fluid px-4">
-    <a class="navbar-brand mx-auto text-center text-primary fw-bold" href="{% url 'index:index' %}"
-      style="font-size: 24px;">
-      <img id="logo" src="{% static 'img/LogoHvids.png' %}" alt="Previsualización" class="d-block"
-        style="max-width: 175px;" data-preview-id="2">
+    <a class="navbar-brand mx-auto text-center text-primary fw-bold" href="{% url 'index:index' %}" style="font-size: 24px;">
+      <img id="logo" src="{% static 'img/LogoHvids.png' %}" alt="Previsualización" class="d-block img-fluid"
+        style="max-width: 40vw;" data-preview-id="2">
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMobile"
+      aria-controls="navbarMobile" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse bg-tercero" id="navbarSupportedContent">
+    <div class="collapse navbar-collapse bg-tercero" id="navbarMobile">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 text-center w-100">
 
-      <ul class="navbar-nav row g-0">
-        <div class="row w-100 mx-0">
+        <li class="nav-item">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:navbarFilterHeader' %}?filter=Artistas">
+            <img src="{% static 'img/AristLogo.png' %}" class="img-fluid icon-navbar mb-1">Artistas
+          </a>
+        </li>
 
+        <li class="nav-item">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:navbarFilterHeader' %}?filter=Juegos">
+            <img src="{% static 'img/SeriesLogo.png' %}" class="img-fluid icon-navbar mb-1">Juegos
+          </a>
+        </li>
 
-          <li class="col-6 nav-item">
-            <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-              style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Artistas">
-              <img src="{% static 'img/AristLogo.png' %}" class="img-fluid mb-1" style="max-width: 75px; height: 75px;">
-              Artistas
-            </a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:navbarFilterHeader' %}?filter=Personajes">
+            <img src="{% static 'img/CharacterLogo.png' %}" class="img-fluid icon-navbar mb-1">Personajes
+          </a>
+        </li>
 
-          <li class="col-6 nav-item">
-            <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-              style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=Juegos">
-              <img src="{% static 'img/SeriesLogo.png' %}" class="img-fluid mb-1"
-                style="max-width: 75px; height: 75px;">
-              Juegos
-            </a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:navbarFilterHeader' %}?filter=Videos">
+            <img src="{% static 'img/videosLogoNew.png' %}" class="img-fluid icon-navbar mb-1">Videos
+          </a>
+        </li>
 
-          <li class="col-6 nav-item">
-            <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-              style="font-size: 28px;" href="{% url 'index:navbarFilterHeader' %}?filter=Personajes">
-              <img src="{% static 'img/CharacterLogo.png' %}" class="img-fluid mb-1"
-                style="max-width: 75px; height: 75px;">
-              Personajes
-            </a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:navbarFilterHeader' %}?filter=Comics">
+            <img src="{% static 'img/ImageLogoNew.png' %}" class="img-fluid icon-navbar mb-1">Imagenes
+          </a>
+        </li>
 
-          <li class="col-6 nav-item">
-            <a class="nav-link active text-sexto fw-bold fnBadComicRegular d-flex flex-column align-items-center"
-              style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Videos">
-              <img src="{% static 'img/videosLogoNew.png' %}" class="img-fluid mb-1"
-                style="max-width: 75px; height: 75px;">
-              Videos
-            </a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:posts_recientes' %}">
+            <img src="{% static 'img/postIcon.png' %}" class="img-fluid icon-navbar mb-1">Posts
+          </a>
+        </li>
 
-          <li class="col-6 nav-item">
-            <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-              style="font-size: 25px;" href="{% url 'index:navbarFilterHeader' %}?filter=Comics">
-              <img src="{% static 'img/ImageLogoNew.png' %}" class="img-fluid mb-1"
-                style="max-width: 75px; height: 75px;">
-              Imagenes
-            </a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:download_video' %}">
+            <img src="{% static 'img/YoutubeLogoNew.png' %}" class="img-fluid icon-navbar mb-1">Descargar
+          </a>
+        </li>
 
-          <li class="col-6 nav-item">
-            <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-              style="font-size: 25px;" href="{% url 'index:download_video' %}">
-              <img src="{% static 'img/YoutubeLogoNew.png' %}" class="img-fluid mb-1"
-                style="max-width: 75px; height: 75px;">
-              Descargas
-            </a>
-          </li>
-          {% if request.user.can_upload %}
-          <li class="col-6 nav-item">
-            <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-              style="font-size: 25px;" href="{% url 'index:uploadElement' %}">
-              <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid mb-1"
-                style="max-width: 75px; height: 75px;">
-              Subir
-            </a>
-          </li>
-          {% endif %}
-          {% if user.is_superuser and user.is_staff %}
-          <li class="col-6 nav-item">
-            <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-              style="font-size: 25px;" href="{% url 'index:adminPage' %}">
-              <img src="{% static 'img/settingsLogoNew2.png' %}" class="img-fluid mb-1"
-                style="max-width: 75px; height: 75px;">
-              Configuración
-            </a>
-          </li>
-          {% endif %}
+        {% if request.user.can_upload %}
+        <li class="nav-item">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:uploadElement' %}">
+            <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid icon-navbar mb-1">Subir Archivo
+          </a>
+        </li>
+        {% endif %}
 
-          {% if request.user.is_authenticated %}
-          <li class="col-6 nav-item">
-            <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-              style="font-size: 25px;" href="{% url 'index:userProfile' request.user.username %}">
-              <img src="{% static 'img/profileImageLogoPNG.png' %}" class="img-fluid mb-1"
-                style="max-width: 75px; height: 75px;">
-              Ver perfil
-            </a>
-          </li>
-          <li class="col-6 nav-item">
-            <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-              style="font-size: 25px;" href="{% url 'login:logout' %}">
-              <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid mb-1"
-                style="max-width: 75px; height: 75px;">
-              Cerrar
-            </a>
-          </li>
-          {% endif %}
+        {% if user.is_superuser and user.is_staff %}
+        <li class="nav-item">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:adminPage' %}">
+            <img src="{% static 'img/settingsLogoNew2.png' %}" class="img-fluid icon-navbar mb-1">Configuración
+          </a>
+        </li>
+        {% endif %}
+
+        {% if request.user.is_authenticated %}
+        <li class="nav-item position-relative">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:userProfile' request.user.username %}">
+            <img src="{% static 'img/profileImageLogoPNG.png' %}" class="img-fluid icon-navbar mb-1">Ver perfil
+          </a>
+
+                   <span class="badge-custom notificacion-badge" id="notificacion-badge-movil"
+            style="display: none; position: absolute; top: 5px; right: 10%; cursor: pointer;">
+            0
+          </span>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" data-bs-toggle="modal" data-bs-target="#logoutModal" style="cursor: pointer;">
+            <img src="{% static 'img/logoutLogo.png' %}" class="img-fluid icon-navbar mb-1">Cerrar Sesión
+          </a>
+        </li>
+
+        <!-- Modal logout -->
+        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="logoutModalLabel">¿Confirmar cierre de sesión?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body text-center">
+                ¿Estás seguro de que deseas cerrar sesión, <strong>{{ request.user }}</strong>?
+              </div>
+              <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Cancelar</button>
+                <a href="{% url 'login:logout' %}" class="btn btn-primary">Cerrar Sesión</a>
+              </div>
+            </div>
+          </div>
         </div>
+        {% endif %}
+
       </ul>
-
     </div>
-
-
   </div>
 </nav>
+
+<!-- Panel de notificaciones -->
+<div id="panel-notificaciones-movil" class="position-fixed bg-white border rounded shadow p-3"
+  style="top: 70px; right: 10px; width: 90vw; max-height: 400px; overflow: hidden; display: none; z-index: 2000;">
+  <h6 class="fw-bold mb-2">Notificaciones</h6>
+  <div id="lista-notificaciones-movil" style="max-height: 340px; overflow-y: auto;">
+    <p class="text-muted mb-0">Cargando...</p>
+  </div>
+  <a href="{% url 'index:pastNotifications' %}">Ver notificaciones pasadas</a>
+</div>
+
+
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const badge = document.getElementById('notificacion-badge');
-    const panel = document.getElementById('panel-notificaciones');
-    const lista = document.getElementById('lista-notificaciones');
-
-    async function actualizarNotificaciones() {
-      try {
-        const response = await fetch("{% url 'index:notificaciones_count' %}");
-        const data = await response.json();
-        const count = data.count;
-
-        if (count > 0) {
-          badge.innerText = count;
-          badge.style.display = 'inline-block';
-        } else {
-          badge.style.display = 'inline-block';
-        }
-      } catch (e) {
-        console.error("Error al actualizar el badge", e);
-      }
-    }
-
-    async function cargarPanelNotificaciones() {
-      try {
-        const res = await fetch("{% url 'index:obtener_notificaciones' %}");
-        const data = await res.json();
-        lista.innerHTML = '';
-
-        if (data.notificaciones.length === 0) {
-          lista.innerHTML = '<p class="text-muted mb-0">No tienes notificaciones pendientes.</p>';
-          return;
-        }
-
-        data.notificaciones.forEach(n => {
-          const item = document.createElement('div');
-          item.classList.add('mb-2', 'small', 'd-flex', 'align-items-center', 'justify-content-between');
-
-          item.innerHTML = `
-    <a href="${n.url}" class="text-decoration-none text-dark flex-grow-1 me-2 ${n.leida ? '' : 'fw-bold'}">
-      <div>
-        ${n.mensaje}
-        <br><small class="text-muted">${n.fecha}</small>
-      </div>
-    </a>
-    ${n.imagen ? `<img src="${n.imagen}" alt="Imagen notificación" style="height: 60px; width: auto; border-radius: 5px;">` : ''}
-  `;
-
-          // Agregar evento click para marcar como leída
-          item.querySelector('a').addEventListener('click', async (e) => {
-            e.preventDefault(); // Para que no navegue inmediatamente
-
-            if (!n.leida) {
-              try {
-                const response = await fetch("{% url 'index:marcar_leida' %}", {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': getCookie('csrftoken'), // función que obtenga el csrftoken
-                  },
-                  body: new URLSearchParams({ id: n.id })
-                });
-                const result = await response.json();
-                if (result.success) {
-                  n.leida = true;
-                  item.querySelector('a').classList.remove('fw-bold');
-                  // Actualizar badge si quieres
-                  actualizarNotificaciones();
-                }
-              } catch (err) {
-                console.error('Error marcando como leída:', err);
-              }
+    document.addEventListener('DOMContentLoaded', function () {
+      const badgeEscritorio = document.getElementById('notificacion-badge');
+      const badgeMovil = document.getElementById('notificacion-badge-movil');
+    
+      const panelEscritorio = document.getElementById('panel-notificaciones');
+      const panelMovil = document.getElementById('panel-notificaciones-movil');
+    
+      const listaEscritorio = document.getElementById('lista-notificaciones');
+      const listaMovil = document.getElementById('lista-notificaciones-movil');
+    
+      // Obtiene el CSRF token
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          document.cookie.split(';').forEach(cookie => {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
             }
-
-            // Finalmente navegar a la url
-            window.location.href = n.url;
           });
-
-          lista.appendChild(item);
-        });
-
-
-      } catch (error) {
-        console.error('Error cargando notificaciones:', error);
-        lista.innerHTML = '<p class="text-danger">Error al cargar notificaciones.</p>';
+        }
+        return cookieValue;
       }
-    }
-
-    // Mostrar/ocultar panel al hacer clic en el badge
-    badge.addEventListener('click', function (e) {
-      e.stopPropagation();  // No cierra inmediatamente
-      if (panel.style.display === 'none' || panel.style.display === '') {
-        cargarPanelNotificaciones();
-        panel.style.display = 'block';
-      } else {
-        panel.style.display = 'none';
+    
+      // Actualiza el conteo en ambos badges
+      async function actualizarNotificaciones() {
+        try {
+          const response = await fetch("{% url 'index:notificaciones_count' %}");
+          const data = await response.json();
+          const count = data.count;
+    
+          [badgeEscritorio, badgeMovil].forEach(badge => {
+            badge.innerText = count;
+            badge.style.display = 'inline-block';
+          });
+        } catch (e) {
+          console.error("Error al actualizar el badge", e);
+        }
       }
+    
+      // Carga notificaciones en el panel y lista que indique
+      async function cargarNotificaciones(panel, lista) {
+        try {
+          const res = await fetch("{% url 'index:obtener_notificaciones' %}");
+          const data = await res.json();
+          lista.innerHTML = '';
+    
+          if (data.notificaciones.length === 0) {
+            lista.innerHTML = '<p class="text-muted mb-0">No tienes notificaciones pendientes.</p>';
+            return;
+          }
+    
+          data.notificaciones.forEach(n => {
+            const item = document.createElement('div');
+            item.classList.add('notificacion-item', 'mb-2', 'small', 'd-flex', 'align-items-center', 'justify-content-between');
+    
+            item.innerHTML = `
+              <a href="${n.url}" class="text-decoration-none text-dark flex-grow-1 me-2 ${n.leida ? '' : 'fw-bold'}">
+                <div>
+                  ${n.mensaje}<br><small class="text-muted">${n.fecha}</small>
+                </div>
+              </a>
+              ${n.imagen ? `<img src="${n.imagen}" alt="Imagen notificación" style="height:60px;width:auto;border-radius:5px;">` : ''}
+            `;
+    
+            // Marcar como leída
+            item.querySelector('a').addEventListener('click', async (e) => {
+              e.preventDefault();
+              if (!n.leida) {
+                try {
+                  const resp = await fetch("{% url 'index:marcar_leida' %}", {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/x-www-form-urlencoded',
+                      'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: new URLSearchParams({ id: n.id })
+                  });
+                  const result = await resp.json();
+                  if (result.success) {
+                    n.leida = true;
+                    item.querySelector('a').classList.remove('fw-bold');
+                    actualizarNotificaciones();
+                  }
+                } catch (err) {
+                  console.error('Error marcando como leída:', err);
+                }
+              }
+              window.location.href = n.url;
+            });
+    
+            lista.appendChild(item);
+          });
+        } catch (err) {
+          console.error('Error cargando notificaciones:', err);
+          lista.innerHTML = '<p class="text-danger">Error al cargar notificaciones.</p>';
+        }
+      }
+    
+      // Toggle panel escritorio
+      badgeEscritorio.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (panelEscritorio.style.display === 'block') {
+          panelEscritorio.style.display = 'none';
+        } else {
+          cargarNotificaciones(panelEscritorio, listaEscritorio);
+          panelEscritorio.style.display = 'block';
+          panelMovil.style.display = 'none';
+        }
+      });
+    
+      // Toggle panel móvil
+      badgeMovil.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (panelMovil.style.display === 'block') {
+          panelMovil.style.display = 'none';
+        } else {
+          cargarNotificaciones(panelMovil, listaMovil);
+          panelMovil.style.display = 'block';
+          panelEscritorio.style.display = 'none';
+        }
+      });
+    
+      // Cierra ambos paneles al clicar fuera
+      document.addEventListener('click', function (e) {
+        if (!panelEscritorio.contains(e.target) && !badgeEscritorio.contains(e.target)) {
+          panelEscritorio.style.display = 'none';
+        }
+        if (!panelMovil.contains(e.target) && !badgeMovil.contains(e.target)) {
+          panelMovil.style.display = 'none';
+        }
+      });
+    
+      // Inicializa
+      actualizarNotificaciones();
+      setInterval(actualizarNotificaciones, 15000);
     });
+  
+    
 
-    // Cierra el panel si se hace clic fuera
-    document.addEventListener('click', function (e) {
-      if (!panel.contains(e.target) && !badge.contains(e.target)) {
-        panel.style.display = 'none';
-      }
-    });
-
-    actualizarNotificaciones();
-    setInterval(actualizarNotificaciones, 15000);
-  });
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -512,5 +554,4 @@
     }
     return cookieValue;
   }
-
 </script>
