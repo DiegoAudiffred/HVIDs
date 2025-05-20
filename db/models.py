@@ -158,14 +158,10 @@ class MediaFile(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     character= models.ManyToManyField(Character, blank=True)
 
-    # Ahora se guarda el archivo localmente
     file = models.FileField(upload_to='media_files/%Y%m%d/', blank=True, null=True,max_length=255)
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
-    # Generación automática de thumbnail
     image = models.ImageField(upload_to='media_files/thumbnails/%Y%m%d/', blank=True, null=True)
-    #isVideo = models.BooleanField(default=True)
     likes = models.ManyToManyField(User, related_name='liked_mediafiles', blank=True)
-    #nsfw = models.BooleanField(default=False)
 
     def total_likes(self):
         return self.likes.count()

@@ -5,6 +5,7 @@
 <head>
     <title>HVIDs</title>
     <meta charset="utf-8">
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <link rel="shortcut icon" href="{% static 'img/logo.png' %}">
@@ -56,11 +57,12 @@
                 {% block sidebar %}
                 {% include 'index/sideBar.html' %}
                 {% endblock %}
+
             </aside>
 
             <!-- Main Content -->
             <section class="col-12 col-md-8 col-lg-9 col-xl-9 col-xxl-10 my-0  px-4">
-                <main class="bg-cuarto">
+                <main class="bg-cuarto" id="main-content">
                     {% block body %}{% endblock %}
                 </main>
             </section>

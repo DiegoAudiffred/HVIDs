@@ -1,0 +1,13 @@
+<div id="audio-info" class="mb-2 fw-bold text-primary text-truncate">
+    🎵 {{ media_name }}
+</div>
+
+{% if image_url %}
+<div class="mb-2">
+    <img src="{{ image_url }}" alt="{{ media_name }}" class="img-fluid rounded shadow">
+</div>
+{% endif %}
+
+<audio id="player-audio" controls class="w-100">
+    <source id="audio-source" src="{{ audio_url }}" type="audio/mpeg">
+</audio>

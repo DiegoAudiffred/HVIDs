@@ -111,11 +111,12 @@
 
     {% for tag in popular_tags %}
     <h5 class="px-3 text-truncate" style="max-width: 100%;">
-      <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
-        href="{% url 'index:filtered_media' 'tag' tag.name %}">
+      <a href="{% url 'index:filtered_media' 'tag' tag.name %}"
+        class="d-inline-block text-tercero shine-underline text-truncate w-100">
         {{ tag.name }} ({{ tag.num_mediafiles }})
-
       </a>
+      <!--  hx-get="{% url 'index:filtered_media' 'tag' tag.name %}"
+        hx-target="#main-content" hx-push-url="true" -->
     </h5>
     {% endfor %}
 
@@ -128,10 +129,12 @@
 
     {% for artist in popular_artists %}
     <h5 class="px-3 text-truncate" style="max-width: 100%;">
-      <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
-        href="{% url 'index:filtered_media' 'artist' artist.name %}">
-        {{ artist.name }}</a>
 
+      <a href="{% url 'index:filtered_media' 'artist' artist.name %}"
+        class="d-inline-block text-tercero shine-underline text-truncate w-100">
+        {{ artist.name }}
+      </a>
+      <!--         hx-get="{% url 'index:filtered_media' 'artist' artist.name %}" hx-target="#main-content" hx-push-url="true" -->
     </h5>
     {% endfor %}
     {% else %}
@@ -144,9 +147,13 @@
 
     {% for character in popular_characters %}
     <h5 class="px-3 text-truncate" style="max-width: 100%;">
-      <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
-        href="{% url 'index:filtered_media' 'character' character.name %}">{{ character.name }}</a>
 
+      <a href="{% url 'index:filtered_media' 'character' character.name %}"
+        class="d-inline-block text-tercero shine-underline text-truncate w-100">
+        {{ character.name }}
+      </a>
+      <!--    hx-get="{% url 'index:filtered_media' 'character' character.name %}" hx-target="#main-content"
+        hx-push-url="true"  -->
     </h5>
     {% endfor %}
     {% else %}
@@ -159,17 +166,35 @@
 
     {% for game in popular_games %}
     <h5 class="px-3 text-truncate" style="max-width: 100%;">
-      <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
-        href="{% url 'index:filtered_media' 'game' game.name %}">
-        {{ game.name }}</a>
 
+      <a href="{% url 'index:filtered_media' 'game' game.name %}"
+        class="d-inline-block text-tercero shine-underline text-truncate w-100">
+        {{ game.name }}
+      </a>
+      <!-- hx-get="{% url 'index:filtered_media' 'game' game.name %}" hx-target="#main-content" hx-push-url="true" -->
     </h5>
     {% endfor %}
     {% else %}
     <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin juegos.</h5>
     {% endif %}
   </div>
+  <div id="audio-container"></div>
+
+  <script>
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+      if (evt.detail.target.id === "audio-container") {
+        const audio = document.getElementById("player-audio");
+        if (audio) {
+          audio.volume = 0.1;  // Ajustar volumen aquí, justo antes de reproducir
+          audio.load();
+          audio.play();
+        }
+      }
+    });
+  </script>
+
 </div>
+
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('multiSearchInput');

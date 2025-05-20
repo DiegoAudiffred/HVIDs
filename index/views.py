@@ -6,6 +6,8 @@ from typing import Counter
 from django.utils.formats import date_format
 from django.contrib.auth import authenticate, login
 from django.core.files import File
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.template.loader import render_to_string
 
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
@@ -62,6 +64,7 @@ from itertools import chain
 
 @login_required(login_url='/login/')
 def index(request):
+  
     user = request.user
 
     # Verifica si se quiere mostrar todo
@@ -91,9 +94,10 @@ def index(request):
     context = {
         'user': user,
         'media_files': combined_media,
+
         **sidebar_context
     }
-
+  
     return render(request, 'index/index.html', context)
 
 @login_required(login_url='/login/')  # ruta de la vista login
@@ -743,15 +747,15 @@ def stream_video(request, id):
 
 def filtered_media(request, filter_type, string):
     sidebar_context = get_sidebar_context()
-    
+    is_htmx = request.headers.get('HX-Request') == 'true'
+    print(is_htmx)
  
-
     filter_map = {
-        'tag': ('tags__name__icontains',),
-        'artist': ('artist__name__icontains',),
-        'character': ('character__name__icontains',),
-        'game': ('game__name__icontains',)
-    }
+    'tag': ('tags__name__iexact',),  # ← clave aquí
+    'artist': ('artist__name__iexact',),
+    'character': ('character__name__iexact',),
+    'game': ('game__name__iexact',)
+}
 
     filters = filter_map.get(filter_type)
 
@@ -772,11 +776,10 @@ def filtered_media(request, filter_type, string):
         'media_files': combined_media,
         **sidebar_context
     }
+  
     return render(request, 'index/index.html', context)
 
-
 AUDIO_FORMATS = ['.mp3', '.wav', '.ogg', '.aac', '.flac']
-from django.contrib.auth.decorators import login_required, user_passes_test
 
 def can_upload_check(user):
     return user.is_authenticated and getattr(user, 'can_upload', False)
@@ -1385,3 +1388,15 @@ def pastNotifications(request):
         'noti': noti,
     }
     return render(request, 'index/allNotifications.html', context)
+
+
+
+def load_audio(request, media_id):
+    media = get_object_or_404(MediaFile, id=media_id)
+    context = {
+        'audio_url': media.file.url,
+        'media_name': media.name,
+        'image_url': media.image.url if media.image else None,
+    }
+    html = render_to_string('index/audio_source.html', context)
+    return HttpResponse(html)

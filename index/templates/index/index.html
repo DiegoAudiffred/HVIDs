@@ -1,4 +1,5 @@
 {% extends 'layout/layout.html' %}
+
 {% load static %}
 
 {% block body %}
@@ -101,20 +102,6 @@
                 class="card-img-top w-100 h-100 object-fit-cover">
               {% endif %}
 
-              {% if mediafile.tipo_objeto == 'mediafile' and mediafile.file %}
-              {% if mediafile.is_video %}
-              <video class="preview-media d-none" preload="metadata"
-                style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;">
-                <source src="{{ mediafile.file.url }}" type="video/mp4">
-                Tu navegador no soporta video.
-              </video>
-              {% elif mediafile.is_audio %}
-              <audio class="preview-media d-none" preload="metadata">
-                <source src="{{ mediafile.file.url }}" type="audio/mpeg">
-                Tu navegador no soporta audio.
-              </audio>
-              {% endif %}
-              {% endif %}
 
               <div
                 class="position-absolute top-50 start-50 translate-middle fs-1 text-white bg-dark bg-opacity-50 rounded-circle p-2 d-none hover-icon">
@@ -129,7 +116,15 @@
 
             {% if mediafile.tipo_objeto == 'comic' or mediafile.tipo_objeto == 'mediafile' %}
             <ul class="list-unstyled small mb-2">
-              <li> ❤️ {{ mediafile.total_likes }}</li>
+              <li> ❤️ {{ mediafile.total_likes }} {% if mediafile.tipo_objeto == 'mediafile' %}
+                <button class="btn btn-sm btn-success mx-3" hx-get="{% url 'index:load_audio' mediafile.id %}"
+                  hx-target="#audio-container" hx-swap="innerHTML">
+                  ▶ Reproducir
+                </button>
+
+                {% endif %}
+              </li>
+
             </ul>
 
             <div class="mb-2 text-truncate">
@@ -151,52 +146,52 @@
   </div>
 </div>
 <script>
-/*  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".perspective-container").forEach(container => {
-      const media = container.querySelector(".preview-media");
-      const icon = container.querySelector(".hover-icon");
-
-      if (media) {
-        container.addEventListener("mouseenter", () => {
-          media.classList.remove("d-none");
-          icon?.classList.remove("d-none");
-          media.currentTime = 0;
-          media.play();
-        });
-
-        container.addEventListener("mouseleave", () => {
-          media.pause();
-          media.classList.add("d-none");
-          icon?.classList.add("d-none");
-        });
-      }
-    });
-  });*/
+  /*  document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".perspective-container").forEach(container => {
+        const media = container.querySelector(".preview-media");
+        const icon = container.querySelector(".hover-icon");
+  
+        if (media) {
+          container.addEventListener("mouseenter", () => {
+            media.classList.remove("d-none");
+            icon?.classList.remove("d-none");
+            media.currentTime = 0;
+            media.play();
+          });
+  
+          container.addEventListener("mouseleave", () => {
+            media.pause();
+            media.classList.add("d-none");
+            icon?.classList.add("d-none");
+          });
+        }
+      });
+    });*/
 </script>
 <script>
- /* document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".perspective-container").forEach(container => {
-      const media = container.querySelector(".preview-media");
-      const icon = container.querySelector(".hover-icon");
-
-      if (media) {
-        media.volume = 0.1; // 🔈 Baja el volumen al 10%
-
-        container.addEventListener("mouseenter", () => {
-          media.classList.remove("d-none");
-          icon?.classList.remove("d-none");
-          media.currentTime = 0;
-          media.play();
-        });
-
-        container.addEventListener("mouseleave", () => {
-          media.pause();
-          media.classList.add("d-none");
-          icon?.classList.add("d-none");
-        });
-      }
-    });
-  });*/
+  /* document.addEventListener("DOMContentLoaded", () => {
+     document.querySelectorAll(".perspective-container").forEach(container => {
+       const media = container.querySelector(".preview-media");
+       const icon = container.querySelector(".hover-icon");
+ 
+       if (media) {
+         media.volume = 0.1; // 🔈 Baja el volumen al 10%
+ 
+         container.addEventListener("mouseenter", () => {
+           media.classList.remove("d-none");
+           icon?.classList.remove("d-none");
+           media.currentTime = 0;
+           media.play();
+         });
+ 
+         container.addEventListener("mouseleave", () => {
+           media.pause();
+           media.classList.add("d-none");
+           icon?.classList.add("d-none");
+         });
+       }
+     });
+   });*/
 </script>
 
 {% endblock %}
