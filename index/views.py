@@ -394,7 +394,8 @@ def multi_search_results(request):
 
 @login_required(login_url='/login/')  
 def deleteComic(request,id):
-    com = Comic.objects.get(name=id)
+    
+    com = Comic.objects.get(id=id)
     com.delete()
     return redirect('index:index')  # Redirigir correctamente
 
@@ -590,7 +591,8 @@ def procesar_menciones(comentario_texto, autor, contenido_obj):
         except Exception as e:
             print(f"❌ Error inesperado al crear la notificación: {e}")
 
-
+from django.core.paginator import Paginator
+@login_required(login_url='/login/')
 
 def viewDownloadedVideos(request):
     media_path = settings.MEDIA_ROOT
@@ -610,6 +612,7 @@ def viewDownloadedVideos(request):
         'archivos': page_obj,
         'MEDIA_URL': settings.MEDIA_URL,
     })
+@login_required(login_url='/login/')
 
 def delete_file(request, filename):
     if request.method == 'POST':
@@ -1226,6 +1229,7 @@ def download_video(request):
     # render normal
     context.update(sidebar_context)
     return render(request, 'index/download.html', context)
+@login_required(login_url='/login/')  
 
 def posts_recientes(request):
     posts = Post.objects.select_related('user').prefetch_related('likes', 'images').filter(hide=False).order_by('-uploaded_at')[:20]
@@ -1244,7 +1248,7 @@ def posts_recientes(request):
     }   
     return render(request, 'index/recentPosts.html', context)
 
-@login_required
+@login_required(login_url='/login/')  
 def editar_post(request, post_id):
     post = get_object_or_404(Post, id=post_id, user=request.user)
 
@@ -1285,7 +1289,7 @@ def crear_post(request):
 
 
 
-@login_required
+@login_required(login_url='/login/')  
 def notificaciones_count(request):
     cantidad = Notificacion.objects.filter(destinatario=request.user, leida=False).count()
     return JsonResponse({'count': cantidad})
@@ -1293,7 +1297,7 @@ def notificaciones_count(request):
 
 
 
-@login_required
+@login_required(login_url='/login/')  
 def obtener_notificaciones(request):
     notificaciones = Notificacion.objects.filter(destinatario=request.user, leida=False).order_by('-fecha')[:10]
     data = []
@@ -1335,7 +1339,7 @@ def obtener_notificaciones(request):
     return JsonResponse({'notificaciones': data})
 
 
-@login_required
+@login_required(login_url='/login/')  
 @require_POST
 def marcar_leida(request):
     notificacion_id = request.POST.get('id')
@@ -1352,8 +1356,8 @@ def marcar_leida(request):
 
 
 
-@login_required
 
+@login_required(login_url='/login/')  
 
 def pastNotifications(request):
     sidebar_context = get_sidebar_context()
