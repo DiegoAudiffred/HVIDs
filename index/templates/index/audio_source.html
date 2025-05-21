@@ -9,5 +9,5 @@
 {% endif %}
 
 <audio id="player-audio" controls class="w-100">
-    <source id="audio-source" src="{{ audio_url }}" type="audio/mpeg">
+    <source id="audio-source"  src="{% url 'index:media_stream' id_media %}" type="audio/mpeg">
 </audio>

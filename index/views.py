@@ -380,7 +380,7 @@ def multi_search_results(request):
         key=lambda x: x.uploaded_at,
         reverse=True
     )
-
+    print(combined_results)
     context = {
         'results': combined_results,
         'search_terms': terms,
@@ -1394,6 +1394,7 @@ def pastNotifications(request):
 def load_audio(request, media_id):
     media = get_object_or_404(MediaFile, id=media_id)
     context = {
+        'id_media':media.id,
         'audio_url': media.file.url,
         'media_name': media.name,
         'image_url': media.image.url if media.image else None,
