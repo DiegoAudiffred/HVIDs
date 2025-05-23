@@ -8,7 +8,10 @@ from django.contrib.auth import authenticate, login
 from django.core.files import File
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.template.loader import render_to_string
-
+import os
+import re
+from django.shortcuts import render
+from yt_dlp import YoutubeDL
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Count
 from django.urls import reverse
@@ -25,9 +28,11 @@ from django.contrib.contenttypes.models import ContentType
 
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
+from django.core.paginator import Paginator
 
 from django.http import FileResponse, HttpResponse, HttpResponseNotFound
 from django.conf import settings
+from itertools import chain
 
 import requests
 @csrf_exempt
@@ -59,10 +64,7 @@ def get_sidebar_context():
         'popular_games': get_top_items(Game, ['mediafile', 'comic']),
     }
 
-
-from itertools import chain
-
-@login_required(login_url='/login/')
+@login_required(login_url='/login/')    
 def index(request):
   
     user = request.user
@@ -97,14 +99,16 @@ def index(request):
 
         **sidebar_context
     }
-  
-    return render(request, 'index/index.html', context)
+    if request.headers.get('HX-Request') == 'true':
+        return render(request, 'index/indexhtmx.html', context)
+    else:
+        # Si es una petición normal, devolvemos la página completa
+        return render(request, 'index/index.html', context)
 
-@login_required(login_url='/login/')  # ruta de la vista login
+@login_required(login_url='/login/')  
 def userProfileLikes(request,username,filter):
 
     return redirect('index:userProfile', request.user.username)
-
 
 @login_required(login_url='/login/')
 def userProfile(request, username):
@@ -177,10 +181,13 @@ def userProfile(request, username):
         'formUser': formUser,
         **sidebar_context
     }
+    if request.headers.get('HX-Request') == 'true':
+        return render(request, 'index/userProfilehtmx.html', context)
+    else:
+        # Si es una petición normal, devolvemos la página completa
+        return render(request, 'index/userProfile.html', context)
 
-    return render(request, 'index/userProfile.html', context)
-
-@login_required(login_url='/login/')  # ruta de la vista login
+@login_required(login_url='/login/')  
 def toggle_like(request, model, pk):
     user = request.user
 
@@ -200,8 +207,7 @@ def toggle_like(request, model, pk):
 
     return JsonResponse({'liked': liked, 'total_likes': obj.likes.count()})
 
-@login_required(login_url='/login/')  # ruta de la vista login
-
+@login_required(login_url='/login/')  
 def adminPage(request):
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
     sidebar_context = get_sidebar_context()
@@ -306,9 +312,13 @@ def adminPage(request):
         'media_files': media_files,
         **sidebar_context
     }
-
-    return render(request, 'index/adminPage.html', context)
-@login_required(login_url='/login/')  # ruta de la vista login  
+    if request.headers.get('HX-Request') == 'true':
+        return render(request, 'index/adminPagehtmx.html', context)
+    else:
+        # Si es una petición normal, devolvemos la página completa
+        return render(request, 'index/adminPage.html', context)
+    
+@login_required(login_url='/login/')    
 def navbarFilterHeader(request):
     thing_to_filter = request.GET.get('filter')
 
@@ -332,8 +342,13 @@ def navbarFilterHeader(request):
         'filter_selected': thing_to_filter,
         **sidebar_context
     }
-    return render(request, 'index/navbarFilterHeader.html', context)
+    if request.headers.get('HX-Request') == 'true':
+        return render(request, 'index/navbarFilterHeaderhtmx.html', context)
+    else:
+        # Si es una petición normal, devolvemos la página completa
+        return render(request, 'index/navbarFilterHeader.html', context)
 
+@login_required(login_url='/login/')    
 def autocomplete(request):
     term = request.GET.get('term', '')
     results = set()
@@ -352,10 +367,14 @@ def autocomplete(request):
     return JsonResponse(list(results), safe=False)
 
 
-
 @login_required(login_url='/login/')  
 def multi_search_results(request):
     query = request.GET.get("q", "").strip()
+    print(query)
+    if query == "":
+        
+            return redirect('index:index')
+   
     terms = query.split()
     
     sidebar_context = get_sidebar_context()
@@ -387,31 +406,31 @@ def multi_search_results(request):
         'media_files': media_files_all,  # si esto es solo para sidebar, puedes renombrarlo
         **sidebar_context
     }
-    return render(request, 'index/multi_search_results.html', context)
-
-
-
+    if request.headers.get('HX-Request') == 'true':
+        return render(request, 'index/multi_search_resultshtmx.html', context)
+    else:
+        # Si es una petición normal, devolvemos la página completa
+        return render(request, 'index/multi_search_results.html', context)
 
 @login_required(login_url='/login/')  
 def deleteComic(request,id):
     
     com = Comic.objects.get(id=id)
     com.delete()
-    return redirect('index:index')  # Redirigir correctamente
+    return redirect('index:index')  
 
-
+@login_required(login_url='/login/')  
 def deleteVideo(request,id):
     com = MediaFile.objects.get(id=id)
     com.delete()
-    return redirect('index:index')  # Redirigir correctamente
+    return redirect('index:index')  
 
+@login_required(login_url='/login/')  
 def deleteComicImage(request, id):
     com = ComicPage.objects.get(id=id)
     comic_id = com.comic.name  
     com.delete()
     return redirect('index:watchComic', comic_id)
-
-
 
 @login_required(login_url='/login/')
 def watchContent(request, id):
@@ -554,8 +573,6 @@ def watchComic(request, id):
         **sidebar_data
     })
 
-
-
 def procesar_menciones(comentario_texto, autor, contenido_obj):
     print("📝 Texto del comentario:", comentario_texto)
     menciones = re.findall(r'@(\w+)', comentario_texto)
@@ -591,9 +608,7 @@ def procesar_menciones(comentario_texto, autor, contenido_obj):
         except Exception as e:
             print(f"❌ Error inesperado al crear la notificación: {e}")
 
-from django.core.paginator import Paginator
 @login_required(login_url='/login/')
-
 def viewDownloadedVideos(request):
     media_path = settings.MEDIA_ROOT
     archivos = []
@@ -612,8 +627,8 @@ def viewDownloadedVideos(request):
         'archivos': page_obj,
         'MEDIA_URL': settings.MEDIA_URL,
     })
-@login_required(login_url='/login/')
 
+@login_required(login_url='/login/')
 def delete_file(request, filename):
     if request.method == 'POST':
         file_path = os.path.join(settings.MEDIA_ROOT, filename)
@@ -622,7 +637,6 @@ def delete_file(request, filename):
             return redirect('view_downloaded_videos')
         return HttpResponse("Archivo no encontrado", status=404)
     return HttpResponse("Método no permitido", status=405)
-
 
 @login_required(login_url='/login/')
 def detailsAbout(request, filtro, valor):
@@ -746,8 +760,7 @@ def stream_video(request, id):
     return FileResponse(open(path, 'rb'), content_type='video/mp4')
 
 
-@login_required(login_url='/login/')  # ruta de la vista login
-
+@login_required(login_url='/login/')  
 def filtered_media(request, filter_type, string):
     sidebar_context = get_sidebar_context()
     is_htmx = request.headers.get('HX-Request') == 'true'
@@ -780,7 +793,11 @@ def filtered_media(request, filter_type, string):
         **sidebar_context
     }
   
-    return render(request, 'index/index.html', context)
+    if request.headers.get('HX-Request') == 'true':
+        return render(request, 'index/indexhtmx.html', context)
+    else:
+        # Si es una petición normal, devolvemos la página completa
+        return render(request, 'index/index.html', context)
 
 AUDIO_FORMATS = ['.mp3', '.wav', '.ogg', '.aac', '.flac']
 
@@ -1012,7 +1029,6 @@ def enviar_telegram_mensaje(texto, image_path=None):
 
 
 @login_required(login_url='/login/')
-
 def edit_objeto(request, tipo, pk):
     # Mapea tipo a modelo y formulario
     modelo_map = {
@@ -1064,8 +1080,6 @@ def tags_suggest(request):
     tags = Tags.objects.filter(name__icontains=q).values_list('name', flat=True)[:10]
     return JsonResponse(list(tags), safe=False)
 
-
-
 def get_items(request, type):
     model_map = {
         'tags': Tags,
@@ -1093,8 +1107,6 @@ def get_items(request, type):
 
     return JsonResponse({'error': 'Invalid type'}, status=400)
 
-
-
 @csrf_exempt
 @login_required(login_url='/login/')
 def delete_item(request, type, id):
@@ -1120,10 +1132,7 @@ def delete_item(request, type, id):
     return JsonResponse({'error': 'Solicitud inválida'}, status=400)
 
 
-import os
-import re
-from django.shortcuts import render
-from yt_dlp import YoutubeDL
+
 
 def safe_filename(name):
     name = re.sub(r'[^\w\s-]', '', name)
@@ -1131,8 +1140,7 @@ def safe_filename(name):
     return name.strip('_')
 
 
-@login_required(login_url='/login/')  # ruta de la vista login
-
+@login_required(login_url='/login/')  
 def download_video(request):
     context = {}
     sidebar_context = get_sidebar_context()
@@ -1229,8 +1237,8 @@ def download_video(request):
     # render normal
     context.update(sidebar_context)
     return render(request, 'index/download.html', context)
-@login_required(login_url='/login/')  
 
+@login_required(login_url='/login/')  
 def posts_recientes(request):
     posts = Post.objects.select_related('user').prefetch_related('likes', 'images').filter(hide=False).order_by('-uploaded_at')[:20]
     sidebar_context = get_sidebar_context()
@@ -1258,6 +1266,7 @@ def editar_post(request, post_id):
             form.save()
     return redirect('index:posts_recientes')
 
+@login_required(login_url='/login/')  
 def crear_post(request):
     sidebar_context = get_sidebar_context()
 
@@ -1287,15 +1296,10 @@ def crear_post(request):
     }
     return render(request, 'index/createPost.html', context)
 
-
-
 @login_required(login_url='/login/')  
 def notificaciones_count(request):
     cantidad = Notificacion.objects.filter(destinatario=request.user, leida=False).count()
     return JsonResponse({'count': cantidad})
-
-
-
 
 @login_required(login_url='/login/')  
 def obtener_notificaciones(request):
@@ -1338,7 +1342,6 @@ def obtener_notificaciones(request):
 
     return JsonResponse({'notificaciones': data})
 
-
 @login_required(login_url='/login/')  
 @require_POST
 def marcar_leida(request):
@@ -1352,13 +1355,7 @@ def marcar_leida(request):
     except Notificacion.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Notificación no encontrada'}, status=404)
 
-
-
-
-
-
 @login_required(login_url='/login/')  
-
 def pastNotifications(request):
     sidebar_context = get_sidebar_context()
     user = request.user
@@ -1393,8 +1390,6 @@ def pastNotifications(request):
     }
     return render(request, 'index/allNotifications.html', context)
 
-
-
 def load_audio(request, media_id):
     media = get_object_or_404(MediaFile, id=media_id)
     context = {
@@ -1405,3 +1400,19 @@ def load_audio(request, media_id):
     }
     html = render_to_string('index/audio_source.html', context)
     return HttpResponse(html)
+#def load_audio(request, media_id):
+#    media = get_object_or_404(MediaFile, id=media_id)
+#
+#    extension = os.path.splitext(media.file.name)[1].lower()  # .mp3 o .mp4
+#
+#    is_video = extension == '.mp4'
+#
+#    context = {
+#        'media_name': media.name,
+#        'file_url': media.file.url,
+#        'image_url': media.image.url if media.image else None,
+#        'is_video': is_video,
+#    }
+#
+#    html = render_to_string('index/audio_source.html', context)
+#    return HttpResponse(html)   

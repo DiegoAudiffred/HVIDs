@@ -9,5 +9,28 @@
 {% endif %}
 
 <audio id="player-audio" controls class="w-100">
-    <source id="audio-source"  src="{% url 'index:media_stream' id_media %}" type="audio/mpeg">
+    <source id="audio-source" src="{% url 'index:media_stream' id_media %}" type="audio/mpeg">
 </audio>
+<!-- 
+<div id="audio-info" class="mb-2 fw-bold text-primary text-truncate">
+    🎵 {{ media_name }}
+</div>
+
+
+
+{% if is_video %}
+<video controls class="w-100" style="max-height: 400px;" id="player-audio">
+    <source src="{{ file_url }}" type="video/mp4" id="audio-source">
+    Tu navegador no soporta el video.
+</video>
+{% else %}
+{% if image_url %}
+<div class=" mb-2">
+    <img src="{{ image_url }}" alt="{{ media_name }}" class="img-fluid rounded shadow">
+</div>
+{% endif %}
+<audio controls class="w-100" id="player-audio">
+    <source src="{{ file_url }}" type="audio/mpeg" id="audio-source">
+    Tu navegador no soporta el audio.
+</audio>
+{% endif %} -->
