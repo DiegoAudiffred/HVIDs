@@ -16,8 +16,11 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CSRF_TRUSTED_ORIGINS = ['https://salchiis.loca.lt','https://mpegs-cfr-hair-theater.trycloudflare.com']
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://salchiiscontent.org',
+    # Si usas otro dominio o subdominios que sirvan tu app
+    'https://otrodominio.com',
+]
 TELEGRAM_BOT_TOKEN = '8047736753:AAFm6CyvCj5cVaHOn4VSBluJTVqd7vXkRoc'
 TELEGRAM_GROUP_CHAT_ID = '-1002634693432'
 # Quick-start development settings - unsuitable for production
@@ -31,6 +34,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -150,6 +154,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = 'login/'
+LOGIN_REDIRECT_URL = '/'
 
 AUTH_USER_MODEL = 'db.User'
 #LOGIN_REDIRECT_URL = "Index:index"
