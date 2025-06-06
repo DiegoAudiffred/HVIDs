@@ -434,7 +434,34 @@
 </div>
 
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const imageInputs = document.querySelectorAll('.imageInput');
 
+        imageInputs.forEach(input => {
+            input.addEventListener('change', function () {
+                const previewId = this.dataset.previewId;
+                const imagePreview = document.querySelector(`.imagePreview[data-preview-id="${previewId}"]`);
+                const file = this.files[0];
+
+                if (file && imagePreview) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.classList.remove('d-none');
+                    };
+
+                    reader.readAsDataURL(file);
+                } else if (imagePreview) {
+                    imagePreview.src = "#";
+                    imagePreview.classList.add('d-none');
+                }
+            });
+        });
+    });
+
+</script>
 <!-- Lista de objetos -->
 <script>
     document.addEventListener("DOMContentLoaded", () => {

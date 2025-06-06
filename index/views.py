@@ -251,15 +251,16 @@ def adminPage(request):
             staff = request.POST.get("is_staff") == 'on'
             superuser = request.POST.get("is_superuser") == 'on'
         
-            #try:
-            #    user = User.objects.get(username=username)
-            #    if password:
-            #        user.set_password(password)
-            #    user.is_staff = staff
-            #    user.is_superuser = superuser
-            #    user.save()
-        #
-            #except User.DoesNotExist:
+            try:
+                user = User.objects.get(username=username)
+                if password:
+                    user.set_password(password)
+                    user.is_staff = staff
+                user.is_superuser = superuser
+                user.save()
+        
+            except User.DoesNotExist:
+                print("normal")
             formUser = addUserForm(request.POST, request.FILES)
             if formUser.is_valid():
                     user = formUser.save(commit=False)
