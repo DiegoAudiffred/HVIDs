@@ -272,11 +272,16 @@
             </div>
 
             <!-- JavaScript para controlar play/pause con la imagen -->
+             
             <script>
+         
+           
                 document.addEventListener('DOMContentLoaded', function () {
                     const audio = document.getElementById('audio-player');
                     const image = document.getElementById('audio-image');
-
+                    if (audio) {
+                        audio.volume = 0.2;
+                    }
                     image.addEventListener('click', function () {
                         if (audio.paused) {
                             audio.play();

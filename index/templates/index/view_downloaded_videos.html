@@ -16,10 +16,9 @@
             </a>
         </div>
         <div class="col-md-6 text-end">
-            <button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
-                data-bs-target="#videoModal{{ forloop.counter }}">
-                <i class="bi bi-play-circle"></i> Reproducir
-            </button>
+            <a href="{{ MEDIA_URL }}{{ archivo }}" target="_blank" class="btn btn-primary">
+                Abrir video
+            </a>
             <form method="post" action="{% url 'index:delete_file' archivo %}" class="d-inline">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline-tercero text-white btn-primary">
@@ -30,24 +29,7 @@
     </div>
 
     <!-- Modal de reproducción -->
-    <div class="modal fade" id="videoModal{{ forloop.counter }}" tabindex="-1"
-        aria-labelledby="videoModalLabel{{ forloop.counter }}" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content bg-dark text-white">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="videoModalLabel{{ forloop.counter }}">{{ archivo }}</h5>
-                    <button type="button" class="btn-close btn-close-black" data-bs-dismiss="modal"
-                        aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <video width="100%" controls>
-                        <source src="{{ MEDIA_URL }}{{ archivo }}" type="video/mp4">
-                        Tu navegador no soporta reproducción de video.
-                    </video>
-                </div>
-            </div>
-        </div>
-    </div>
+ 
     {% empty %}
     <div class="row">
         <div class="col-12">

@@ -698,27 +698,33 @@
 </div>
 <!-- Modal -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content bg-cuarto comic-modal m-auto">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-cuarto comic-modal m-0">
+
+      <!-- Header -->
       <div class="modal-header">
         <h5 class="modal-title fnBadComicTitle" id="modalLabel">{{ mediafile.name }}</h5>
-
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-
       </div>
 
-      <div class="modal-body p-0 h-100 d-flex flex-column justify-content-center">
+      <!-- Body: ocupa todo el alto restante del modal -->
+      <div class="modal-body p-0 d-flex flex-column" style="height: calc(100vh - 56px);"> <!-- 56px es el alto aproximado del header -->
+
         <!-- Carrusel -->
-        <div id="comicCarousel" class="carousel slide" data-bs-ride="false">
-          <div class="carousel-inner">
+        <div id="comicCarousel" class="carousel slide flex-grow-1 w-100" data-bs-ride="false">
+          <div class="carousel-inner h-100">
+
             {% for page in comic_pages %}
-            <div class="carousel-item {% if forloop.first %}active{% endif %}">
-              <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
-                <img src="{{ page.image.url }}" class="comic-img img-fluid mx-auto d-block shadow rounded"
-                  alt="Página del cómic">
+            <div class="carousel-item {% if forloop.first %}active{% endif %} h-100">
+              <div class="w-100 h-100 d-flex justify-content-center align-items-center">
+                <img src="{{ page.image.url }}"
+                     class="comic-img shadow rounded"
+                     alt="Página del cómic"
+                     style="max-height: 100%; max-width: 100%; object-fit: contain;">
               </div>
             </div>
             {% endfor %}
+
           </div>
 
           <!-- Controles -->
@@ -736,9 +742,12 @@
         <div class="row g-2 justify-content-center mt-3 px-3">
           {% for page in comic_pages %}
           <div class="col-2 mx-2">
-            <img src="{{ page.image.url }}" class="img-thumbnail thumbnail-selector p-0" data-bs-target="#comicCarousel"
-              data-bs-slide-to="{{ forloop.counter0 }}" aria-current="{% if forloop.first %}true{% endif %}"
-              alt="Miniatura {{ forloop.counter }}">
+            <img src="{{ page.image.url }}"
+                 class="img-thumbnail thumbnail-selector p-0"
+                 data-bs-target="#comicCarousel"
+                 data-bs-slide-to="{{ forloop.counter0 }}"
+                 aria-current="{% if forloop.first %}true{% endif %}"
+                 alt="Miniatura {{ forloop.counter }}">
           </div>
           {% endfor %}
         </div>
@@ -746,6 +755,7 @@
     </div>
   </div>
 </div>
+
 
 <style>
   .carousel-item {

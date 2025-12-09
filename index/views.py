@@ -35,6 +35,23 @@ from django.conf import settings
 from itertools import chain
 
 import requests
+import json
+import time
+import torch
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+
+import json
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.shortcuts import render
+import torch
+import json
+
+
+
+
 @csrf_exempt
 def error_500(request):
     try:
@@ -89,7 +106,7 @@ def index(request):
         chain(media_files, comics),
         key=lambda x: x.uploaded_at,
         reverse=True
-    )[:20]
+    )[:24]
 
     sidebar_context = get_sidebar_context()
 
@@ -145,7 +162,7 @@ def userProfile(request, username):
         chain(media_files, comics),
         key=lambda x: x.uploaded_at,
         reverse=True
-    )[:9]
+    )
 
     # Mantener nombres esperados por el template
     allThigs = {
@@ -169,7 +186,7 @@ def userProfile(request, username):
     sidebar_context = get_sidebar_context()
 
     context = {
-        'combined_media': combined_media,
+        'combined_media': combined_media[:9],
         'mediafiles': allThigs['mediafiles'],
         'artists': allThigs['artists'],
         'comics': allThigs['comics'],
@@ -330,11 +347,11 @@ def navbarFilterHeader(request):
     elif thing_to_filter == "Personajes":
         media_files = Character.objects.all
     elif thing_to_filter == "Videos":
-         media_files = MediaFile.objects.filter().order_by('-uploaded_at')
+         media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
     elif thing_to_filter == "Comics":
-         media_files = Comic.objects.filter().order_by('-uploaded_at')
+         media_files = Comic.objects.filter(hide=False).order_by('-uploaded_at')
     else:
-        media_files = MediaFile.objects.filter().order_by('-uploaded_at')
+        media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
 
     sidebar_context = get_sidebar_context()
 
@@ -429,13 +446,13 @@ def deleteVideo(request,id):
 @login_required(login_url='/login/')  
 def deleteComicImage(request, id):
     com = ComicPage.objects.get(id=id)
-    comic_id = com.comic.name  
+    comic_id = com.comic.id  
     com.delete()
     return redirect('index:watchComic', comic_id)
 
 @login_required(login_url='/login/')
 def watchContent(request, id):
-    mediafile = get_object_or_404(MediaFile, name=id)
+    mediafile = get_object_or_404(MediaFile, id=id)
     formVideo = UploadElementForm(instance=mediafile)
     form = addComentariosForm()
     if request.method == 'POST':
@@ -451,7 +468,7 @@ def watchContent(request, id):
                         if tag:
                             obj, _ = Tags.objects.get_or_create(name=tag.upper())
                             mediafile.tags.add(obj)
-                return redirect('index:watchContent', mediafile.name)
+                return redirect('index:watchContent', mediafile.id)
         elif 'comentario' in request.POST:
             form_comentario = addComentariosForm(request.POST, request.FILES)
             if form_comentario.is_valid():
@@ -465,7 +482,7 @@ def watchContent(request, id):
                     autor=request.user,
                     contenido_obj=mediafile
                 )
-                return redirect('index:watchContent', mediafile.name)
+                return redirect('index:watchContent', mediafile.id)
          
                   
     is_audio = False
@@ -487,7 +504,7 @@ def watchContent(request, id):
 
 @login_required(login_url='/login/')
 def watchComic(request, id):
-    comic = get_object_or_404(Comic, name=id)
+    comic = get_object_or_404(Comic, id=id)
     form_comentario = addComentariosForm()
     form_page = ComicPageForm()
     formComic = UploadComicForm(instance=comic)
@@ -506,7 +523,7 @@ def watchComic(request, id):
                             mediafile.tags.add(obj)
                
 
-                return redirect('index:watchComic', comic.name)
+                return redirect('index:watchComic', comic.id)
         elif 'comentario' in request.POST:
             form_comentario = addComentariosForm(request.POST)
             if form_comentario.is_valid():
@@ -522,7 +539,7 @@ def watchComic(request, id):
                         contenido_obj=comic
                     )
 
-                    return redirect('index:watchComic', comic.name)
+                    return redirect('index:watchComic', comic.id)
 
 
 
@@ -531,7 +548,7 @@ def watchComic(request, id):
             current = ComicPage.objects.filter(comic=comic).count()
             for i, img in enumerate(images, start=1):
                 ComicPage(comic=comic, image=img, order=current + i).save()
-            file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.name]))
+            file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.id]))
                 
             texto = (
     f"🎬 <b>¡{len(images)} Nuevas imagenes subidas!</b>\n"
@@ -558,7 +575,7 @@ def watchComic(request, id):
             print('DEBUG: enviando Telegram', texto, image_path)
             resp = enviar_telegram_mensaje(texto, image_path)
             print('DEBUG: respuesta Telegram', resp)
-            return redirect('index:watchComic', comic.name)
+            return redirect('index:watchComic', comic.id)
     comic.liked_by_user = request.user.is_authenticated and comic.likes.filter(id=request.user.id).exists()
     comentarios = Comentario.objects.filter(comicID=comic)
     comentarios = reversed(comentarios)
@@ -634,10 +651,15 @@ def delete_file(request, filename):
     if request.method == 'POST':
         file_path = os.path.join(settings.MEDIA_ROOT, filename)
         if os.path.exists(file_path) and os.path.isfile(file_path):
-            os.remove(file_path)
-            return redirect('view_downloaded_videos')
+            try:
+                time.sleep(0.5)  # Espera para que el navegador libere el archivo
+                os.remove(file_path)
+            except PermissionError:
+                return HttpResponse("No se pudo eliminar el archivo por falta de permisos", status=403)
+            return redirect('index:viewDownloadedVideos')
         return HttpResponse("Archivo no encontrado", status=404)
     return HttpResponse("Método no permitido", status=405)
+
 
 @login_required(login_url='/login/')
 def detailsAbout(request, filtro, valor):
@@ -881,7 +903,7 @@ def uploadElement(request):
                         media.tags.add(obj)
 
                 # Notificación a Telegram
-                file_url = request.build_absolute_uri(reverse('index:watchContent', args=[media.name]))
+                file_url = request.build_absolute_uri(reverse('index:watchContent', args=[media.id]))
                 texto = (
                     f"🎬 <b>¡Nuevo video subido!</b>\n"
                     f"📤 <i>Cortesía de</i> <b>{media.user}</b>\n\n"
@@ -927,15 +949,16 @@ def uploadElement(request):
                 comic.save()
                 formComic.save_m2m()
             
-                for image in request.FILES.getlist('comicImages'):
-                    ComicPage.objects.create(comic=comic, image=image)
+                for index, image in enumerate(request.FILES.getlist('comicImages')):
+                    ComicPage.objects.create(comic=comic, image=image, order=index)
+
             
                 for tag in request.POST.get('tags_selectedComic', '').split(','):
                     if tag.strip():
                         obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
                         comic.tags.add(obj)
             
-                file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.name]))
+                file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.id]))
                 texto = (
                     f"🎬 <b>¡Nuevo imagén subida!</b>\n"
                     f"📤 <i>Cortesía de</i> <b>{comic.user}</b>\n\n"
@@ -966,7 +989,8 @@ def uploadElement(request):
                 print('DEBUG: enviando Telegram', texto, image_path)
                 resp = enviar_telegram_mensaje(texto, image_path)
                 print('DEBUG: respuesta Telegram', resp)
-
+                
+                return redirect('index:index')
     # GET o errores: reconstruir context original
     form = UploadElementForm()
     formComic = UploadComicForm()
@@ -1318,13 +1342,13 @@ def obtener_notificaciones(request):
 
             if model_name == 'comic':
                 # Construir url para el comic
-                url = reverse('index:watchComic', args=[contenido.name])
+                url = reverse('index:watchComic', args=[contenido.id])
                 if hasattr(contenido, 'image') and contenido.image:
                     imagen = contenido.image.url
 
             elif model_name == 'mediafile':
                 # Construir url para el mediafile
-                url = reverse('index:watchContent', args=[contenido.name])
+                url = reverse('index:watchContent', args=[contenido.id])
                 if hasattr(contenido, 'image') and contenido.image:
                     imagen = contenido.image.url
         
@@ -1380,9 +1404,9 @@ def pastNotifications(request):
         if n.contenido_objeto:
             model_name = n.contenido_objeto._meta.model_name
             if model_name == 'comic':
-                n.url_objeto = reverse('index:watchComic', args=[n.contenido_objeto.name])
+                n.url_objeto = reverse('index:watchComic', args=[n.contenido_objeto.id])
             elif model_name == 'mediafile':
-                n.url_objeto = reverse('index:watchContent', args=[n.contenido_objeto.name])  # Cambia según tu URL real
+                n.url_objeto = reverse('index:watchContent', args=[n.contenido_objeto.id])  # Cambia según tu URL real
 
     context = {
         **sidebar_context,
@@ -1417,3 +1441,22 @@ def load_audio(request, media_id):
 #
 #    html = render_to_string('index/audio_source.html', context)
 #    return HttpResponse(html)   
+@login_required(login_url='/login/')    
+def allVideosHide(request):
+ 
+    media_files = MediaFile.objects.filter(hide=True).order_by('-uploaded_at')
+    comics = Comic.objects.filter(hide=True).order_by('-uploaded_at')
+
+    combined_media = sorted(
+        chain(media_files, comics),
+        key=lambda x: x.uploaded_at,
+        reverse=True
+    )
+    sidebar_context = get_sidebar_context()
+
+    context = {
+        'combined_media': combined_media,
+        **sidebar_context
+    }
+
+    return render(request, 'index/hideVids.html', context)

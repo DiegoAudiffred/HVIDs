@@ -260,7 +260,8 @@ class ComicPage(models.Model):
     comic = models.ForeignKey(Comic, related_name='pages', on_delete=models.CASCADE)
     image = models.ImageField(upload_to=comic_page_upload_to)
     order = models.PositiveIntegerField(default=0)
-
+    def __str__(self):
+        return self.comic.name
 
 class Comentario(models.Model):
     mediaFileID= models.ForeignKey(MediaFile, on_delete=models.CASCADE,blank=True,null=True)

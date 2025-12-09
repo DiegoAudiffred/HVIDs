@@ -437,7 +437,7 @@
     }
 
     // Actualiza el conteo en ambos badges
-    async function actualizarNotificaciones() {
+    /*async function actualizarNotificaciones() {
       try {
         const response = await fetch("{% url 'index:notificaciones_count' %}");
         const data = await response.json();
@@ -509,7 +509,7 @@
         console.error('Error cargando notificaciones:', err);
         lista.innerHTML = '<p class="text-danger">Error al cargar notificaciones.</p>';
       }
-    }
+    }*/
 
     // Toggle panel escritorio
     badgeEscritorio.addEventListener('click', function (e) {

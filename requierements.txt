@@ -1,16 +1,32 @@
-
-Django
-django-crispy-forms
-django-user-agents
+# Core
+Django>=4.2,<5.0
+requests
 Pillow
 moviepy
-ffmpeg 
-django-hashids
-yt-dlp
-channels 
-channels_redis
-requests
+ffmpeg-python
+
+# Forms & UI
+django-crispy-forms
 crispy-bootstrap5
 django-bootstrap-datepicker-plus
-django-taggit-bootstrap
 django-json-widget
+django-taggit-bootstrap
+
+# User tools
+django-user-agents
+django-hashids
+
+# Real-time
+channels
+channels_redis
+
+# AI/Model
+transformers>=4.41.1
+torch==2.2.2+cu118
+torchaudio==2.2.2+cu118
+torchvision==0.17.2+cu118
+# Index URL para PyTorch con CUDA 11.8
+--extra-index-url https://download.pytorch.org/whl/cu118
+
+# Otros
+yt-dlp

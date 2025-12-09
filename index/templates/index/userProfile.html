@@ -167,7 +167,7 @@
     <div class="row">
         {% for item in combined_media %}
         <div class="col-lg-4 col-md-6 mb-4 col-12">
-            <a href="{% if item.tipo_objeto == 'comic' %} {% url 'index:watchComic' item.name %} {% else %} {% url 'index:watchContent' item.name %} {% endif %}"
+            <a href="{% if item.tipo_objeto == 'comic' %} {% url 'index:watchComic' item.id %} {% else %} {% url 'index:watchContent' item.id %} {% endif %}"
                 class="text-decoration-none text-dark">
                 <div class="card shadow-sm h-100">
                     {% if item.image %}
@@ -207,7 +207,7 @@
     <div class="row">
         {% for item in mediafiles %}
         <div class="col-lg-4 col-md-6 mb-4 col-12">
-            <a href="{% url 'index:watchContent' item.name %}" class="text-decoration-none text-dark">
+            <a href="{% url 'index:watchContent' item.id %}" class="text-decoration-none text-dark">
                 <!-- Completa el href -->
                 <div class="card shadow-sm h-100">
                     {% if item.image %}
@@ -283,7 +283,7 @@
     <div class="row">
         {% for item in comics %}
         <div class="col-lg-4 col-md-6 mb-4 col-12">
-            <a href="{% url 'index:watchComic' item.name %}" class="text-decoration-none text-dark">
+            <a href="{% url 'index:watchComic' item.id %}" class="text-decoration-none text-dark">
                 <div class="card shadow-sm h-100">
                     {% if item.image %}
 

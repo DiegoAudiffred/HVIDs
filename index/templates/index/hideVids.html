@@ -65,11 +65,11 @@
 
 
     <div class="row ">
-        {% if not media_files%}
+        {% if not combined_media%}
 
         <h1>Nada que mostrar</h1>
         {% endif %}
-        {% for mediafile in media_files %}
+        {% for mediafile in combined_media %}
         <div
             class="col-12 col-lg-6 col-xl-3 {% if mediafile.tipo_objeto == 'comic' or mediafile.tipo_objeto == 'mediafile' %} col-xxl-4 {% else %} col-xxl-2 {% endif %} my-3 perspective-container">
             <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden hover-shadow rainbow-hover">

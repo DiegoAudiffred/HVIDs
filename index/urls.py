@@ -26,14 +26,16 @@ path('load-audio/<int:media_id>/', views.load_audio, name='load_audio'),
     path('notificaciones/obtener/', views.obtener_notificaciones, name='obtener_notificaciones'),
 
     path('adminPage/', views.adminPage, name='adminPage'),
-    path("video/<str:id>/", views.watchContent, name='watchContent'),
-    path('comic/<str:id>/', views.watchComic, name='watchComic'),
+    path("video/<int:id>/", views.watchContent, name='watchContent'),
+    path('comic/<int:id>/', views.watchComic, name='watchComic'),
     path('edit/<str:tipo>/<int:pk>/', views.edit_objeto, name='edit_objeto'),
     path('crear-post/', views.crear_post, name='crear_post'),
     path('notificaciones/marcar_leida/', views.marcar_leida, name='marcar_leida'),
 path('editar-post/<int:post_id>/', views.editar_post, name='editar_post'),
 
     path("navbarFilterHeader/", views.navbarFilterHeader, name='navbarFilterHeader'),
+        path("allVideosHide/", views.allVideosHide, name='allVideosHide'),
+
     path('autocomplete/', views.autocomplete, name='autocomplete'),
     path('buscar/', views.multi_search_results, name='multi_search_results'),
     path('multi-search/', views.multi_search_results, name='multi_search_results'),
@@ -49,4 +51,5 @@ path('editar-post/<int:post_id>/', views.editar_post, name='editar_post'),
     path('profile/<str:username>',views.userProfile, name='userProfile'),
     path('profile/<str:username>/verLikes<str:filter>/',views.userProfileLikes, name='userProfileLikes'),
     path('pastNotifications/',views.pastNotifications, name='pastNotifications'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
