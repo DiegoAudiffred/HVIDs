@@ -37,7 +37,6 @@ from itertools import chain
 import requests
 import json
 import time
-import torch
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
@@ -46,7 +45,6 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.shortcuts import render
-import torch
 import json
 
 
@@ -116,11 +114,8 @@ def index(request):
 
         **sidebar_context
     }
-    if request.headers.get('HX-Request') == 'true':
-        return render(request, 'index/indexhtmx.html', context)
-    else:
-        # Si es una petición normal, devolvemos la página completa
-        return render(request, 'index/index.html', context)
+
+    return render(request, 'index/index.html', context)
 
 @login_required(login_url='/login/')  
 def userProfileLikes(request,username,filter):
@@ -129,10 +124,8 @@ def userProfileLikes(request,username,filter):
 
 @login_required(login_url='/login/')
 def userProfile(request, username):
-    # Obtener usuario o lanzar 404 si no existe
     user = get_object_or_404(User, username=username)
 
-    # Seguridad: solo el dueño del perfil puede editarlo
     if request.user != user and request.method == 'POST':
         return redirect('index:userProfile', user.username)
 
@@ -153,7 +146,6 @@ def userProfile(request, username):
             
     formUser = editUserForm(instance=user)
 
-    # Cargar media y comics subidos por el usuario
     media_files = MediaFile.objects.filter(hide=False, user=user).prefetch_related('tags')
     comics = Comic.objects.filter(hide=False, user=user).prefetch_related('tags')
 
@@ -163,7 +155,7 @@ def userProfile(request, username):
         key=lambda x: x.uploaded_at,
         reverse=True
     )
-
+    total = len(combined_media)
     # Mantener nombres esperados por el template
     allThigs = {
         'mediafiles': user.liked_mediafiles.all()[:9],
@@ -196,6 +188,7 @@ def userProfile(request, username):
         'favTags': top5_tags,
         'total_likes': total_likes,
         'formUser': formUser,
+        'total':total, #se añadio el 10 para el numero total de publicaciones
         **sidebar_context
     }
     if request.headers.get('HX-Request') == 'true':
@@ -662,6 +655,95 @@ def delete_file(request, filename):
 
 
 @login_required(login_url='/login/')
+def upload_file(request, filename):
+    if request.method == 'POST':
+        local_filepath = os.path.join(settings.MEDIA_ROOT, filename)
+        
+        if not os.path.exists(local_filepath):
+            return redirect('index:viewDownloadedVideos')
+
+        with open(local_filepath, 'rb') as f:
+            uploaded_file = File(f, name=filename)
+
+            data = {
+                'name': os.path.splitext(filename)[0],
+                'user': request.user.id,
+                'artist': '',
+                'game': '',
+                'character': '',
+            }
+            
+            form = UploadElementForm(data, files={'file': uploaded_file})
+
+            if form.is_valid():
+                media = form.save(commit=False)
+                media.user = request.user
+                
+                base_name, ext = os.path.splitext(media.file.name)
+                ext = ext.lower()
+                is_audio = ext in AUDIO_FORMATS
+
+                upload_dir = datetime.datetime.now().strftime("media_files/%Y%m%d/")
+                
+                if is_audio:
+                    final_name_base = f"{base_name}{ext}"
+                else:
+                    final_name_base = f"{base_name}.mp4"
+                
+                final_name = final_name_base
+
+                count = 1
+                while default_storage.exists(os.path.join(upload_dir, final_name)):
+                    if is_audio:
+                        final_name = f"{os.path.splitext(base_name)[0]}_{count}{ext}"
+                    else:
+                        final_name = f"{os.path.splitext(base_name)[0]}_{count}.mp4"
+                    count += 1
+                
+                final_path_in_storage = os.path.join(upload_dir, final_name)
+                media.file.name = final_path_in_storage
+                
+                media.save()
+                form.save_m2m()
+
+                for tag in request.POST.get('tags_selectedVideo', '').split(','):
+                    if tag.strip():
+                        obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
+                        media.tags.add(obj)
+
+                file_url = request.build_absolute_uri(reverse('index:watchContent', args=[media.id]))
+                texto = (
+                    f"🎬 <b>¡Nuevo video subido!</b>\n"
+                    f"📤 <i>Cortesía de</i> <b>{media.user}</b>\n\n"
+                    f"📎 <b>Nombre:</b> <a href='{file_url}'>{media.name}</a>\n"
+                    f"📺 <i>Haz clic en el nombre para verlo o descargarlo.</i>\n\n"
+                    f"🔞 <i>Contenido variado: anime, series, y más...</i>"
+                )
+                
+                image_path = None
+                
+                if media.image and hasattr(media.image, 'path') and os.path.exists(media.image.path):
+                     try:
+                        with Image.open(media.image.path) as img:
+                            if img.mode != 'RGB':
+                                img = img.convert('RGB')
+                            max_size = (1280, 1280)
+                            img.thumbnail(max_size)
+                            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as temp_img:
+                                img.save(temp_img.name, format='JPEG', quality=85)
+                                image_path = temp_img.name
+                     except Exception as e:
+                        print(f"❌ Error al procesar la imagen para Telegram: {e}")
+
+                enviar_telegram_mensaje(texto, image_path)
+
+                return redirect('index:index')
+            else:
+                print(f"Errores del formulario: {form.errors}")
+                return redirect('index:viewDownloadedVideos')
+
+    return redirect('index:viewDownloadedVideos')
+@login_required(login_url='/login/')
 def detailsAbout(request, filtro, valor):
     sidebar_context = get_sidebar_context()
 
@@ -816,11 +898,8 @@ def filtered_media(request, filter_type, string):
         **sidebar_context
     }
   
-    if request.headers.get('HX-Request') == 'true':
-        return render(request, 'index/indexhtmx.html', context)
-    else:
-        # Si es una petición normal, devolvemos la página completa
-        return render(request, 'index/index.html', context)
+
+    return render(request, 'index/index.html', context)
 
 AUDIO_FORMATS = ['.mp3', '.wav', '.ogg', '.aac', '.flac']
 
@@ -863,46 +942,23 @@ def uploadElement(request):
                         final_name = f"{base_name}_{count}.mp4"
                     count += 1
 
-                #save_path = os.path.join(settings.MEDIA_ROOT, upload_dir, final_name)
-
-                #if not is_audio and ext != ".mp4":
-                #    with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_input:
-                #        for chunk in uploaded_file.chunks():
-                #            temp_input.write(chunk)
-                #        temp_input_path = temp_input.name
-#
-                #    # Convertir a MP4
-                #    subprocess.run([
-                #        "ffmpeg", "-i", temp_input_path, "-c:v", "libx264", "-crf", "23", "-preset", "medium", save_path
-                #    ], check=True)
-#
-                #    os.remove(temp_input_path)  # Elimina el archivo temporal original
-#
-                #    # Guardar el archivo convertido en la base de datos (Django FileField)
-                #    with open(save_path, 'rb') as f:
-                #        media.file.save(final_name, File(f), save=False)
-#
-                #    os.remove(save_path)  # Elimina el archivo .mp4 local tras guardarlo
-                #else:
+ 
                 uploaded_file.name = final_name
                 media.file = uploaded_file
 
 
 
-                # Guardar imagen manualmente si viene
                 if 'image' in request.FILES:
                     media.image = request.FILES['image']
 
                 media.save()
                 form.save_m2m()
 
-                # Añadir tags
                 for tag in request.POST.get('tags_selectedVideo', '').split(','):
                     if tag.strip():
                         obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
                         media.tags.add(obj)
 
-                # Notificación a Telegram
                 file_url = request.build_absolute_uri(reverse('index:watchContent', args=[media.id]))
                 texto = (
                     f"🎬 <b>¡Nuevo video subido!</b>\n"
@@ -917,11 +973,9 @@ def uploadElement(request):
                 if media.image and hasattr(media.image, 'path') and os.path.exists(media.image.path):
                     try:
                         with Image.open(media.image.path) as img:
-                            # Verifica y convierte si no es RGB
                             if img.mode != 'RGB':
                                 img = img.convert('RGB')
 
-                            # Redimensionar si es muy grande (máximo ancho/alto 1280x1280, Telegram friendly)
                             max_size = (1280, 1280)
                             img.thumbnail(max_size)
 
@@ -1289,6 +1343,14 @@ def editar_post(request, post_id):
         form = EditPostForm(request.POST, instance=post)
         if form.is_valid():
             form.save()
+    return redirect('index:posts_recientes')
+
+
+
+@login_required(login_url='/login/')  
+def eliminar_post(request,id):
+    post = Post.objects.get(id=id)
+    post.delete()
     return redirect('index:posts_recientes')
 
 @login_required(login_url='/login/')  

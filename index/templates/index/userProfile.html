@@ -6,15 +6,15 @@
 
     <div class="row mb-4">
         <div class="col-12">
-            <h2>Perfil de {{ user }}</h2>
+            <h2 class="mb-4">Perfil de {{ user }}</h2>
 
             <!-- Banner para móviles (pantallas < 768px) -->
-            <div class="d-lg-none position-relative rounded overflow-hidden"
+            <div class="d-lg-none position-relative rounded overflow-hidden border border-secondary"
                 style="height: 230px; background-image: url('{% if user.banner %}{{ user.banner.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}'); background-size: cover; background-position: center;">
 
                 <img src="{% if user.image %}{{ user.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
                     alt="{{ user.username }}"
-                    class="position-absolute top-0 start-0 m-2 border border-white rounded-circle shadow"
+                    class="position-absolute top-0 start-0 m-2 border border-primary rounded-circle shadow"
                     style="width: 90px; height: 90px; object-fit: cover;">
 
                 {% if request.user == user %}
@@ -24,7 +24,7 @@
                 </button>
                 {% endif %}
 
-                <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-50 text-white p-2">
+                <div class="position-absolute bottom-0 start-0 end-0 bg-tercero bg-opacity-50 text-white p-2">
                     <h6 class="mb-1">{{ user.username }}</h6>
                     <small><strong>Publicaciones:</strong> {{ combined_media|length }}</small><br>
                     <small><strong>Likes:</strong> {{ total_likes }}</small>
@@ -44,13 +44,13 @@
             </div>
 
             <!-- Banner para pantallas medianas o mayores (≥ 768px) -->
-            <div class="d-none d-lg-block position-relative rounded overflow-hidden"
+            <div class="d-none d-lg-block position-relative rounded overflow-hidden border border-4 border-secondary"
                 style="height: 340px; background-image: url('{% if user.banner %}{{ user.banner.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}'); background-size: cover; background-position: center;">
 
                 <!-- Imagen de perfil -->
                 <img src="{% if user.image %}{{ user.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
                     alt="{{ user.username }}"
-                    class="position-absolute top-0 start-0 m-4 border border-white rounded-circle shadow"
+                    class="position-absolute top-0 start-0 m-4 border border-primary rounded-circle shadow"
                     style="width: 200px; height: 200px; object-fit: cover;">
 
                 <!-- Información del perfil en la parte superior derecha -->
@@ -66,7 +66,7 @@
                         {% endfor %}
                     </p>
                     <p><strong>Miembro desde:</strong> {{ user.date_joined }}</p>
-                    <p><strong>Publicaciones:</strong> {{ combined_media|length }}</p>
+                    <p><strong>Publicaciones:</strong> {{ total }}</p>
                     <p><strong>Likes dados:</strong> {{ total_likes }}</p>
                 </div>
 
@@ -97,21 +97,30 @@
 
                     <div class="modal-body">
                         <!-- Aquí puedes poner acciones como cambiar imagen, banner, etc -->
-                        <div class="text-center">
-                            Nombre del usuario:
+                        <div class="text-center my-2">
+                            <div>
+                                Nombre del usuario:
+
+                            </div>
                             {{formUser.username}}
                         </div>
-                        <div class="text-center">
-                            Contraseña del usuario:
+                        <div class="text-center my-2">
+                            <div>
+                                Contraseña del usuario:
+
+                            </div>
                             {{formUser.password}}
 
                         </div>
-                        <div class="text-center">
-                            Imagen de perfil
+                        <div class="text-center my-2">
+                            <div>
+                                Imagen de perfil
+
+                            </div>
                             <label for="imageInput1" style="cursor: pointer;">
                                 {% if user.image %}
                                 <img src="{{user.image.url}}" alt="Previsualización"
-                                    class="img-thumbnail d-block imagePreview w-100 h-auto"
+                                    class="img-thumbnail d-block imagePreview w-100 h-auto my-2"
                                     style="max-height: 500px; object-fit: contain;" data-preview-id="1">
                                 {% else %}
                                 <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"
@@ -124,14 +133,15 @@
 
 
                         </div>
-                        <div class="text-center">
-                            Imagen del banner
+                        <div class="text-center my-2">
+                            <div> Imagen del banner
+                            </div>
                             <label for="imageInput2" style="cursor: pointer;">
 
                                 {% if user.banner %}
 
                                 <img src="{{user.banner.url}}" alt="Previsualización"
-                                    class="img-thumbnail d-block imagePreview w-100 h-auto"
+                                    class="img-thumbnail d-block imagePreview w-100 h-auto my-2"
                                     style="max-height: 500px; object-fit: contain;" data-preview-id="2">
                                 {% else %}
                                 <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"

@@ -327,7 +327,7 @@ class editUserForm(forms.ModelForm):
         super(editUserForm, self).__init__(*args, **kwargs)
         self.fields['username'].required = True
         self.fields['username'].widget.attrs.update({
-            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2 my-2',
             'placeholder': 'Introduce el nombre del usuario',
             'rows': '1'
         })
@@ -360,7 +360,7 @@ class addGameForm(forms.ModelForm):
             
             self.fields['tags'].required = False
             self.fields['tags'].widget.attrs.update({
-            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2 my-2',
             'placeholder': ' Introduce los tags del personaje',
             'rows': '1'
         })

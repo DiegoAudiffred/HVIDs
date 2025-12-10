@@ -5,7 +5,6 @@
 <div class="container-fluid  mt-4">
   <div class="row">
     <h1>Descargar Video de YouTube</h1>
-    <a href="{% url 'index:viewDownloadedVideos' %}">Videos descargados</a>
   </div>
   <form method="post" id="download-form">
     {% csrf_token %}
@@ -30,7 +29,7 @@
         </div>
       </div>
       <div class="col-md-6 col-12 my-2">
-        <label class="fw-bold">Tipo de descarga:</label>
+        <label class="fw-bold mb-3">Tipo de descarga:</label>
         <select name="download_type" class="form-select">
           <option value="video" selected>Video</option>
           <option value="audio">Audio</option>
@@ -59,6 +58,7 @@
     <div class="alert alert-danger">{{ error }}</div>
     {% endif %}
   </div>
+    <a href="{% url 'index:viewDownloadedVideos' %}">Videos descargados</a>
 
 </div>
 

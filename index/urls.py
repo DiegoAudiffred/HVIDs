@@ -30,9 +30,10 @@ path('load-audio/<int:media_id>/', views.load_audio, name='load_audio'),
     path('comic/<int:id>/', views.watchComic, name='watchComic'),
     path('edit/<str:tipo>/<int:pk>/', views.edit_objeto, name='edit_objeto'),
     path('crear-post/', views.crear_post, name='crear_post'),
+    path('eliminar_post/<int:id>', views.eliminar_post,name='eliminar_post'),
+
     path('notificaciones/marcar_leida/', views.marcar_leida, name='marcar_leida'),
 path('editar-post/<int:post_id>/', views.editar_post, name='editar_post'),
-
     path("navbarFilterHeader/", views.navbarFilterHeader, name='navbarFilterHeader'),
         path("allVideosHide/", views.allVideosHide, name='allVideosHide'),
 
@@ -48,6 +49,9 @@ path('editar-post/<int:post_id>/', views.editar_post, name='editar_post'),
     path('comic/page/deleteComicImage/<int:id>', views.deleteComicImage, name='deleteComicImage'),
     path('descargas/', views.viewDownloadedVideos, name='viewDownloadedVideos'),
     path('descargas/eliminar/<str:filename>/', views.delete_file, name='delete_file'),
+    path('descargas/subir/<str:filename>/', views.upload_file, name='upload_file'),
+
+    
     path('profile/<str:username>',views.userProfile, name='userProfile'),
     path('profile/<str:username>/verLikes<str:filter>/',views.userProfileLikes, name='userProfileLikes'),
     path('pastNotifications/',views.pastNotifications, name='pastNotifications'),

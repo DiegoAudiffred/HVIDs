@@ -8,38 +8,42 @@
 
         {% for post in posts %}
         <div class="col-12 col-lg-6 col-xl-4 col-xxl-4 my-3 d-flex">
-            <div class="card w-100 shadow-sm rounded-4 overflow-hidden hover-shadow rainbow-hover border border-3 d-flex flex-column h-100"
-                style="min-height: 500px;"> <!-- ajusta el min-height si necesitas -->
+            <div class="card w-100 bg-sexto shadow-sm rounded-4 overflow-hidden hover-shadow rainbow-hover border border-3 d-flex flex-column h-100"
+                style="min-height: 500px;">
 
                 <!-- Título -->
                 <h5 class="card-title fw-bold text-truncate m-2 text-primary">{{ post.name }}</h5>
 
                 <!-- Usuario -->
-                <div class="d-flex align-items-center px-3 mb-2">
-                    <a href="{% url 'index:userProfile' post.user.username %}"
-                        class="text-decoration-none text-dark d-flex align-items-center mx-4 ">
-                        {% if post.user.image %}
-                        <img src="{{ post.user.image.url }}" class="rounded-circle me-2"
-                            style="width: 40px; height: 40px; object-fit: cover;" alt="{{ post.user.username }}">
-                        {% else %}
-                        <img src="{% static 'img/default-user.jpg' %}" class="rounded-circle me-2"
-                            style="width: 40px; height: 40px; object-fit: cover;" alt="Sin foto">
-                        {% endif %}
-                        <span class="fw-semibold">{{ post.user.username }}</span>
-                    </a>
+                <div class="row d-flex align-items-center px-3 mb-2 ">
+                    <div class="col-6">
+                        <a href="{% url 'index:userProfile' post.user.username %}"
+                            class="text-decoration-none text-dark d-flex align-items-center ">
+                            {% if post.user.image %}
+                            <img src="{{ post.user.image.url }}" class="rounded-circle me-2"
+                                style="width: 40px; height: 40px; object-fit: cover;" alt="{{ post.user.username }}">
+                            {% else %}
+                            <img src="{% static 'img/default-user.jpg' %}" class="rounded-circle"
+                                style="width: 40px; height: 40px; object-fit: cover;" alt="Sin foto">
+                            {% endif %}
+                            <span class="fw-semibold text-tercero">{{ post.user.username }}</span>
+                        </a>
+                    </div>
                     {% if request.user == post.user %}
-                    <button class="btn mx-3 border border-3 btn-outline-secondary btn-primary text-white"
-                        onclick="enableEdit({{ post.id }})">Editar</button>
+                    <div class="col-6">
+                        <button class="btn border border-3 border-secondary btn-primary text-white"
+                            onclick="enableEdit({{ post.id }})">Editar</button>
 
+                    </div>
                     {% endif %}
                 </div>
 
 
 
-                <div class="card-body d-flex flex-column bg-sexto text-primary flex-grow-1">
+                <div class="card-body d-flex flex-column bg-white text-primary flex-grow-1">
 
                     <!-- Modo visualización -->
-                    <p class="card-text text-tercero small mb-2 flex-grow-1" id="desc-text-{{ post.id }}">
+                    <p class="card-text text-tercero small mb-2 flex-grow-1 " id="desc-text-{{ post.id }}">
                         {{ post.description }}</p>
 
                     <form method="POST" action="{% url 'index:editar_post' post.id %}" class="d-none"
@@ -48,9 +52,26 @@
                         <textarea name="description" rows="4"
                             class="form-control text-tercero bg-sexto border border-2 border-primary mb-2"
                             maxlength="500" required>{{ post.description }}</textarea>
-                        <button type="submit" class="btn btn-primary btn-sm">Guardar</button>
-                        <button type="button" class="btn btn-secondary btn-sm text-white"
-                            onclick="cancelEdit({{ post.id }})">Cancelar</button>
+                        <button type="submit" class="btn btn-cuarto btn-sm">Guardar</button>
+                        <sbutton type="button" class="btn btn-secondary btn-sm text-white"
+                            onclick="cancelEdit({{ post.id }})">Cancelar</sbutton>
+                        <button type="button" class="btn btn-primary btn-sm text-white" data-bs-toggle="modal"
+                            data-bs-target="#deletePostModal">Eliminar</button>
+
+                        <div class="modal fade" id="deletePostModal" tabindex="-1" aria-labelledby="deletePostModal"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content border-0">
+                                    <div class="modal-header">
+                                        Seguro que deseas eliminar este Post?
+                                    </div>
+                                    <div class="modal-body text-center p-0">
+                                        <a class="btn btn-primary" href="{% url 'index:eliminar_post' post.id %}">
+                                            Eliminar</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                     <!-- Imagen solo si existe -->
                     {% if post.images.all %}
@@ -68,7 +89,8 @@
                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                 <div class="modal-content bg-transparent border-0">
                                     <div class="modal-body text-center p-0">
-                                        <img src="{{ image.image.url }}" class="img-fluid rounded" alt="Imagen grande">
+                                        <img src="{{ image.image.url }}" class="img-fluid rounded py-2"
+                                            alt="Imagen grande">
                                     </div>
                                 </div>
                             </div>
@@ -79,8 +101,9 @@
 
 
                     <!-- Likes -->
-                    <ul class="list-unstyled small mb-2">
-                        <li><button class="btn btn-like p-0 border-0 bg-transparent d-flex align-items-center gap-2"
+                    <ul class="list-unstyled small mb-2 ">
+                        <li class="border border-4"><button
+                                class="btn btn-like p-0 border-0 bg-transparent d-flex align-items-center gap-2 "
                                 data-model="{{ post.tipo_objeto }}" data-id="{{ post.id }}">
                                 <div class="position-relative">
                                     <!-- Ícono Like -->
