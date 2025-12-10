@@ -1,0 +1,72 @@
+    {% load static %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="char_form">
+        <div class="row d-none my-5 justify-content-center" id="charForm">
+            <div class="my-3">
+                <h1>Agregar un nuevo Personaje</h1>
+            </div>
+            <div class="col-lg-6  my-3 my-md-0 col-12 text-center">
+
+                <label for="imageInput1" style="cursor: pointer;">
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"
+                        class="img-thumbnail d-block imagePreview w-100 h-auto"
+                        style="max-height: 500px; object-fit: contain;" data-preview-id="1">
+                </label>
+
+                <input type="file" name="image" id="imageInput1" accept="image/*" class="d-none imageInput"
+                    data-preview-id="1">
+
+
+            </div>
+
+            <div class="col-lg-6 my-3 my-md-0 col-12 text-start">
+                <div class="my-2">
+                    Nombre:*
+                    {{ formChar.name }}
+
+                </div>
+                <div class="my-2">
+                    Sexo:
+                    {{ formChar.gender }}
+
+                </div>
+                <div class="my-2">
+                    Juego:
+                    {{ formChar.game }}
+
+                </div>
+                <div class="tag-input-wrapper my-2 position-relative" data-input-id="tagInputChar"
+                    data-suggestions-id="tagSuggestionsChar" data-container-id="tagContainerChar"
+                    data-hidden-id="tagsSelectedChar"> Etiquetas:
+                    <input type="text" id="tagInputChar" class="rounded-3 border-3 border-primary px-4 w-100 py-2"
+                        placeholder="Escribe una etiqueta y presiona Enter o Tab para autocompletar">
+                    <div id="tagSuggestionsChar"
+                        class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
+                    </div>
+                    <div id="tagContainerChar" class="mt-2 d-flex flex-wrap gap-2">
+
+
+                    </div>
+
+                </div>
+                <div class=" my-2">
+                    Descripción:
+                    {{ formChar.description }}
+                </div>
+
+                <div class="my-2">
+                    Cumpleaños:
+                    {{ formChar.birthdate }}
+                </div>
+                <div class="my-2">
+                    <button type="submit" class="btn  fw-bold w-100 bg-secondary text-cuarto">Agregar Personaje</button>
+
+                </div>
+            </div>
+
+        </div>
+        <input type="hidden" name="tags_selectedChar" id="tagsSelectedChar">
+
+    </form>

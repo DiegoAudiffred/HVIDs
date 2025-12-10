@@ -129,7 +129,6 @@ class Character(models.Model):
         return "character"
 
     
-
     
 class Artist(models.Model):
     name = models.CharField(max_length=100,unique=True)    

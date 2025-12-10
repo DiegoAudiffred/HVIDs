@@ -1,0 +1,35 @@
+        {% load static %}
+           <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="user_form">
+        <div class="row d-none my-5 justify-content-center" id="userForm">
+            <div class="my-3">
+                <h1>Agregar un nuevo Usuario</h1>
+            </div>
+            <div class="col-lg-6  my-3 col-12 text-start">
+                Nombre:*
+                {{ formUser.username }}
+            </div>
+            <div class="col-lg-6  my-3  col-12 text-start">
+                Contraseña:*
+                {{ formUser.password }}
+            </div>
+            <div class="col-lg-6 my-3 col-6">
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <label class="mb-0 fs-5" for="{{ formUser.is_staff.id_for_label }}">Staff</label>
+                    {{ formUser.is_staff }}
+                </div>
+            </div>
+
+            <div class="col-lg-6 my-3 col-6">
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <label class="mb-0 fs-5" for="{{ formUser.is_superuser.id_for_label }}">Superusuario</label>
+                    {{ formUser.is_superuser }}
+                </div>
+            </div>
+
+            <div class="col-lg-6  my-3  col-12 text-center">
+                <button type="submit" class="btn  fw-bold w-100 bg-secondary text-cuarto">Agregar Usuario</button>
+            </div>
+        </div>
+    </form>

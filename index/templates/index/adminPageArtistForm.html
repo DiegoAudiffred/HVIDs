@@ -1,0 +1,126 @@
+    {% load static %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="artist_form">
+        <div class="row d-none my-5 justify-content-center" id="artistForm">
+            <div class="my-3">
+                <h1>Agregar un nuevo Artista</h1>
+            </div>
+            <div class="col-lg-6 my-3 my-lg-0 col-12 text-center">
+                <label for="imageInput2" style="cursor: pointer;">
+                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización"
+                        class="img-thumbnail d-block imagePreview w-100 h-auto"
+                        style="max-height: 500px; object-fit: contain;" data-preview-id="2">
+                </label>
+                <input type="file" name="image" id="imageInput2" accept="image/*" class="d-none imageInput"
+                    data-preview-id="2">
+            </div>
+
+            <div class="col-lg-6  my-3 my-lg-0 col-12 text-start">
+                <div class="my-2">
+                    Nombre: *
+                    {{ formArtist.name }}
+                </div>
+                <div class="my-2">
+                    Sexo:
+                    {{ formArtist.gender }}
+                </div>
+                <div class="tag-input-wrapper my-2 position-relative" data-input-id="tagInputArtist"
+                    data-suggestions-id="tagSuggestionsArtist" data-container-id="tagContainerArtist"
+                    data-hidden-id="tagsSelectedArtist"> Etiquetas:
+                    <input type="text" id="tagInputArtist" class="rounded-3 border-3 border-primary px-4 w-100 py-2"
+                        placeholder="Escribe una etiqueta y presiona Enter o Tab para autocompletar">
+                    <div id="tagSuggestionsArtist"
+                        class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
+                    </div>
+                    <div id="tagContainerArtist" class="mt-2 d-flex flex-wrap gap-2"></div>
+                </div>
+                <div class="my-2">
+                    Descripción:
+                    {{ formArtist.description }}
+                </div>
+                <div class="my-2">
+                    Redes sociales
+                    <div id="socialButtons" class="mb-3 d-flex flex-wrap gap-2">
+
+                        <button type="button" class="btn btn-sm p-1" data-net="facebook">
+                            <img src="{% static 'img/Facebook.png' %}" alt="" class="img-fluid"
+                                style="width: 32px; height: 32px;">
+                        </button>
+                        <button type="button" class="btn btn-sm p-1" data-net="twitter">
+                            <img src="{% static 'img/Twitter.png' %}" alt="" class="img-fluid"
+                                style="width: 32px; height: 32px;">
+                        </button>
+                        <button type="button" class="btn btn-sm p-1" data-net="instagram">
+                            <img src="{% static 'img/Instagram.png' %}" alt="" class="img-fluid"
+                                style="width: 32px; height: 32px;">
+                        </button>
+                        <button type="button" class="btn btn-sm p-1" data-net="youtube">
+                            <img src="{% static 'img/Youtube.png' %}" alt="" class="img-fluid"
+                                style="width: 32px; height: 32px;">
+                        </button>
+                        <button type="button" class="btn btn-sm p-1" data-net="tiktok">
+                            <img src="{% static 'img/Tiktok.png' %}" alt="" class="img-fluid"
+                                style="width: 32px; height: 32px;">
+                        </button>
+                        <button type="button" class="btn btn-sm p-1" data-net="onlyfans">
+                            <img src="{% static 'img/Onlyfans.png' %}" alt="" class="img-fluid"
+                                style="width: 32px; height: 32px;">
+                        </button>
+
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 d-none social-input " id="input-facebook">
+                            <label class="form-label">Facebook</label>
+                            {{ formArtist.facebook }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-twitter">
+                            <label class="form-label">Twitter</label>
+                            {{ formArtist.twitter }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-instagram">
+                            <label class="form-label">Instagram</label>
+                            {{ formArtist.instagram }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-youtube">
+                            <label class="form-label">YouTube</label>
+                            {{ formArtist.youtube }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-tiktok">
+                            <label class="form-label">TikTok</label>
+                            {{ formArtist.tiktok }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-onlyfans">
+                            <label class="form-label">OnlyFans</label>
+                            {{ formArtist.onlyfans }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-extra1">
+                            <label class="form-label">Red extra 1</label>
+                            {{ formArtist.extra1 }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-extra2">
+                            <label class="form-label">Red extra 2</label>
+                            {{ formArtist.extra2 }}
+                        </div>
+                        <div class="col-12 col-md-6 d-none social-input" id="input-extra3">
+                            <label class="form-label">Red extra 3</label>
+                            {{ formArtist.extra3 }}
+                        </div>
+                    </div>
+                </div>
+                <div class="my-2">
+                    Cumpleaños:
+                    {{ formArtist.birthdate }}
+                </div>
+                <div class="my-2">
+                    <button type="submit" class="btn  fw-bold w-100 bg-secondary text-cuarto">Agregar Artista</button>
+                </div>
+            </div>
+
+
+
+        </div>
+        <input type="hidden" name="tags_selectedArtist" id="tagsSelectedArtist">
+
+    </form>

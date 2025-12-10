@@ -1,0 +1,15 @@
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="tag_form">
+        <div class="row d-none my-5 justify-content-center" id="tagForm">
+            <div class="my-3">
+                <h1>Agregar una nueva Etiqueta/Tag</h1>
+            </div>
+            <div class="col-lg-6  my-3 my-lg-0 col-12 text-center">
+                {{ formTag.name }}
+            </div>
+            <div class="col-lg-6 col-12 text-center">
+                <button type="submit" class="btn  fw-bold w-100 bg-secondary text-cuarto">Agregar Tag</button>
+            </div>
+        </div>
+    </form>

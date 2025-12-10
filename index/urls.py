@@ -14,7 +14,6 @@ urlpatterns = [
     path('media_stream/<int:id>/', views.stream_video, name='media_stream'),
     path('tags-suggest/', views.tags_suggest, name='tags_suggest'),
     path('get-items/<str:type>/', views.get_items, name='get_items'),
-    path('delete-item/<str:type>/<int:id>/', views.delete_item, name='delete_item'),
 path('load-audio/<int:media_id>/', views.load_audio, name='load_audio'),
 
     path("uploadElement/", views.uploadElement, name='uploadElement'),

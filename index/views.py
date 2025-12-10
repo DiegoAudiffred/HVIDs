@@ -422,6 +422,9 @@ def multi_search_results(request):
     else:
         # Si es una petición normal, devolvemos la página completa
         return render(request, 'index/multi_search_results.html', context)
+    
+
+
 
 @login_required(login_url='/login/')  
 def deleteComic(request,id):
@@ -485,12 +488,15 @@ def watchContent(request, id):
     comentarios = Comentario.objects.filter(mediaFileID=mediafile)
     comentarios = reversed(comentarios)
     sidebar_data = get_sidebar_context()
+    
     return render(request, 'index/watchContent.html', {
         'mediafile': mediafile,
         'comentarios': comentarios,
         'form': form,
         'formVideo': formVideo,
             'is_audio': is_audio,
+                    'MEDIA_URL': settings.MEDIA_URL,
+
 
         **sidebar_data,
     })
