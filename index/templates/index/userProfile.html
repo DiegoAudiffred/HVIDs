@@ -176,21 +176,21 @@
 
     <div class="row">
         {% for item in combined_media %}
-        <div class="col-lg-4 col-md-6 mb-4 col-12">
+        <div class="col-lg-3 col-md-3 mb-4 col-12">
             <a href="{% if item.tipo_objeto == 'comic' %} {% url 'index:watchComic' item.id %} {% else %} {% url 'index:watchContent' item.id %} {% endif %}"
                 class="text-decoration-none text-dark">
-                <div class="card shadow-sm h-100">
+                <div class="shadow-sm h-100 border border-4 border-primary rounded-5">
                     {% if item.image %}
-                    <img src="{{ item.image.url }}" class="card-img-top img-fixed" alt="{{ item.name }}" style="width: 100%;
-                    height: 300px; /* o el alto que desees */
-                    object-fit: cover;">
+                    <img src="{{ item.image.url }}" class="img-fixed" alt="{{ item.name }}" style="width: 100%;
+                height: 300px; /* o el alto que desees */
+                object-fit: cover;border-top: 50%;">
                     {% else %}
-                    <img src="{% static 'img/noImage.jpg' %}" class="card-img-top img-fixed" style="width: 100%;
-                    height: 300px; /* o el alto que desees */
-                    object-fit: cover;" alt="Previsualización">
+                    <img src="{% static 'img/noImage.jpg' %}" class="img-fixed" style="width: 100%;
+                height: 300px; /* o el alto que desees */
+                object-fit: cover;" alt="Previsualización">
                     {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                    <div class="bg-secondary rounded-5 rounded-top py-3">
+                        <h5 class=" text-center text-truncate text-white px-2">{{ item.name }}</h5>
                     </div>
                 </div>
             </a>

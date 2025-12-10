@@ -55,7 +55,7 @@ class User(AbstractUser):
     can_upload = models.BooleanField(default=True)
     can_edit = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-
+    can_nsfw = models.BooleanField(default=True)
     # Campo para seguir usuarios
     following = models.ManyToManyField(
         "self",
@@ -156,7 +156,7 @@ class MediaFile(models.Model):
     hide = models.BooleanField(default=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     character= models.ManyToManyField(Character, blank=True)
-
+    nsfw = models.BooleanField(default=False)
     file = models.FileField(upload_to='media_files/%Y%m%d/', blank=True, null=True,max_length=255)
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
     image = models.ImageField(upload_to='media_files/thumbnails/%Y%m%d/', blank=True, null=True)
@@ -213,7 +213,7 @@ class Comic(models.Model):
     image = models.ImageField(upload_to='media_files/comicPortraits/', blank=True, null=True)
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
     likes = models.ManyToManyField(User, related_name='liked_comic', blank=True)
-    #nsfw = models.BooleanField(default=False)
+    nsfw = models.BooleanField(default=False)
 
     def total_likes(self):
         return self.likes.count()
