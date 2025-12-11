@@ -44,13 +44,13 @@
             </div>
 
             <!-- Banner para pantallas medianas o mayores (≥ 768px) -->
-            <div class="d-none d-lg-block position-relative rounded overflow-hidden border border-4 border-secondary"
+            <div class="d-none d-lg-block position-relative rounded overflow-hidden border border-4 border-quinto rounded-5"
                 style="height: 340px; background-image: url('{% if user.banner %}{{ user.banner.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}'); background-size: cover; background-position: center;">
 
                 <!-- Imagen de perfil -->
                 <img src="{% if user.image %}{{ user.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
                     alt="{{ user.username }}"
-                    class="position-absolute top-0 start-0 m-4 border border-primary rounded-circle shadow"
+                    class="position-absolute top-0 start-0 m-4 border border-quinto rounded-circle shadow"
                     style="width: 200px; height: 200px; object-fit: cover;">
 
                 <!-- Información del perfil en la parte superior derecha -->
@@ -179,18 +179,25 @@
         <div class="col-lg-3 col-md-3 mb-4 col-12">
             <a href="{% if item.tipo_objeto == 'comic' %} {% url 'index:watchComic' item.id %} {% else %} {% url 'index:watchContent' item.id %} {% endif %}"
                 class="text-decoration-none text-dark">
-                <div class="shadow-sm h-100 border border-4 border-primary rounded-5">
+                <div class="shadow-sm h-100 border border-4 border-primary " style="border-top-left-radius: 45px;
+                border-top-right-radius: 45px;border-bottom-left-radius: 45px;
+                border-bottom-right-radius:45px;">
                     {% if item.image %}
                     <img src="{{ item.image.url }}" class="img-fixed" alt="{{ item.name }}" style="width: 100%;
                 height: 300px; /* o el alto que desees */
-                object-fit: cover;border-top: 50%;">
+                object-fit: cover;
+                border-top-left-radius: 40px;
+                border-top-right-radius: 40px;">
                     {% else %}
                     <img src="{% static 'img/noImage.jpg' %}" class="img-fixed" style="width: 100%;
                 height: 300px; /* o el alto que desees */
-                object-fit: cover;" alt="Previsualización">
+                object-fit: cover;
+                border-top-left-radius: 40px;
+                border-top-right-radius: 40px;" alt="Previsualización">
                     {% endif %}
-                    <div class="bg-secondary rounded-5 rounded-top py-3">
-                        <h5 class=" text-center text-truncate text-white px-2">{{ item.name }}</h5>
+                    <div class="bg-secondary  py-3 border-top border-primary" style=" border-bottom-left-radius: 40px;
+                border-bottom-right-radius:40px;">
+                        <h5 class=" text-center text-truncate text-white px-2 ">{{ item.name }}</h5>
                     </div>
                 </div>
             </a>
@@ -234,7 +241,7 @@
 
                     {% endif %}
                     <div class="card-body">
-                        <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                        <h5 class="card-title  text-truncate">{{ item.name }}</h5>
                     </div>
                 </div>
             </a>

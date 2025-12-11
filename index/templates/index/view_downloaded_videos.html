@@ -3,9 +3,11 @@
 {% block body %}
 <div class="container-fluid mt-4">
     <div class="row mb-3">
-        <div class="col-12">
-            <h1>Archivos descargados</h1>
-        </div>
+    <div class="col-12 border-bottom border-3 border-primary">
+
+
+      <h1 class="fw-bold text-dark">Videos descargados</h1>
+    </div>
     </div>
 
     {% for archivo in archivos %}
@@ -19,6 +21,7 @@
             <a href="{{ MEDIA_URL }}{{ archivo }}" target="_blank" class="btn btn-primary">
                 Abrir video
             </a>
+            {% if request.user.is_superuser%}
             <form method="post" action="{% url 'index:delete_file' archivo %}" class="d-inline">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline-tercero text-white btn-primary">
@@ -31,6 +34,7 @@
                     <i class="bi bi-trash"></i> Subir a la pagina
                 </button>
             </form>
+            {% endif %}
         </div>
     </div>
 

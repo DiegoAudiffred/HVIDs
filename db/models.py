@@ -53,7 +53,7 @@ class User(AbstractUser):
     image = models.ImageField(upload_to="uploads/gallery/", blank=True, null=True)
     banner = models.ImageField(upload_to="uploads/gallery/", blank=True, null=True)
     can_upload = models.BooleanField(default=True)
-    can_edit = models.BooleanField(default=False)
+#    can_edit = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     can_nsfw = models.BooleanField(default=True)
     # Campo para seguir usuarios

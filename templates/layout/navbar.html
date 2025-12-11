@@ -241,7 +241,7 @@
         <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-              <div class="modal-header bg-warning text-dark">
+              <div class="modal-header bg-secondary text-white">
                 <h5 class="modal-title" id="logoutModalLabel">¿Confirmar cierre de sesión?</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
               </div>
@@ -384,24 +384,7 @@
           </a>
         </li>
 
-        <!-- Modal logout -->
-        <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title" id="logoutModalLabel">¿Confirmar cierre de sesión?</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-              </div>
-              <div class="modal-body text-center">
-                ¿Estás seguro de que deseas cerrar sesión, <strong>{{ request.user }}</strong>?
-              </div>
-              <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Cancelar</button>
-                <a href="{% url 'login:logout' %}" class="btn btn-primary">Cerrar Sesión</a>
-              </div>
-            </div>
-          </div>
-        </div>
+
         {% endif %}
 
       </ul>

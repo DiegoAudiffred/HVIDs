@@ -3,35 +3,40 @@
 
 {% block body %}
 <div class="container mt-4">
-    <div class="row">
-        <a href="{% url 'index:crear_post' %}" class="btn btn-primary mb-3">Crear nueva nota</a>
+    <div class="row mb-3">
+        <div class="col-9 border-bottom border-3 border-primary">
+            <h1 class="fw-bold text-dark">Posts</h1>
+        </div>
 
-        {% for post in posts %}
+        <div class="col-3 border-bottom border-3 border-primary">
+            <a href="{% url 'index:crear_post' %}" class="btn btn-primary mb-3 w-100">Crear nueva nota</a>
+
+        </div>
+        {% for post in page_obj %}
         <div class="col-12 col-lg-6 col-xl-4 col-xxl-4 my-3 d-flex">
-            <div class="card w-100 bg-sexto shadow-sm rounded-4 overflow-hidden hover-shadow rainbow-hover border border-3 d-flex flex-column h-100"
+            <div class="card w-100 bg-secondary shadow-sm rounded-4 overflow-hidden hover-shadow rainbow-hover border border-3 d-flex flex-column h-100"
                 style="min-height: 500px;">
 
-                <!-- Título -->
-                <h5 class="card-title fw-bold text-truncate m-2 text-primary">{{ post.name }}</h5>
+                <h5 class="card-title fw-bold text-truncate m-2 text-white px-2">{{ post.name }}</h5>
 
-                <!-- Usuario -->
                 <div class="row d-flex align-items-center px-3 mb-2 ">
-                    <div class="col-6">
+                    <div class="col-8">
                         <a href="{% url 'index:userProfile' post.user.username %}"
                             class="text-decoration-none text-dark d-flex align-items-center ">
                             {% if post.user.image %}
-                            <img src="{{ post.user.image.url }}" class="rounded-circle me-2"
+                            <img src="{{ post.user.image.url }}" class="rounded-circle me-3 border border-quinto "
                                 style="width: 40px; height: 40px; object-fit: cover;" alt="{{ post.user.username }}">
                             {% else %}
-                            <img src="{% static 'img/default-user.jpg' %}" class="rounded-circle"
+                            <img src="{% static 'img/default-user.jpg' %}"
+                                class="rounded-circle me-3 border border-quinto"
                                 style="width: 40px; height: 40px; object-fit: cover;" alt="Sin foto">
                             {% endif %}
                             <span class="fw-semibold text-tercero">{{ post.user.username }}</span>
                         </a>
                     </div>
                     {% if request.user == post.user %}
-                    <div class="col-6">
-                        <button class="btn border border-3 border-secondary btn-primary text-white"
+                    <div class="col-4">
+                        <button class="btn btn-primary text-white w-100"
                             onclick="enableEdit({{ post.id }})">Editar</button>
 
                     </div>
@@ -42,7 +47,6 @@
 
                 <div class="card-body d-flex flex-column bg-white text-primary flex-grow-1">
 
-                    <!-- Modo visualización -->
                     <p class="card-text text-tercero small mb-2 flex-grow-1 " id="desc-text-{{ post.id }}">
                         {{ post.description }}</p>
 
@@ -50,9 +54,9 @@
                         id="edit-form-{{ post.id }}">
                         {% csrf_token %}
                         <textarea name="description" rows="4"
-                            class="form-control text-tercero bg-sexto border border-2 border-primary mb-2"
-                            maxlength="500" required>{{ post.description }}</textarea>
-                        <button type="submit" class="btn btn-cuarto btn-sm">Guardar</button>
+                            class="form-control text-tercero border border-2 border-primary mb-2" maxlength="500"
+                            required>{{ post.description }}</textarea>
+                        <button type="submit" class="btn btn-quinto btn-sm text-white">Guardar</button>
                         <sbutton type="button" class="btn btn-secondary btn-sm text-white"
                             onclick="cancelEdit({{ post.id }})">Cancelar</sbutton>
                         <button type="button" class="btn btn-primary btn-sm text-white" data-bs-toggle="modal"
@@ -73,7 +77,6 @@
                             </div>
                         </div>
                     </form>
-                    <!-- Imagen solo si existe -->
                     {% if post.images.all %}
                     <div class="d-flex flex-wrap gap-2">
                         {% for image in post.images.all %}
@@ -83,7 +86,6 @@
                                 data-bs-toggle="modal" data-bs-target="#imageModal{{ post.id }}_{{ forloop.counter }}">
                         </div>
 
-                        <!-- Modal para imagen -->
                         <div class="modal fade" id="imageModal{{ post.id }}_{{ forloop.counter }}" tabindex="-1"
                             aria-labelledby="imageModalLabel{{ post.id }}_{{ forloop.counter }}" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -100,18 +102,15 @@
                     {% endif %}
 
 
-                    <!-- Likes -->
                     <ul class="list-unstyled small mb-2 ">
-                        <li class="border border-4"><button
+                        <li class=""><button
                                 class="btn btn-like p-0 border-0 bg-transparent d-flex align-items-center gap-2 "
                                 data-model="{{ post.tipo_objeto }}" data-id="{{ post.id }}">
                                 <div class="position-relative">
-                                    <!-- Ícono Like -->
                                     <img src="{% static 'img/Liked.png' %}" alt="Liked"
                                         class="like-icon liked position-absolute top-0 start-0"
                                         style="{% if not post.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: opacity 0.3s ease;" />
 
-                                    <!-- Ícono Not Liked -->
                                     <img src="{% static 'img/Likend.png' %}" alt="Not Liked"
                                         class="like-icon not-liked position-absolute top-0 start-0"
                                         style="{% if post.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: opacity 0.3s ease;" />
@@ -122,16 +121,51 @@
                     </ul>
 
 
-                    <!-- Fecha -->
                     <p class="card-text text-muted small mb-0 mt-auto">Subido: {{ post.uploaded_at|date:"d M Y H:i" }}
                     </p>
                 </div>
             </div>
         </div>
 
+        {% empty %}
+        <p class="text-center">No hay posts disponibles.</p>
         {% endfor %}
     </div>
 
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Navegación de Posts" class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+            {% endif %}
+
+            {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+            <li class="page-item active" aria-current="page"><span class="page-link">{{ i }}</span></li>
+            {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %} <li class="page-item"><a
+                    class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 </div>
 
 <style>

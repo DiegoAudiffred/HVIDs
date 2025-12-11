@@ -116,7 +116,8 @@
 
             {% if mediafile.tipo_objeto == 'comic' or mediafile.tipo_objeto == 'mediafile' %}
             <ul class="list-unstyled small mb-2">
-              <li> ❤️ {{ mediafile.total_likes }} {% if mediafile.tipo_objeto == 'mediafile' %}
+              <li> <img src="{% static 'img/Liked.png' %}" width="20px" height="20px"> {{ mediafile.total_likes }}
+                {% if mediafile.tipo_objeto == 'mediafile' %}
                 <button class="btn btn-sm btn-success mx-3" hx-get="{% url 'index:load_audio' mediafile.id %}"
                   hx-target="#audio-container" hx-swap="innerHTML">
                   ▶ Reproducir
@@ -145,53 +146,6 @@
 
   </div>
 </div>
-<script>
-  /*  document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll(".perspective-container").forEach(container => {
-        const media = container.querySelector(".preview-media");
-        const icon = container.querySelector(".hover-icon");
-  
-        if (media) {
-          container.addEventListener("mouseenter", () => {
-            media.classList.remove("d-none");
-            icon?.classList.remove("d-none");
-            media.currentTime = 0;
-            media.play();
-          });
-  
-          container.addEventListener("mouseleave", () => {
-            media.pause();
-            media.classList.add("d-none");
-            icon?.classList.add("d-none");
-          });
-        }
-      });
-    });*/
-</script>
-<script>
-  /* document.addEventListener("DOMContentLoaded", () => {
-     document.querySelectorAll(".perspective-container").forEach(container => {
-       const media = container.querySelector(".preview-media");
-       const icon = container.querySelector(".hover-icon");
- 
-       if (media) {
-         media.volume = 0.1; // 🔈 Baja el volumen al 10%
- 
-         container.addEventListener("mouseenter", () => {
-           media.classList.remove("d-none");
-           icon?.classList.remove("d-none");
-           media.currentTime = 0;
-           media.play();
-         });
- 
-         container.addEventListener("mouseleave", () => {
-           media.pause();
-           media.classList.add("d-none");
-           icon?.classList.add("d-none");
-         });
-       }
-     });
-   });*/
-</script>
+
 
 {% endblock %}

@@ -79,42 +79,25 @@ def get_sidebar_context():
         'popular_games': get_top_items(Game, ['mediafile', 'comic']),
     }
 
-@login_required(login_url='/login/')    
+@login_required(login_url='/login/')
 def index(request):
-  
     user = request.user
-
-    # Verifica si se quiere mostrar todo
-    show_all = request.GET.get('show_all') == 'true'
-
-    if show_all:
-        media_files = MediaFile.objects.all()
-        comics = Comic.objects.all()
-    else:
-        media_files = MediaFile.objects.filter(hide=False)
-        comics = Comic.objects.filter(hide=False)
-
-    # Añadir atributos is_video e is_audio
-    for mf in media_files:
-        ext = os.path.splitext(mf.file.name)[1].lower()
-        mf.is_video = ext in ['.mp4', '.webm']
-        mf.is_audio = ext in ['.mp3', '.ogg']
-
+    limit = 12
+    media_files_qs = MediaFile.objects.order_by('-uploaded_at')[:limit]
+    comics_qs = Comic.objects.order_by('-uploaded_at')[:limit]
+    media_files = list(media_files_qs)
+    comics = list(comics_qs)
     combined_media = sorted(
         chain(media_files, comics),
         key=lambda x: x.uploaded_at,
         reverse=True
-    )[:24]
-
+    )[:12]
     sidebar_context = get_sidebar_context()
-
     context = {
         'user': user,
         'media_files': combined_media,
-
         **sidebar_context
     }
-
     return render(request, 'index/index.html', context)
 
 @login_required(login_url='/login/')  
@@ -125,10 +108,8 @@ def userProfileLikes(request,username,filter):
 @login_required(login_url='/login/')
 def userProfile(request, username):
     user = get_object_or_404(User, username=username)
-
     if request.user != user and request.method == 'POST':
         return redirect('index:userProfile', user.username)
-
     if request.method == 'POST':
         form = editUserForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
@@ -143,31 +124,23 @@ def userProfile(request, username):
             return redirect('index:userProfile', updated_user.username)
         else:
             print(form.errors)
-            
     formUser = editUserForm(instance=user)
-
     media_files = MediaFile.objects.filter(hide=False, user=user).prefetch_related('tags')
     comics = Comic.objects.filter(hide=False, user=user).prefetch_related('tags')
-
-    # Combinar y ordenar por fecha
     combined_media = sorted(
         chain(media_files, comics),
         key=lambda x: x.uploaded_at,
         reverse=True
     )
     total = len(combined_media)
-    # Mantener nombres esperados por el template
     allThigs = {
-        'mediafiles': user.liked_mediafiles.all()[:9],
-        'artists': user.liked_artist.all()[:9],
-        'comics': user.liked_comic.all()[:9],
-        'characters': user.liked_character.all()[:9],
-        'games': user.liked_game.all()[:9],
+        'mediafiles': user.liked_mediafiles.all()[:4],
+        'artists': user.liked_artist.all()[:4],
+        'comics': user.liked_comic.all()[:4],
+        'characters': user.liked_character.all()[:4],
+        'games': user.liked_game.all()[:4],
     }
-
-
     total_likes = sum(qs.count() for qs in allThigs.values())
-
     favTags = []
     for _, thing in allThigs.items():
         for item in thing:
@@ -178,7 +151,7 @@ def userProfile(request, username):
     sidebar_context = get_sidebar_context()
 
     context = {
-        'combined_media': combined_media[:9],
+        'combined_media': combined_media[:4],
         'mediafiles': allThigs['mediafiles'],
         'artists': allThigs['artists'],
         'comics': allThigs['comics'],
@@ -624,8 +597,7 @@ def procesar_menciones(comentario_texto, autor, contenido_obj):
             print(f"❌ Usuario '{username}' no encontrado")
         except Exception as e:
             print(f"❌ Error inesperado al crear la notificación: {e}")
-
-@login_required(login_url='/login/')
+#@login_required(login_url='/login/')
 def viewDownloadedVideos(request):
     media_path = settings.MEDIA_ROOT
     archivos = []
@@ -1225,7 +1197,7 @@ def safe_filename(name):
     return name.strip('_')
 
 
-@login_required(login_url='/login/')  
+#@login_required(login_url='/login/')  
 def download_video(request):
     context = {}
     sidebar_context = get_sidebar_context()
@@ -1323,22 +1295,26 @@ def download_video(request):
     context.update(sidebar_context)
     return render(request, 'index/download.html', context)
 
-@login_required(login_url='/login/')  
+@login_required(login_url='/login/')
 def posts_recientes(request):
-    posts = Post.objects.select_related('user').prefetch_related('likes', 'images').filter(hide=False).order_by('-uploaded_at')[:20]
+    posts_list = Post.objects.select_related('user').prefetch_related('likes', 'images').filter(hide=False).order_by('-uploaded_at')
     sidebar_context = get_sidebar_context()
-
+    paginator = Paginator(posts_list, 6) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    posts = page_obj.object_list 
     if request.user.is_authenticated:
         user = request.user
         for post in posts:
             post.liked_by_user = post.likes.filter(id=user.id).exists()
     else:
         for post in posts:
-            post.liked_by_user = False
+            post.liked_by_user = False     
     context = {
         'posts': posts,
+        'page_obj': page_obj, 
         **sidebar_context
-    }   
+    } 
     return render(request, 'index/recentPosts.html', context)
 
 @login_required(login_url='/login/')  

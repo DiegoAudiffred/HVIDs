@@ -2,97 +2,172 @@
 {% load static %}
 
 {% block body %}
-<div class="container-fluid  mt-4">
-  <div class="row">
-    <h1>Descargar Video de YouTube</h1>
-  </div>
-  <form method="post" id="download-form">
-    {% csrf_token %}
-    <div class="row align-items-end">
-      <div class="col-12 my-2">
-        <div class="d-flex w-100 gap-2">
-          <!-- Ícono SVG -->
-          <span class="d-flex justify-content-center" style="width: 50px; height: 50px;">
-            <svg height="50px" width="50px" viewBox="0 0 461.001 461.001" fill="#000000"
-              xmlns="http://www.w3.org/2000/svg">
-              <path style="fill:#F61C0D;" d="M365.257,67.393H95.744C42.866,67.393,0,110.259,0,163.137v134.728
-                c0,52.878,42.866,95.744,95.744,95.744h269.513c52.878,0,95.744-42.866,95.744-95.744V163.137 
-                C461.001,110.259,418.135,67.393,365.257,67.393z M300.506,237.056l-126.06,60.123
-                c-3.359,1.602-7.239-0.847-7.239-4.568V168.607c0-3.774,3.982-6.22,7.348-4.514l126.06,63.881
-                C304.363,229.873,304.298,235.248,300.506,237.056z" />
-            </svg>
-          </span>
 
-          <!-- Input -->
-          <input class="form-control rounded-3 py-2 px-3 my-auto fnBadComicRegular" type="text" name="url"
-            placeholder="https://youtube.com/..." required>
+<div class="container-fluid mt-4">
+  <div class="row mb-3">
+    <div class="col-12 border-bottom border-3 border-primary">
+
+
+      <h1 class="fw-bold text-dark">Descarga de YouTube</h1>
+    </div>
+    <div class="col-12">
+      <div id="result" class="mb-4">
+        {% if already_downloaded %}
+        <div class="alert alert-info border-start border-4 border-info rounded-3" role="alert">
+          <i class="fas fa-info-circle me-2"></i>
+          El archivo ya estaba: <a href="/media/{{ filename }}" target="_blank" class="alert-link fw-semibold">{{
+            filename }}</a>
+        </div>
+        {% elif filename %}
+        <div class="alert alert-success border-start border-4 border-success rounded-3" role="alert">
+          <i class="fas fa-check-circle me-2"></i>
+          ¡Descarga completada! <a href="/media/{{ filename }}" target="_blank" class="alert-link fw-semibold">{{
+            filename }}</a>
+        </div>
+        {% elif error %}
+        <div class="alert alert-danger border-start border-4 border-danger rounded-3" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Error: {{ error }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-12">
+      <form method="post" id="download-form">
+        {% csrf_token %}
+
+        <div class="mb-4">
+          <label for="url-input" class="form-label fw-bold text-primary">URL del video</label>
+          <div class="input-group input-group-lg border border-secondary rounded-3 overflow-hidden shadow-sm">
+            <span class="input-group-text bg-light border-0" style="color: #FF0000;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 461.001 461.001"
+                fill="currentColor">
+                <path
+                  d="M365.257,67.393H95.744C42.866,67.393,0,110.259,0,163.137v134.728 c0,52.878,42.866,95.744,95.744,95.744h269.513c52.878,0,95.744-42.866,95.744-95.744V163.137 C461.001,110.259,418.135,67.393,365.257,67.393z M300.506,237.056l-126.06,60.123 c-3.359,1.602-7.239-0.847-7.239-4.568V168.607c0-3.774,3.982-6.22,7.348-4.514l126.06,63.881 C304.363,229.873,304.298,235.248,300.506,237.056z" />
+              </svg>
+            </span>
+            <input id="url-input" class="form-control py-2 px-3 border-0" type="url" name="url"
+              placeholder="Pega el enlace del video de YouTube..." required>
+          </div>
+        </div>
+
+        <div class="row ">
+          <div class="col-lg-6 col-12 my-2">
+            <label for="download-type" class="form-label fw-bold text-primary">Formato de Salida</label>
+            <select id="download-type" name="download_type"
+              class="form-select form-select-lg py-2 rounded-3 shadow-sm border-secondary">
+              <option value="video" selected> Video (MP4)</option>
+              <option value="audio"> Audio (MP3)</option>
+            </select>
+          </div>
+
+          <div class="col-lg-6 col-12 my-2">
+            <label for="download-btn" class="form-label fw-bold text-white d-none d-md-block">.</label>
+            <button id="download-btn" type="submit"
+              class="btn btn-primary btn-lg fw-bold text-uppercase py-2 shadow-sm w-100">
+              <i class="fas fa-arrow-alt-circle-down me-2"></i> Iniciar Descarga
+            </button>
+            <button id="cancel-btn" type="button" class="btn btn-outline-danger mt-2" style="display:none;">
+              <i class="fas fa-times me-1"></i> Cancelar Proceso
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div id="loading-bar" class="my-4 p-3 rounded-3 bg-light border border-info border-3" style="display:none;">
+        <p class="mb-2 fw-semibold text-center text-secondary">
+          <i class="fas fa-spinner fa-pulse me-2"></i> Esperando respuesta del servidor...
+        </p>
+        <div class="progress" style="height: 20px;">
+          <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar"
+            aria-valuenow="100" style="width:100%;"></div>
         </div>
       </div>
-      <div class="col-md-6 col-12 my-2">
-        <label class="fw-bold mb-3">Tipo de descarga:</label>
-        <select name="download_type" class="form-select">
-          <option value="video" selected>Video</option>
-          <option value="audio">Audio</option>
-        </select>
-      </div>
-      <div class="col-md-6 col-12 my-2 d-flex gap-2">
-        <button id="download-btn" type="submit" class="btn btn-primary flex-fill">Descargar</button>
-        <button id="cancel-btn" type="button" class="btn btn-danger flex-fill" style="display:none;">Cancelar</button>
-      </div>
     </div>
-  </form>
-  <div id="loading-bar" class="my-3" style="display:none;">
-    <p>⏳ Descargando, por favor espera...</p>
-    <div class="progress">
-      <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%"></div>
-    </div>
-  </div>
-  <div id="result" class="mt-3">
-    {% if already_downloaded %}
-    <div class="alert alert-info">✅ El archivo ya estaba: <a href="/media/{{ filename }}" target="_blank">{{ filename
-        }}</a></div>
-    {% elif filename %}
-    <div class="alert alert-success">✅ Archivo descargado: <a href="/media/{{ filename }}" target="_blank">{{ filename
-        }}</a></div>
-    {% elif error %}
-    <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
-  </div>
-    <a href="{% url 'index:viewDownloadedVideos' %}">Videos descargados</a>
 
+    <div class="col-12 text-start">
+      <div class=" pt-3 ">
+        <a href="{% url 'index:viewDownloadedVideos' %}" class="btn btn-sm btn-outline-secondary text-out">
+          Ver Descargas
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
+
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
+    // Asegúrate de tener FontAwesome (fas) incluido en tu layout.html
     const form = document.getElementById('download-form');
     const loading = document.getElementById('loading-bar');
     const result = document.getElementById('result');
     const cancel = document.getElementById('cancel-btn');
+    const downloadBtn = document.getElementById('download-btn');
 
     form.addEventListener('submit', async e => {
       e.preventDefault();
+
+      // Mostrar carga y deshabilitar botón principal
       loading.style.display = 'block';
       result.innerHTML = '';
-      cancel.style.display = 'inline-block';
+      cancel.style.display = 'block';
+      downloadBtn.disabled = true;
+      downloadBtn.innerHTML = '<i class="fas fa-hourglass-half me-2"></i> Procesando...';
 
       const data = new URLSearchParams(new FormData(form));
-      const resp = await fetch("{% url 'index:download_video' %}", {
-        method: 'POST',
-        headers: { 'X-CSRFToken': data.get('csrfmiddlewaretoken'), 'X-Requested-With': 'XMLHttpRequest' },
-        body: data
-      });
-      const json = await resp.json();
-      loading.style.display = 'none';
-      cancel.style.display = 'none';
 
-      if (json.error) { result.innerHTML = `<div class="alert alert-danger">${json.error}</div>`; }
-      else {
-        const msg = json.already_downloaded ? '✅ Ya existía:' : '✅ Descargado:';
-        result.innerHTML = `<div class="alert alert-success">${msg} <a href="/media/${json.filename}" target="_blank">${json.filename}</a></div>`;
+      try {
+        const resp = await fetch("{% url 'index:download_video' %}", {
+          method: 'POST',
+          headers: { 'X-CSRFToken': getCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' },
+          body: data
+        });
+
+        const json = await resp.json();
+
+        if (json.error) {
+          result.innerHTML = `<div class="alert alert-danger border-start border-4 border-danger rounded-3" role="alert"><i class="fas fa-exclamation-triangle me-2"></i> Error: ${json.error}</div>`;
+        } else {
+          const msg = json.already_downloaded ? '✅ Archivo encontrado:' : '✅ ¡Descarga completada!';
+          const alertClass = json.already_downloaded ? 'alert-info border-info' : 'alert-success border-success';
+          const iconClass = json.already_downloaded ? 'fas fa-info-circle' : 'fas fa-check-circle';
+
+          result.innerHTML = `<div class="alert ${alertClass} border-start border-4 rounded-3" role="alert"><i class="${iconClass} me-2"></i> ${msg} <a href="/media/${json.filename}" target="_blank" class="alert-link fw-semibold">${json.filename}</a></div>`;
+        }
+      } catch (error) {
+        result.innerHTML = `<div class="alert alert-danger border-start border-4 border-danger rounded-3" role="alert"><i class="fas fa-exclamation-triangle me-2"></i> Error de conexión o servidor.</div>`;
+      } finally {
+        // Ocultar carga y restablecer botones
+        loading.style.display = 'none';
+        cancel.style.display = 'none';
+        downloadBtn.disabled = false;
+        downloadBtn.innerHTML = '<i class="fas fa-arrow-alt-circle-down me-2"></i> Iniciar Descarga';
       }
     });
 
-    cancel.addEventListener('click', () => { loading.style.display = 'none'; result.innerHTML = ''; cancel.style.display = 'none'; });
+    cancel.addEventListener('click', () => {
+      loading.style.display = 'none';
+      result.innerHTML = '';
+      cancel.style.display = 'none';
+      downloadBtn.disabled = false;
+      downloadBtn.innerHTML = '<i class="fas fa-arrow-alt-circle-down me-2"></i> Iniciar Descarga';
+    });
+
+    // Función para obtener el CSRF token
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        document.cookie.split(';').forEach(function (cookie) {
+          cookie = cookie.trim();
+          if (cookie.startsWith(name + '=')) {
+            cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+          }
+        });
+      }
+      return cookieValue;
+    }
   });
 </script>
 {% endblock %}
