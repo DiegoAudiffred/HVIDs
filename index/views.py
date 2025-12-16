@@ -151,7 +151,7 @@ def userProfile(request, username):
     sidebar_context = get_sidebar_context()
 
     context = {
-        'combined_media': combined_media[:4],
+        'combined_media': combined_media[:6],
         'mediafiles': allThigs['mediafiles'],
         'artists': allThigs['artists'],
         'comics': allThigs['comics'],

@@ -18,7 +18,8 @@
                 style="width: 90px; height: 90px; object-fit: cover;">
 
             {% if request.user == user %}
-            <button type="button" class="btn btn-light position-absolute top-0 end-0 m-2 p-1 shadow rounded-circle"
+            <button type="button"
+                class="btn btn-light position-absolute top-0 end-0 p-2 m-2 shadow rounded-circle bg-quinto bg-opacity-50 border-secondary"
                 data-bs-toggle="modal" data-bs-target="#perfilModal">
                 <img src="{% static 'img/edit.png' %}" alt="Opciones" style="width: 24px; height: 24px;">
             </button>
@@ -26,7 +27,7 @@
 
             <div class="position-absolute bottom-0 start-0 end-0 bg-tercero bg-opacity-50 text-white p-2">
                 <h6 class="mb-1">{{ user.username }}</h6>
-                <small><strong>Publicaciones:</strong> {{ combined_media|length }}</small><br>
+                <small><strong>Publicaciones:</strong> {{ total }}</small><br>
                 <small><strong>Likes:</strong> {{ total_likes }}</small>
                 <small class="d-flex flex-wrap align-items-center mb-2">
                     <strong class="me-2">Tags favoritos:</strong>
@@ -73,9 +74,9 @@
             <!-- Botón de editar al fondo a la derecha -->
             {% if request.user == user %}
             <button type="button"
-                class="btn btn-light position-absolute top-0 end-0 p-2 shadow rounded-circle bg-quinto bg-opacity-50"
+                class="btn btn-light position-absolute top-0 end-0 p-2 m-2 shadow rounded-circle bg-quinto bg-opacity-50 border-secondary"
                 data-bs-toggle="modal" data-bs-target="#perfilModal">
-                <img src="{% static 'img/edit.png' %}" alt="Opciones" style="width: 30px; height: 30px;">
+                <img src="{% static 'img/edit.png' %}" alt="Opciones" style="width: 24px; height: 24px;">
             </button>
             {% endif %}
         </div>
@@ -172,11 +173,12 @@
 
 
     {% if combined_media %}
-    <h4>Recientes subidos por {{user}}</h4>
-
-    <div class="row">
+    <div class="col-12 border-bottom border-3 border-primary">
+        <h4 class="fw-bold text-dark">Recientes subidos por {{user}}</h4>
+    </div>
+    <div class="row mt-4">
         {% for item in combined_media %}
-        <div class="col-lg-3 col-md-3 mb-4 col-12">
+        <div class=" col-lg-4 col-md-6 mb-4 col-12">
             <a href="{% if item.tipo_objeto == 'comic' %} {% url 'index:watchComic' item.id %} {% else %} {% url 'index:watchContent' item.id %} {% endif %}"
                 class="text-decoration-none text-dark">
                 <div class="shadow-sm h-100 border border-4 border-primary " style="border-top-left-radius: 45px;
@@ -195,9 +197,9 @@
                 border-top-left-radius: 40px;
                 border-top-right-radius: 40px;" alt="Previsualización">
                     {% endif %}
-                    <div class="bg-secondary  py-3 border-top border-primary" style=" border-bottom-left-radius: 40px;
+                    <div class="bg-secondary  py-2 border-top border-primary" style=" border-bottom-left-radius: 40px;
                 border-bottom-right-radius:40px;">
-                        <h5 class=" text-center text-truncate text-white px-2 ">{{ item.name }}</h5>
+                        <h5 class=" text-center text-truncate text-white px-4 m-0">{{ item.name }}</h5>
                     </div>
                 </div>
             </a>
