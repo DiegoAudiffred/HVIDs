@@ -302,35 +302,41 @@ def adminPage(request):
         # Si es una petición normal, devolvemos la página completa
         return render(request, 'index/adminPage.html', context)
     
-@login_required(login_url='/login/')    
+@login_required(login_url='/login/')
 def navbarFilterHeader(request):
     thing_to_filter = request.GET.get('filter')
+    page_number = request.GET.get('page')
 
     if thing_to_filter == "Artistas":
-        media_files = Artist.objects.all
+        queryset = Artist.objects.all() 
     elif thing_to_filter == "Juegos":
-        media_files = Game.objects.all
+        queryset = Game.objects.all()
     elif thing_to_filter == "Personajes":
-        media_files = Character.objects.all
+        queryset = Character.objects.all()
     elif thing_to_filter == "Videos":
-         media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
+        queryset = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
     elif thing_to_filter == "Comics":
-         media_files = Comic.objects.filter(hide=False).order_by('-uploaded_at')
+        queryset = Comic.objects.filter(hide=False).order_by('-uploaded_at')
     else:
-        media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
+        queryset = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
+
+    paginator = Paginator(queryset, 24) 
+    
+    try:
+        page_obj = paginator.get_page(page_number)
+    except Exception:
+        page_obj = paginator.get_page(1)
 
     sidebar_context = get_sidebar_context()
 
     context = {
-        'media_files': media_files,
+        'media_files': page_obj.object_list, 
+        'page_obj': page_obj,
         'filter_selected': thing_to_filter,
         **sidebar_context
     }
-    if request.headers.get('HX-Request') == 'true':
-        return render(request, 'index/navbarFilterHeaderhtmx.html', context)
-    else:
-        # Si es una petición normal, devolvemos la página completa
-        return render(request, 'index/navbarFilterHeader.html', context)
+
+    return render(request, 'index/navbarFilterHeader.html', context)
 
 @login_required(login_url='/login/')    
 def autocomplete(request):
@@ -846,8 +852,7 @@ def stream_video(request, id):
 @login_required(login_url='/login/')  
 def filtered_media(request, filter_type, string):
     sidebar_context = get_sidebar_context()
-    is_htmx = request.headers.get('HX-Request') == 'true'
-    print(is_htmx)
+
  
     filter_map = {
     'tag': ('tags__name__iexact',),  # ← clave aquí

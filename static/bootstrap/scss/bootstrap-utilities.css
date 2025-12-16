@@ -54,56 +54,56 @@
   color: #0d6efd !important;
 }
 .link-primary:hover, .link-primary:focus {
-  color: #0a58ca !important;
+  color: rgb(10.4, 88, 202.4) !important;
 }
 
 .link-secondary {
   color: #6c757d !important;
 }
 .link-secondary:hover, .link-secondary:focus {
-  color: #565e64 !important;
+  color: rgb(86.4, 93.6, 100) !important;
 }
 
 .link-success {
   color: #198754 !important;
 }
 .link-success:hover, .link-success:focus {
-  color: #146c43 !important;
+  color: rgb(20, 108, 67.2) !important;
 }
 
 .link-info {
   color: #0dcaf0 !important;
 }
 .link-info:hover, .link-info:focus {
-  color: #3dd5f3 !important;
+  color: rgb(61.4, 212.6, 243) !important;
 }
 
 .link-warning {
   color: #ffc107 !important;
 }
 .link-warning:hover, .link-warning:focus {
-  color: #ffcd39 !important;
+  color: rgb(255, 205.4, 56.6) !important;
 }
 
 .link-danger {
   color: #dc3545 !important;
 }
 .link-danger:hover, .link-danger:focus {
-  color: #b02a37 !important;
+  color: rgb(176, 42.4, 55.2) !important;
 }
 
 .link-light {
   color: #f8f9fa !important;
 }
 .link-light:hover, .link-light:focus {
-  color: #f9fafb !important;
+  color: rgb(249.4, 250.2, 251) !important;
 }
 
 .link-dark {
   color: #212529 !important;
 }
 .link-dark:hover, .link-dark:focus {
-  color: #1a1e21 !important;
+  color: rgb(26.4, 29.6, 32.8) !important;
 }
 
 .ratio {

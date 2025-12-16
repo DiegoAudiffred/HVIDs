@@ -1,4 +1,4 @@
-<div id="audio-info" class="mb-2 fw-bold text-primary text-truncate">
+<div id="audio-info" class="mb-2 fw-bold text-secondary text-truncate">
     🎵 {{ media_name }}
 </div>
 
@@ -8,7 +8,7 @@
 </div>
 {% endif %}
 
-<audio id="player-audio" controls class="w-100">
+<audio id="player-audio" controls class="w-100  border rounded-5">
     <source id="audio-source" src="{% url 'index:media_stream' id_media %}" type="audio/mpeg">
 </audio>
 <!-- 

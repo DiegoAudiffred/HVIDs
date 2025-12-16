@@ -1,10 +1,8 @@
 <style>
   #autocompleteContainer {
     top: 100%;
-    /* aparece justo debajo del input */
     left: 0;
     z-index: 1050;
-    /* para asegurarte que se superponga incluso a tooltips, etc */
     max-height: 300px;
     overflow-y: auto;
   }
@@ -27,37 +25,13 @@
     transition: color 0.3s ease;
   }
 
-  /* Underline base (invisible hasta hover) */
-  /*.shine-underline::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(
-    to right,
-    violet,
-    red,
-    orange,
-    yellow,
-    green,
-    blue,
-    indigo
-  );
-  bottom: 0;
-  left: 0;
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.3s ease-out;
-}*/
+
 
   /* Efecto en hover: texto en arcoíris + underline animado */
   .shine-underline:hover {
     background: linear-gradient(to right,
         #8B0000,
-        /* Rojo oscuro */
-        #ffd700
-        /* Amarillo */
-      );
+        #ffd700);
     background-size: 200% auto;
     background-clip: text;
     -webkit-background-clip: text;
@@ -98,7 +72,16 @@
       <input type="text" id="multiSearchInput" name="q"
         class="form-control text-tercero border border-primary border-end-0 shadow-none" placeholder="Buscar...">
       <button class="btn btn-quinto border border-primary border-start-0 "
-        style="outline: none; border: none; box-shadow: none;" type="submit"><svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M11 6C13.7614 6 16 8.23858 16 11M16.6588 16.6549L21 21M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z" stroke="#8B0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg></button>
+        style="outline: none; border: none; box-shadow: none;width:85px" type="submit"><svg width="30px" height="30px"
+          viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+          <g id="SVGRepo_iconCarrier">
+            <path
+              d="M11 6C13.7614 6 16 8.23858 16 11M16.6588 16.6549L21 21M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"
+              stroke="#8B0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </g>
+        </svg></button>
     </div>
     <div id="autocompleteContainer" class="border bg-white position-absolute z-3 w-100" style="display: none;"></div>
   </form>
@@ -106,19 +89,18 @@
 
 
   <div class="d-none d-md-block">
-    <h3 class="text-primary">Tags</h3>
+    <h3 class="text-secondary border-bottom  border-primary px-2">Etiquetas</h3>
+
     {% if popular_tags %}
 
 
     {% for tag in popular_tags %}
-    <h5 class="px-3 text-truncate" style="max-width: 100%;">
+    <h5 class="px-4 text-truncate" style="max-width: 100%;">
       <a href="{% url 'index:filtered_media' 'tag' tag.name %}"
         class="d-inline-block text-tercero shine-underline text-truncate w-100"
         hx-get="{% url 'index:filtered_media' 'tag' tag.name %}" hx-target="#main-content" hx-push-url="true">
         {{ tag.name }} ({{ tag.num_mediafiles }})
       </a>
-      <!--  hx-get="{% url 'index:filtered_media' 'tag' tag.name %}"
-        hx-target="#main-content" hx-push-url="true" -->
     </h5>
     {% endfor %}
 
@@ -126,11 +108,11 @@
     <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin tags.</h5>
     {% endif %}
 
-    <h3 class="text-primary">Artistas</h3>
+    <h3 class="text-secondary border-bottom  border-primary px-2">Artistas</h3>
     {% if popular_artists %}
 
     {% for artist in popular_artists %}
-    <h5 class="px-3 text-truncate" style="max-width: 100%;">
+    <h5 class="px-4 text-truncate" style="max-width: 100%;">
 
       <a href="{% url 'index:filtered_media' 'artist' artist.name %}"
         class="d-inline-block text-tercero shine-underline text-truncate w-100"
@@ -144,12 +126,12 @@
     <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin artistas.</h5>
     {% endif %}
 
-    <h3 class="text-primary">Personajes</h3>
+    <h3 class="text-secondary border-bottom  border-primary px-2">Personajes</h3>
     <!-- Añadir contenido adicional aquí -->
     {% if popular_characters %}
 
     {% for character in popular_characters %}
-    <h5 class="px-3 text-truncate" style="max-width: 100%;">
+    <h5 class="px-4 text-truncate" style="max-width: 100%;">
 
       <a href="{% url 'index:filtered_media' 'character' character.name %}"
         class="d-inline-block text-tercero shine-underline text-truncate w-100"
@@ -157,34 +139,31 @@
         hx-push-url="true">
         {{ character.name }}
       </a>
-      <!--    hx-get="{% url 'index:filtered_media' 'character' character.name %}" hx-target="#main-content"
-        hx-push-url="true"  -->
+
     </h5>
     {% endfor %}
     {% else %}
     <h5 class="d-inline-block text-tercero text-truncate w-100">Sin Personajes.</h5>
     {% endif %}
 
-    <h3 class="text-primary">Juegos</h3>
-    <!-- Añadir contenido adicional aquí -->
+    <h3 class="text-secondary border-bottom  border-primary px-2">Juegos</h3>
     {% if popular_games %}
 
     {% for game in popular_games %}
-    <h5 class="px-3 text-truncate" style="max-width: 100%;">
+    <h5 class="px-4 text-truncate" style="max-width: 100%;">
 
       <a href="{% url 'index:filtered_media' 'game' game.name %}"
         class="d-inline-block text-tercero shine-underline text-truncate w-100"
         hx-get="{% url 'index:filtered_media' 'game' game.name %}" hx-target="#main-content" hx-push-url="true">
         {{ game.name }}
       </a>
-      <!-- hx-get="{% url 'index:filtered_media' 'game' game.name %}" hx-target="#main-content" hx-push-url="true" -->
     </h5>
     {% endfor %}
     {% else %}
     <h5 class="d-inline-block text-tercero text-truncate w-100"> Sin juegos.</h5>
     {% endif %}
   </div>
-  <div id="audio-container"></div>
+  <div id="audio-container" class="my-5 "></div>
 
   <script>
     document.body.addEventListener('htmx:afterSwap', function (evt) {
