@@ -8,7 +8,7 @@ from db.models import *
 class UploadComicForm(forms.ModelForm):
     class Meta:
         model = Comic
-        fields = ['name', 'artist', 'tags', 'game', 'character','user','hide','image','user']
+        fields = ['name', 'artist', 'tags', 'game', 'character','user','hide','image','user','nsfw']
     def __init__(self, *args, **kwargs):
             super(UploadComicForm, self).__init__(*args, **kwargs)
 
@@ -20,7 +20,7 @@ class UploadComicForm(forms.ModelForm):
 }
             self.fields['hide'].widget.attrs.update(checkbox_style)
 
-            #self.fields['nsfw'].widget.attrs.update(checkbox_style)
+            self.fields['nsfw'].widget.attrs.update(checkbox_style)
 
             self.fields['artist'].required = False
             self.fields['artist'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
@@ -31,6 +31,8 @@ class UploadComicForm(forms.ModelForm):
             self.fields['character'].required = False
             self.fields['character'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
+            self.fields['nsfw'].widget.attrs.update(checkbox_style)
+            
             self.fields['user'].required = False
             self.fields['user'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
 
@@ -54,7 +56,7 @@ class UploadElementForm(forms.ModelForm):
     )
     class Meta:
         model = MediaFile
-        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image','hide','user']
+        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image','hide','user','nsfw']
         
         widgets = {
             'file': forms.ClearableFileInput(attrs={'accept': 'video/*'}),
@@ -89,6 +91,7 @@ class UploadElementForm(forms.ModelForm):
       # Estilos personalizados para las checkboxes
     
         self.fields['hide'].widget.attrs.update(checkbox_style)
+        self.fields['nsfw'].widget.attrs.update(checkbox_style)
 
         # Asegúrate de que el campo de tags está usando CheckboxSelectMultiple correctamente.
         self.fields['tags'].required = False

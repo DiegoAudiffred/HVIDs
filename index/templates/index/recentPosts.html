@@ -57,22 +57,30 @@
                             class="form-control text-tercero border border-2 border-primary mb-2" maxlength="500"
                             required>{{ post.description }}</textarea>
                         <button type="submit" class="btn btn-quinto btn-sm text-white">Guardar</button>
-                        <sbutton type="button" class="btn btn-secondary btn-sm text-white"
-                            onclick="cancelEdit({{ post.id }})">Cancelar</sbutton>
+                        <button type="button" class="btn btn-secondary btn-sm text-white"
+                            onclick="cancelEdit({{ post.id }})">Cancelar</button>
                         <button type="button" class="btn btn-primary btn-sm text-white" data-bs-toggle="modal"
-                            data-bs-target="#deletePostModal">Eliminar</button>
+                            data-bs-target="#deletePostModal{{ post.id }}">Eliminar</button>
 
-                        <div class="modal fade" id="deletePostModal" tabindex="-1" aria-labelledby="deletePostModal"
+                        <div class="modal fade" id="deletePostModal{{post.id}}" tabindex="-1" aria-labelledby="deletePostModal"
                             aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                 <div class="modal-content border-0">
                                     <div class="modal-header">
                                         Seguro que deseas eliminar este Post?
+                                        
                                     </div>
                                     <div class="modal-body text-center p-0">
-                                        <a class="btn btn-primary" href="{% url 'index:eliminar_post' post.id %}">
-                                            Eliminar</a>
+                                                                                El post de {{post.user}} sera eliminado.
+
+                            
                                     </div>
+                                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary text-white"
+                                data-bs-dismiss="modal">Cerrar</button>
+            <a class="btn btn-primary" href="{% url 'index:eliminar_post' post.id %}">
+                                            Eliminar</a>
+                        </div>
                                 </div>
                             </div>
                         </div>
