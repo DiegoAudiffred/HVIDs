@@ -28,7 +28,7 @@
             <h1>{{ mediafile.name }}</h1>
 
         </div>
-        {% if request.user.can_edit or request.user == mediafile.user %}
+        {% if request.user == mediafile.user %}
 
         <div class="col-lg-2 col-6 ">
             <button class="btn btn-quinto w-100 my-2 my-lg-0" data-bs-toggle="modal"

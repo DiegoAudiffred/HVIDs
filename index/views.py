@@ -426,13 +426,13 @@ def deleteComicImage(request, id):
     return redirect('index:watchComic', comic_id)
 
 @login_required(login_url='/login/')
-def watchContent(request, id):
+def watchVideo(request, id):
     mediafile = get_object_or_404(MediaFile, id=id)
-    formVideo = UploadElementForm(instance=mediafile)
+    formVideo = uploadFileForm(instance=mediafile)
     form = addComentariosForm()
     if request.method == 'POST':
         if 'update_video' in request.POST:
-            formVideo = UploadElementForm(request.POST, request.FILES, instance=mediafile)
+            formVideo = uploadFileForm(request.POST, request.FILES, instance=mediafile)
             if formVideo.is_valid():
                 formVideo.save()
                 mediafile = formVideo.instance
@@ -443,7 +443,7 @@ def watchContent(request, id):
                         if tag:
                             obj, _ = Tags.objects.get_or_create(name=tag.upper())
                             mediafile.tags.add(obj)
-                return redirect('index:watchContent', mediafile.id)
+                return redirect('index:watchVideo', mediafile.id)
         elif 'comentario' in request.POST:
             form_comentario = addComentariosForm(request.POST, request.FILES)
             if form_comentario.is_valid():
@@ -457,7 +457,7 @@ def watchContent(request, id):
                     autor=request.user,
                     contenido_obj=mediafile
                 )
-                return redirect('index:watchContent', mediafile.id)
+                return redirect('index:watchVideo', mediafile.id)
          
                   
     is_audio = False
@@ -468,7 +468,7 @@ def watchContent(request, id):
     comentarios = reversed(comentarios)
     sidebar_data = get_sidebar_context()
     
-    return render(request, 'index/watchContent.html', {
+    return render(request, 'index/watchVideo.html', {
         'mediafile': mediafile,
         'comentarios': comentarios,
         'form': form,
@@ -618,13 +618,13 @@ def viewDownloadedVideos(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'index/view_downloaded_videos.html', {
+    return render(request, 'index/viewDownloadedVideos.html', {
         'archivos': page_obj,
         'MEDIA_URL': settings.MEDIA_URL,
     })
 
 @login_required(login_url='/login/')
-def delete_file(request, filename):
+def deleteDownloadedVideo(request, filename):
     if request.method == 'POST':
         file_path = os.path.join(settings.MEDIA_ROOT, filename)
         if os.path.exists(file_path) and os.path.isfile(file_path):
@@ -639,7 +639,7 @@ def delete_file(request, filename):
 
 
 @login_required(login_url='/login/')
-def upload_file(request, filename):
+def uploadDownloadedVideo(request, filename):
     if request.method == 'POST':
         local_filepath = os.path.join(settings.MEDIA_ROOT, filename)
         
@@ -657,7 +657,7 @@ def upload_file(request, filename):
                 'character': '',
             }
             
-            form = UploadElementForm(data, files={'file': uploaded_file})
+            form = uploadFileForm(data, files={'file': uploaded_file})
 
             if form.is_valid():
                 media = form.save(commit=False)
@@ -695,7 +695,7 @@ def upload_file(request, filename):
                         obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
                         media.tags.add(obj)
 
-                file_url = request.build_absolute_uri(reverse('index:watchContent', args=[media.id]))
+                file_url = request.build_absolute_uri(reverse('index:watchVideo', args=[media.id]))
                 texto = (
                     f"🎬 <b>¡Nuevo video subido!</b>\n"
                     f"📤 <i>Cortesía de</i> <b>{media.user}</b>\n\n"
@@ -757,7 +757,7 @@ def detailsAbout(request, filtro, valor):
         comics      = Comic.objects.filter(game=resultado)
 
     else:
-        return render(request, 'index/filteredInfoPage.html', {
+        return render(request, 'index/detailsAbout.html', {
             'mensaje': "Filtro no reconocido",
             **sidebar_context
         })
@@ -782,7 +782,7 @@ def detailsAbout(request, filtro, valor):
         **sidebar_context,
     }
 
-    return render(request, 'index/filteredInfoPage.html', context)
+    return render(request, 'index/detailsAbout.html', context)
 
 
 @require_POST
@@ -891,14 +891,14 @@ def can_upload_check(user):
 
 @user_passes_test(can_upload_check, login_url='/login/')
 @login_required(login_url='/login/')
-def uploadElement(request):
+def uploadFile(request):
 
   
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
         if form_type == 'video':
-            form = UploadElementForm(request.POST, request.FILES)
+            form = uploadFileForm(request.POST, request.FILES)
             if form.is_valid():
                 media = form.save(commit=False)
                 media.user = request.user
@@ -942,7 +942,7 @@ def uploadElement(request):
                         obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
                         media.tags.add(obj)
 
-                file_url = request.build_absolute_uri(reverse('index:watchContent', args=[media.id]))
+                file_url = request.build_absolute_uri(reverse('index:watchVideo', args=[media.id]))
                 texto = (
                     f"🎬 <b>¡Nuevo video subido!</b>\n"
                     f"📤 <i>Cortesía de</i> <b>{media.user}</b>\n\n"
@@ -1029,7 +1029,7 @@ def uploadElement(request):
                 
                 return redirect('index:index')
     # GET o errores: reconstruir context original
-    form = UploadElementForm()
+    form = uploadFileForm()
     formComic = UploadComicForm()
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
     sidebar_context = get_sidebar_context()
@@ -1039,7 +1039,7 @@ def uploadElement(request):
         'media_files': media_files,
         **sidebar_context
     }
-    return render(request, 'index/uploadElement.html', context)
+    return render(request, 'index/uploadFile.html', context)
 
 
 def enviar_telegram_mensaje(texto, image_path=None):
@@ -1203,7 +1203,7 @@ def safe_filename(name):
 
 
 #@login_required(login_url='/login/')  
-def download_video(request):
+def videoDownloader(request):
     context = {}
     sidebar_context = get_sidebar_context()
 
@@ -1298,10 +1298,10 @@ def download_video(request):
 
     # render normal
     context.update(sidebar_context)
-    return render(request, 'index/download.html', context)
+    return render(request, 'index/videoDownloader.html', context)
 
 @login_required(login_url='/login/')
-def posts_recientes(request):
+def recentPosts(request):
     posts_list = Post.objects.select_related('user').prefetch_related('likes', 'images').filter(hide=False).order_by('-uploaded_at')
     sidebar_context = get_sidebar_context()
     paginator = Paginator(posts_list, 6) 
@@ -1330,7 +1330,7 @@ def editar_post(request, post_id):
         form = EditPostForm(request.POST, instance=post)
         if form.is_valid():
             form.save()
-    return redirect('index:posts_recientes')
+    return redirect('index:recentPosts')
 
 
 
@@ -1338,10 +1338,10 @@ def editar_post(request, post_id):
 def eliminar_post(request,id):
     post = Post.objects.get(id=id)
     post.delete()
-    return redirect('index:posts_recientes')
+    return redirect('index:recentPosts')
 
 @login_required(login_url='/login/')  
-def crear_post(request):
+def createPost(request):
     sidebar_context = get_sidebar_context()
 
     if request.method == 'POST':
@@ -1359,7 +1359,7 @@ def crear_post(request):
           for imagen in imagenes:
               PostImage.objects.create(post=post, image=imagen)
 
-          return redirect('index:posts_recientes')
+          return redirect('index:recentPosts')
 
     else:
         form = PostForm()
@@ -1397,7 +1397,7 @@ def obtener_notificaciones(request):
 
             elif model_name == 'mediafile':
                 # Construir url para el mediafile
-                url = reverse('index:watchContent', args=[contenido.id])
+                url = reverse('index:watchVideo', args=[contenido.id])
                 if hasattr(contenido, 'image') and contenido.image:
                     imagen = contenido.image.url
         
@@ -1455,7 +1455,7 @@ def pastNotifications(request):
             if model_name == 'comic':
                 n.url_objeto = reverse('index:watchComic', args=[n.contenido_objeto.id])
             elif model_name == 'mediafile':
-                n.url_objeto = reverse('index:watchContent', args=[n.contenido_objeto.id])  # Cambia según tu URL real
+                n.url_objeto = reverse('index:watchVideo', args=[n.contenido_objeto.id])  # Cambia según tu URL real
 
     context = {
         **sidebar_context,
@@ -1472,7 +1472,7 @@ def load_audio(request, media_id):
         'media_name': media.name,
         'image_url': media.image.url if media.image else None,
     }
-    html = render_to_string('index/audio_source.html', context)
+    html = render_to_string('index/audioSource.html', context)
     return HttpResponse(html)
 #def load_audio(request, media_id):
 #    media = get_object_or_404(MediaFile, id=media_id)
@@ -1488,7 +1488,7 @@ def load_audio(request, media_id):
 #        'is_video': is_video,
 #    }
 #
-#    html = render_to_string('index/audio_source.html', context)
+#    html = render_to_string('index/audioSource.html', context)
 #    return HttpResponse(html)   
 @login_required(login_url='/login/')    
 def allVideosHide(request):

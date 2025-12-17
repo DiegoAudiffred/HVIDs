@@ -77,7 +77,7 @@
                 {% if mediafile.tipo_objeto == 'comic' %}
                 <a href="{% url 'index:watchComic' mediafile.id %}">
                     {% elif mediafile.tipo_objeto == 'mediafile' %}
-                    <a href="{% url 'index:watchContent' mediafile.id %}">
+                    <a href="{% url 'index:watchVideo' mediafile.id %}">
                         {% elif mediafile.tipo_objeto == 'character' %}
                         <a href="{% url 'index:detailsAbout' 'character' mediafile.name %}">
                             {% elif mediafile.tipo_objeto == 'artist' %}

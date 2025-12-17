@@ -1,4 +1,4 @@
-<!-- uploadElement.html -->
+<!-- uploadFile.html -->
 {% extends 'layout/layout.html' %}
 {% block body %}
 <style>
@@ -31,7 +31,7 @@
 
 
     <!-- Formulario para Videos -->
-    <form action="{% url 'index:uploadElement' %}" method="post" enctype="multipart/form-data" id="videoForm"
+    <form action="{% url 'index:uploadFile' %}" method="post" enctype="multipart/form-data" id="videoForm"
         style="display:none">
         {% csrf_token %}
         <input type="hidden" name="form_type" id="formType" value="video">
@@ -119,7 +119,7 @@
 
     <!-- Formulario para Comics -->
     <!-- Formulario para Comics -->
-    <form action="{% url 'index:uploadElement' %}" method="post" enctype="multipart/form-data" id="comicForm"
+    <form action="{% url 'index:uploadFile' %}" method="post" enctype="multipart/form-data" id="comicForm"
         style="display:none">
         {% csrf_token %}
         <input type="hidden" name="form_type" id="formType" value="comic">

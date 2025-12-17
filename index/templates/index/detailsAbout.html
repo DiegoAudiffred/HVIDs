@@ -78,7 +78,7 @@
                 </div>
                 <div class="col-1">
 
-                    {% if request.user.is_staff and request.user.is_superuser and request.user.can_edit %}
+                    {% if request.user.is_staff and request.user.is_superuser %}
                     <a href="{% url 'index:edit_objeto' resultado.tipo_objeto resultado.id %}">
                         <img src="{% static 'img/edit.png' %}" style="max-width: 30px;" alt="Editar">
                     </a>
@@ -271,10 +271,18 @@
     <div class="row my-4">
         {% if not contenido %}
 
-        <h3 class="p-0">"{{resultado.name}}" no tiene nada asociado unu</h3>
-        {% else %}
-        <h3 class="p-0">Contenido reciente de "{{resultado.name}}"</h3>
 
+    <div class="row align-items-center ">
+        <div class="col-12 border-bottom border-3 border-primary">
+            <h3 class="fw-bold text-dark">"{{resultado.name}}" no tiene nada asociado aun</h3>
+        </div>
+  </div>       
+   {% else %}
+    <div class="row align-items-center ">
+        <div class="col-12 border-bottom border-3 border-primary">
+        <h3 class="fw-bold text-dark">Contenido reciente de "{{resultado.name}}"</h3>
+        </div>
+  </div>       
         {% endif %}
         {% for mediafile in contenido %}
         <div class="col-12 col-lg-6 col-xl-3 col-xxl-3  my-2 perspective-container">
@@ -283,7 +291,7 @@
                 {% if mediafile.tipo_objeto == 'comic' %}
                 <a href="{% url 'index:watchComic' mediafile.id %}" class="text-decoration-none text-tercero ">
                     {% else %}
-                    <a href="{% url 'index:watchContent' mediafile.id %}">
+                    <a href="{% url 'index:watchVideo' mediafile.id %}">
                         {% endif %}
 
                         {% if mediafile.image %}

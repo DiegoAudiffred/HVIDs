@@ -22,13 +22,13 @@
                 Abrir video
             </a>
             {% if request.user.is_superuser%}
-            <form method="post" action="{% url 'index:delete_file' archivo %}" class="d-inline">
+            <form method="post" action="{% url 'index:deleteDownloadedVideo' archivo %}" class="d-inline">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline-tercero text-white btn-primary">
                     <i class="bi bi-trash"></i> Eliminar
                 </button>
             </form>
-            <form method="post" action="{% url 'index:upload_file' archivo %}" class="d-inline">
+            <form method="post" action="{% url 'index:uploadDownloadedVideo' archivo %}" class="d-inline">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline-tercero text-white btn-primary">
                     <i class="bi bi-trash"></i> Subir a la pagina

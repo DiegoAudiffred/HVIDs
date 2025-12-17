@@ -106,7 +106,7 @@
     <div class="col-lg-8 col-12">
       <h1 class="">{{ mediafile.name }}</h1>
     </div>
-    {% if request.user.can_edit or request.user == mediafile.user %}
+    {% if request.user == mediafile.user %}
 
     <div class="col-lg-2 col-6 ">
       <button class="btn btn-quinto w-100 my-2 my-lg-0" data-bs-toggle="modal"
@@ -310,7 +310,7 @@
       </button>
 
       <!-- Botón de editar (en este caso eliminar imagen) -->
-      {% if request.user.can_edit or request.user == mediafile.user %}
+      {% if request.user == mediafile.user %}
       <button
         class="btn delete-btn btn-sm btn-outline-danger w-25 border border-3 border-primary rounded rounded-4 my-2"
         data-bs-toggle="modal" data-bs-target="#deleteImageModal{{ page.id }}">

@@ -179,14 +179,14 @@
         </li>
         <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-            style="font-size: 1.2vw;" href="{% url 'index:posts_recientes' %}">
+            style="font-size: 1.2vw;" href="{% url 'index:recentPosts' %}">
             <img src="{% static 'img/postIcon.png' %}" class="img-fluid icon-navbar mb-1">Notas
           </a>
         </li>
 
         <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-            style="font-size: 1.2vw;" href="{% url 'index:download_video' %}">
+            style="font-size: 1.2vw;" href="{% url 'index:videoDownloader' %}">
             <img src="{% static 'img/YoutubeLogoNew.png' %}" class="img-fluid icon-navbar mb-1">Descargar
           </a>
         </li>
@@ -194,7 +194,7 @@
 
         <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
-            style="font-size: 1.2vw;" href="{% url 'index:uploadElement' %}">
+            style="font-size: 1.2vw;" href="{% url 'index:uploadFile' %}">
             <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid icon-navbar mb-1">Subir
           </a>
         </li>
@@ -328,20 +328,20 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:posts_recientes' %}">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:recentPosts' %}">
             <img src="{% static 'img/postIcon.png' %}" class="img-fluid icon-navbar mb-1">Posts
           </a>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:download_video' %}">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:videoDownloader' %}">
             <img src="{% static 'img/YoutubeLogoNew.png' %}" class="img-fluid icon-navbar mb-1">Descargar
           </a>
         </li>
 
         {% if request.user.can_upload %}
         <li class="nav-item">
-          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:uploadElement' %}">
+          <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:uploadFile' %}">
             <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid icon-navbar mb-1">Subir Archivo
           </a>
         </li>

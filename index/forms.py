@@ -45,7 +45,7 @@ class ComicPageForm(forms.ModelForm):
         model = ComicPage
         fields = ['image', 'order']
 
-class UploadElementForm(forms.ModelForm):
+class uploadFileForm(forms.ModelForm):
     tags = forms.ModelMultipleChoiceField(
     queryset=Tags.objects.all(),
     required=False,
@@ -62,7 +62,7 @@ class UploadElementForm(forms.ModelForm):
             'file': forms.ClearableFileInput(attrs={'accept': 'video/*'}),
         }
     def __init__(self, *args, **kwargs):
-        super(UploadElementForm, self).__init__(*args, **kwargs)
+        super(uploadFileForm, self).__init__(*args, **kwargs)
         checkbox_style = {
     'class': 'form-check-input fs-2 my-0',  # Tamaño más grande + margen derecho y vertical
 }

@@ -119,7 +119,7 @@
       const data = new URLSearchParams(new FormData(form));
 
       try {
-        const resp = await fetch("{% url 'index:download_video' %}", {
+        const resp = await fetch("{% url 'index:videoDownloader' %}", {
           method: 'POST',
           headers: { 'X-CSRFToken': getCookie('csrftoken'), 'X-Requested-With': 'XMLHttpRequest' },
           body: data
