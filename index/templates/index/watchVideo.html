@@ -22,18 +22,56 @@
 
 
 
-<div class="container-fluid mt-4">
-    <div class="row align-items-center  ">
-        <div class="col-lg-8 col-12">
-            <h1>{{ mediafile.name }}</h1>
-
+<div class="container-fluid mt-4 ">
+    <div class="row align-items-center border-bottom border-3 border-primary mb-3"> <!-- Titulo -->
+        <div class="col-12 col-lg-8 align-self-end">
+            <h1 class="fw-bold text-dark m-0 pb-2">{{ mediafile.name }}</h1>
         </div>
         {% if request.user == mediafile.user %}
 
-        <div class="col-lg-2 col-6 ">
-            <button class="btn btn-quinto w-100 my-2 my-lg-0" data-bs-toggle="modal"
-                data-bs-target="#imageFileEdit">Editar</button>
+        <div class="col-lg-2 col-6  align-self-end">
+            <div class="pb-2">
+                <button class="btn btn-quinto w-100" data-bs-toggle="modal"
+                    data-bs-target="#imageFileEdit">Editar</button>
+            </div>
+        </div>
 
+        <div class="col-lg-2 col-6  align-self-end">
+            <div class="pb-2">
+                <button class="btn btn-primary w-100" data-bs-toggle="modal"
+                    data-bs-target="#imageModalDelete">Borrar</button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="imageModalDelete" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content bg-cuarto comic-modal m-auto">
+                    <div class="modal-header">
+                        <h2 class="modal-title fnBadComicTitle" id="modalLabel">Borrar registro</h2>
+
+
+                    </div>
+
+                    <div class="modal-body p-0 h-100 d-flex flex-column justify-content-center">
+                        <!-- Carrusel -->
+                        <div class="row px-3">
+                            <div class="col-12 text-center">
+                                Estas seguro de querer eliminar el archivo {{ mediafile.name }}? esta acción es
+                                permanente
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <a href="{% url 'index:deleteVideo' mediafile.id %}" class="btn btn-primary">Sí, quiero
+                            borrarlos</a>
+                        <button type="button" class="btn-quinto btn" data-bs-dismiss="modal" aria-label="Cerrar">No, me
+                            arrepenti</button>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="modal fade" id="imageFileEdit" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -98,7 +136,7 @@
                                     </div>
                                     <div class="row p-2">
                                         <div class="col-md-3 col-12 my-auto">
-                                            Subid por
+                                            Subido por
                                         </div>
                                         <div class="col-md-9 col-12 my-auto">
                                             {{ formVideo.user }}
@@ -109,7 +147,7 @@
                                             NSFW? *
                                         </div>
                                         <div class="col-md-9 col-12 my-auto">
-                                                                                        {{ formVideo.nsfw }}
+                                            {{ formVideo.nsfw }}
 
                                         </div>
                                     </div>
@@ -190,685 +228,634 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-lg-2 col-6 ">
-            <button class="btn btn-primary w-100 my-2 my-lg-0" data-bs-toggle="modal"
-                data-bs-target="#imageModalDelete">Borrar</button>
-        </div>
-
-        <div class="modal fade" id="imageModalDelete" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content bg-cuarto comic-modal m-auto">
-                    <div class="modal-header">
-                        <h2 class="modal-title fnBadComicTitle" id="modalLabel">Borrar registro</h2>
-
-
-                    </div>
-
-                    <div class="modal-body p-0 h-100 d-flex flex-column justify-content-center">
-                        <!-- Carrusel -->
-                        <div class="row px-3">
-                            <div class="col-12 text-center">
-                                Estas seguro de querer eliminar el archivo {{ mediafile.name }}? esta acción es
-                                permanente
-
-                            </div>
-                        </div>
-
-
-                    </div>
-                    <div class="modal-footer">
-                        <a href="{% url 'index:deleteVideo' mediafile.id %}" class="btn btn-primary">Sí, quiero
-                            borrarlos</a>
-                        <button type="button" class="btn-quinto btn" data-bs-dismiss="modal" aria-label="Cerrar">No, me
-                            arrepenti</button>
-                    </div>
-                </div>
-            </div>
-        </div>
         {% endif %}
 
 
-        <div class="media-container"> <!-- Video -->
-            <link href="https://vjs.zencdn.net/8.9.0/video-js.css" rel="stylesheet" />
+    </div>
 
-            <style>
-                .media-container video {
-                    width: 100%;
-                    max-height: 500px;
-                    object-fit: contain;
-                    display: block;
-                    margin: 0 auto;
-                }
-            </style>
+    <div class="media-container my-3"> <!-- Video -->
+        <link href="https://vjs.zencdn.net/8.9.0/video-js.css" rel="stylesheet" />
 
-            <!-- 
-    <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" crossorigin="anonymous"
-                data-setup='{}'>
-                <source src="{{ mediafile.file.url }}" type="video/mp4" />
-                Tu navegador no soporta la reproducción de video.
-            </video> -->
-
-
-            <!--    <video id="my-video" controls preload="auto">
-                <source src="http://localhost:8001/{{ mediafile.file.name|slice:" 15:"|urlencode }}"
-                    type="video/webm" />
-                <source src="http://localhost:8001/{{ mediafile.file.name|slice:" 15:"|urlencode }}" type="video/mp4" />
-            </video> -->
-            {% if is_audio %}
-            <div class="d-flex justify-content-center mt-4">
-                <div class="position-relative" style="display: inline-block;">
-                    {% if mediafile.image %}
-                    <img id="audio-image" src="{{ mediafile.image.url }}" alt="Imagen del audio" class="img-fluid"
-                        style="max-width: 400px; cursor: pointer;">
-                    {% endif %}
-
-                    <!-- Reproductor de audio centrado abajo -->
-                    <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2">
-                        <audio id="audio-player" controls>
-                            <source src="{% url 'index:media_stream' mediafile.id %}" type="audio/mpeg">
-                            Tu navegador no soporta audio.
-                        </audio>
-                    </div>
-                </div>
-            </div>
-
-            <!-- JavaScript para controlar play/pause con la imagen -->
-             
-            <script>
-         
-           
-                document.addEventListener('DOMContentLoaded', function () {
-                    const audio = document.getElementById('audio-player');
-                    const image = document.getElementById('audio-image');
-                    if (audio) {
-                        audio.volume = 0.2;
-                    }
-                    image.addEventListener('click', function () {
-                        if (audio.paused) {
-                            audio.play();
-                        } else {
-                            audio.pause();
-                        }
-                    });
-                });
-            </script>
-
-            {% else %}
-            <video controls class="video-js vjs-default-skin" id="video-player-{{ mediafile.id }}">
-                <source src="{% url 'index:media_stream' mediafile.id %}" type="video/mp4">
-                Tu navegador no soporta video.
-            </video>
-
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const video = document.getElementById('video-player-{{ mediafile.id }}');
-                    if (video) {
-                        video.volume = 0.2;
-                    }
-                });
-            </script>
-            {% endif %}
-
-
-        </div>
         <style>
-            .character-tooltip {
-                position: relative;
-                display: inline-block;
-                cursor: pointer;
-            }
-
-            .character-tooltip .preview-image {
-                visibility: hidden;
-                width: 150px;
-                background-color: #fff;
-                border: 1px solid #ddd;
-                border-radius: 0.5rem;
-                padding: 5px;
-                position: absolute;
-                z-index: 10;
-                top: 100%;
-                left: 50%;
-                transform: translateX(-50%);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                transition: all 0.2s ease-in-out;
-            }
-
-            .character-tooltip:hover .preview-image {
-                visibility: visible;
+            .media-container video {
+                width: 100%;
+                max-height: 500px;
+                object-fit: contain;
+                display: block;
+                margin: 0 auto;
             }
         </style>
 
-        <!-- Archivo  -->
-        <div class="row gy-3">
 
-            <!-- Info de subida -->
-            <div class="col-12">
-                <p class="mb-1 text-muted">
-                    <strong>Subido el:</strong>
-                    {{ mediafile.uploaded_at|date:"d \d\e F \d\e Y \a \l\a\s H:i" }}
-                    {% if mediafile.user %}
-                    <strong>por</strong>
-                    {% if mediafile.user.image %}
-                    <img src="{{ mediafile.user.image.url}}" alt="Imagen de usuario" class="rounded-circle me-2"
-                        style="width: 40px; height: 40px; object-fit: cover;">
-                    <a href="{% url 'index:userProfile' mediafile.user.username %}">{{ mediafile.user.username }}</a>
-                    {% else %}
-                    <img src="{% static 'img/noImage.jpg' %}" alt="Imagen de usuario" class="rounded-circle me-2"
-                        style="width: 40px; height: 40px; object-fit: cover;">
-                    <a href="{% url 'index:userProfile' mediafile.user.username %}">{{ mediafile.user.username }}</a>
-                    {% endif %}
-                    {% else %}
-                    <span class="text-danger">Sin usuario</span>
-                    {% endif %}
-                </p>
-            </div>
-
-            <!-- Artista -->
-            <div class="col-12">
-                <p class="mb-1">
-                    <strong>Artista:</strong>
-                    {% if mediafile.artist %}
-                    <a href="{% url 'index:detailsAbout' 'artist' mediafile.artist.name %}">
-                        {{ mediafile.artist }}
-                    </a>
-                    {% else %}
-                    <span class="text-danger">Sin artista</span>
-                    {% endif %}
-                </p>
-
-            </div>
-            <!-- Personajes -->
-            <div class="col-12">
-                {% if mediafile.character.exists %}
-                <p class="mb-1"><strong>Personajes:</strong></p>
-                <div class="d-flex flex-wrap gap-2">
-                    {% for char in mediafile.character.all %}
-                    <div class="character-tooltip">
-                        <a href="{% url 'index:detailsAbout' 'character' char.name %}"
-                            class="d-inline-block rounded-pill bg-sexto text-black text-decoration-none py-2 px-4">
-                            {{ char.name }}
-                        </a>
-                        <div class="preview-image text-center">
-                            {% if char.image %}
-                            <img src="{{ char.image.url }}" alt="{{ char.name }}" class="img-fluid rounded" />
-                            {% else %}
-                            <img src="{% static 'img/noImage.jpg' %}" alt="{{ char.name }}" class="img-fluid rounded" />
-
-                            {% endif %}
-                            <div class="small mt-1">{{ char.name }}</div>
-                        </div>
-                    </div>
-                    {% endfor %}
-
-                </div>
-                {% else %}
-                <p class="text-danger">Sin personajes</p>
+        {% if is_audio %}
+        <div class="d-flex justify-content-center mt-4">
+            <div class="position-relative" style="display: inline-block;">
+                {% if mediafile.image %}
+                <img id="audio-image" src="{{ mediafile.image.url }}" alt="Imagen del audio" class="img-fluid"
+                    style="max-width: 400px; cursor: pointer;">
                 {% endif %}
 
-            </div>
-            <!-- Likes -->
-            <div class="col-12">
-                <label class="form-label">Likes:</label>
-                <button class="btn btn-like p-0 border-0 bg-transparent d-flex align-items-center gap-2"
-                    data-model="{{ mediafile.tipo_objeto }}" data-id="{{ mediafile.id }}">
-                    <div class="position-relative">
-                        <!-- Ícono Like -->
-                        <img src="{% static 'img/Liked.png' %}" alt="Liked"
-                            class="like-icon liked position-absolute top-0 start-0"
-                            style="{% if not mediafile.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: opacity 0.3s ease;" />
-
-                        <!-- Ícono Not Liked -->
-                        <img src="{% static 'img/Likend.png' %}" alt="Not Liked"
-                            class="like-icon not-liked position-absolute top-0 start-0"
-                            style="{% if mediafile.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: opacity 0.3s ease;" />
-                    </div>
-                    <span class="like-count text-black">{{ mediafile.total_likes }}</span>
-                </button>
-            </div>
-
-            <!-- Tags -->
-            <div class="col-12">
-                <p class="mb-1"><strong>Tags:</strong></p>
-                <div class="d-flex flex-wrap gap-2">
-                    {% for tag in mediafile.tags.all %}
-                    <a href="{% url 'index:filtered_media' 'tag' tag.name %}"
-                        class="badge bg-secondary text-decoration-none">{{ tag.name }}</a>
-                    {% endfor %}
+                <!-- Reproductor de audio centrado abajo -->
+                <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2">
+                    <audio id="audio-player" controls>
+                        <source src="{% url 'index:media_stream' mediafile.id %}" type="audio/mpeg">
+                        Tu navegador no soporta audio.
+                    </audio>
                 </div>
             </div>
-
-            <!-- Botón de descarga -->
-            <div class="col-12">
-                <a href="{{ MEDIA_URL }}{{ mediafile.file }}" class="btn btn-primary">Download</a>
-            </div>
-
         </div>
 
-        <!-- Info del archivo -->
-        <!-- Comentarios -->
-        <div class="row my-5">
-            <div class="col-12">
-                <h2 class="mb-3 border-bottom pb-2">💬 Comentarios</h2>
-            </div>
+        <script>
 
-            <!-- Agregar comentario -->
-            <div class="col-12 mb-3">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title mb-3">Agrega tu comentario</h5>
-                        <form class="row" method="post" id="comentarioForm">
-                            {% csrf_token %}
-                            <div class="col-md-9 mb-2 mb-md-0">
-                                <style>
-                                    #comentarioEditable:empty::before {
-                                        content: attr(placeholder);
-                                        color: #888;
-                                        pointer-events: none;
-                                    }
-                                </style>
-                                <div id="comentarioEditable"
-                                    class="form-control shadow-none bg-corporateTan200 px-2 py-1" contenteditable="true"
-                                    placeholder="Introduce tu comentario" style="min-height: 38px;"></div>
 
-                                <!-- Campo oculto que realmente se envía al backend -->
-                                <input type="hidden" name="comentario" id="id_comentario">
-                            </div>
-                            <div class="col-md-3 text-end">
-                                <button class="btn btn-primary w-100" type="submit">Enviar ✉️</button>
-                            </div>
-                        </form>
+            document.addEventListener('DOMContentLoaded', function () {
+                const audio = document.getElementById('audio-player');
+                const image = document.getElementById('audio-image');
+                if (audio) {
+                    audio.volume = 0.2;
+                }
+                image.addEventListener('click', function () {
+                    if (audio.paused) {
+                        audio.play();
+                    } else {
+                        audio.pause();
+                    }
+                });
+            });
+        </script>
+
+        {% else %}
+        <video controls class="video-js vjs-default-skin" id="video-player-{{ mediafile.id }}">
+            <source src="{% url 'index:media_stream' mediafile.id %}" type="video/mp4">
+            Tu navegador no soporta video.
+        </video>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const video = document.getElementById('video-player-{{ mediafile.id }}');
+                if (video) {
+                    video.volume = 0.2;
+                }
+            });
+        </script>
+        {% endif %}
+
+
+    </div>
+    <style>
+        .character-tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .character-tooltip .preview-image {
+            visibility: hidden;
+            width: 150px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            padding: 5px;
+            position: absolute;
+            z-index: 10;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .character-tooltip:hover .preview-image {
+            visibility: visible;
+        }
+    </style>
+
+    <!-- Archivo  -->
+    <div class="row border-top border-3 border-primary my-4 pt-3">
+
+        <div class="col-12 mb-3">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                    {% if mediafile.user %}
+                    <img src="{% if mediafile.user.image %}{{ mediafile.user.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
+                        alt="User" class="rounded-circle shadow-sm border border-2 border-primary me-2"
+                        style="width: 45px; height: 45px; object-fit: cover;">
+                    <div>
+                        <a href="{% url 'index:userProfile' mediafile.user.username %}"
+                            class="fw-bold text-decoration-none d-block">@{{ mediafile.user.username }}</a>
+                        <small class="text-muted"><i class="fas fa-calendar-alt me-1"></i>
+                            {{ mediafile.uploaded_at|date:"d \d\e F, Y" }}</small>
                     </div>
+                    {% else %}
+                    <span class="badge bg-danger-subtle text-danger p-2"><i class="fas fa-user-slash me-1"></i>Sin
+                        usuario</span>
+                    {% endif %}
                 </div>
+
+                <button
+                    class="btn btn-light shadow-sm border-primary rounded-pill px-3 py-2 btn-like d-flex align-items-center gap-2"
+                    data-model="{{ mediafile.tipo_objeto }}" data-id="{{ mediafile.id }}">
+                    <div class="position-relative" style="width: 24px; height: 24px;">
+                        <img src="{% static 'img/Liked.png' %}" alt="Liked"
+                            class="like-icon liked position-absolute top-0 start-0"
+                            style="{% if not mediafile.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: 0.3s;" />
+                        <img src="{% static 'img/Likend.png' %}" alt="Not Liked"
+                            class="like-icon not-liked position-absolute top-0 start-0"
+                            style="{% if mediafile.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: 0.3s;" />
+                    </div>
+                    <span class="like-count fw-bold">{{ mediafile.total_likes }}</span>
+                </button>
             </div>
+        </div>
 
-            <!-- Lista de comentarios -->
-            <div class="col-12 mt-4">
-                <div id="comentariosContainer">
-                    {% for comentario in comentarios %}
-                    <div class="card mb-3 shadow-sm border-start border-5 border-primary comentario">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div class="d-flex align-items-center">
-                                    {% if comentario.usuario.image %}
-                                    <img src="{{ comentario.usuario.image.url }}" alt="Imagen de usuario"
-                                        class="rounded-circle me-2" alt="Imagen de usuario" class="rounded-circle me-2"
-                                        style="width: 30px; height: 30px; object-fit: cover;">
-                                    {% else %}
-                                    <img src="{% static 'img/noImage.jpg' %}" alt="Imagen de usuario"
-                                        class="rounded-circle me-2" alt="Imagen de usuario" class="rounded-circle me-2"
-                                        style="width: 30px; height: 30px; object-fit: cover;">
-                                    {% endif %}
+        <div class="col-md-6 mb-3">
+            <h6 class="text-primary fw-bold text-uppercase small mb-2">Artistas
+            </h6>
+            {% if mediafile.artist %}
+            <a href="{% url 'index:detailsAbout' 'artist' mediafile.artist.name %}"
+                class="btn btn-secondary rounded-pill py-1 px-3 text-white border-tercero border-2">
+                {{ mediafile.artist }}
+            </a>
+            {% else %}
+            <span class="text-muted small italic">Desconocido</span>
+            {% endif %}
+        </div>
 
-                                    <a href="{% url 'index:userProfile' comentario.usuario.username %}"
-                                        class="fw-bold text-decoration-none text-primary">
-                                        {{ comentario.usuario }}
-                                    </a>
-                                </div>
-                                <small class="text-muted">{{ comentario.uploaded_at }}</small>
-                            </div>
-                            <p class="mb-0">{{ comentario.comentario }}</p>
+        <div class="col-12 mb-3">
+            <h6 class="text-primary fw-bold text-uppercase small mb-2">Personajes</h6>
+            {% if mediafile.character.exists %}
+            <div class="d-flex flex-wrap gap-2">
+                {% for char in mediafile.character.all %}
+                <div class="character-tooltip position-relative">
+                    <a href="{% url 'index:detailsAbout' 'character' char.name %}"
+                        class="d-inline-flex align-items-center rounded-pill bg-sexto text-black text-decoration-none py-1 px-3 border-cuarto border-2">
+                        {{ char.name }} </a>
+                    <div class="preview-image shadow-lg border rounded p-1 bg-white">
+                        <img src="{% if char.image %}{{ char.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
+                            alt="{{ char.name }}" class="img-fluid rounded mb-1" />
+                        <div class=" fw-bold small text-dark">{{ char.name }}
                         </div>
                     </div>
-                    {% empty %}
-                    <p class="text-muted">Sé el primero en comentar 😃</p>
-                    {% endfor %}
-
                 </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted small mb-0">No se han etiquetado personajes</p>
+            {% endif %}
+        </div>
 
-                <!-- Comentairios -->
+        <div class="col-12 mb-4">
+            <h6 class="text-primary fw-bold text-uppercase small mb-2">
+                Tags
+            </h6>
+            <div class="d-flex flex-wrap gap-1">
+                {% for tag in mediafile.tags.all %}
+                <a href="{% url 'index:filtered_media' 'tag' tag.name %}"
+                    class="badge bg-secondary-subtle text-secondary border border-secondary-subtle text-decoration-none px-3 py-2">
+                    #{{ tag.name }}
+                </a>
+                {% empty %}
+                <span class="text-danger small">Sin tags</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-12">
+            <a href="{{ MEDIA_URL }}{{ mediafile.file }}"
+                class="btn btn-primary btn-lg w-100 shadow rounded-pill d-flex align-items-center justify-content-center gap-2 py-2">
+                <i class="fas fa-cloud-download-alt"></i>
+                Descargar </a>
+        </div>
+
+    </div>
+
+    <!-- Comentarios -->
+    <div class="row  border-top border-3 border-primary my-4">
+        <div class="col-12 my-3">
+            <h2 class="">Comentarios</h2>
+        </div>
+
+        <!-- Agregar comentario -->
+        <div class="col-12 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Agrega tu comentario</h5>
+                    <form class="row" method="post" id="comentarioForm">
+                        {% csrf_token %}
+                        <div class="col-md-9 mb-2 mb-md-0">
+                            <style>
+                                #comentarioEditable:empty::before {
+                                    content: attr(placeholder);
+                                    color: #888;
+                                    pointer-events: none;
+                                }
+                            </style>
+                            <div id="comentarioEditable" class="form-control shadow-none bg-corporateTan200 px-2 py-1"
+                                contenteditable="true" placeholder="Introduce tu comentario" style="min-height: 38px;">
+                            </div>
+
+                            <!-- Campo oculto que realmente se envía al backend -->
+                            <input type="hidden" name="comentario" id="id_comentario">
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <button class="btn btn-primary w-100" type="submit">Enviar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de comentarios -->
+        <div class="col-12 mt-4">
+            <div id="comentariosContainer">
+                {% for comentario in comentarios %}
+                <div class="card mb-3 shadow-sm border-start border-5 border-primary comentario">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center">
+                                {% if comentario.usuario.image %}
+                                <img src="{{ comentario.usuario.image.url }}" alt="Imagen de usuario"
+                                    class="rounded-circle me-2" alt="Imagen de usuario" class="rounded-circle me-2"
+                                    style="width: 30px; height: 30px; object-fit: cover;">
+                                {% else %}
+                                <img src="{% static 'img/noImage.jpg' %}" alt="Imagen de usuario"
+                                    class="rounded-circle me-2" alt="Imagen de usuario" class="rounded-circle me-2"
+                                    style="width: 30px; height: 30px; object-fit: cover;">
+                                {% endif %}
+
+                                <a href="{% url 'index:userProfile' comentario.usuario.username %}"
+                                    class="fw-bold text-decoration-none text-primary">
+                                    {{ comentario.usuario }}
+                                </a>
+                            </div>
+                            <small class="text-muted">{{ comentario.uploaded_at }}</small>
+                        </div>
+                        <p class="mb-0">{{ comentario.comentario }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted">Sé el primero en comentar</p>
+                {% endfor %}
+
             </div>
 
+            <!-- Comentairios -->
+        </div>
+
+
+    </div>
+</div>
 
 
 
 
-            <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    const imageInputs = document.querySelectorAll('.imageInput');
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const imageInputs = document.querySelectorAll('.imageInput');
 
-                    imageInputs.forEach(input => {
-                        input.addEventListener('change', function () {
-                            const previewId = this.dataset.previewId;
-                            const imagePreview = document.querySelector(`.imagePreview[data-preview-id="${previewId}"]`);
-                            const file = this.files[0];
+        imageInputs.forEach(input => {
+            input.addEventListener('change', function () {
+                const previewId = this.dataset.previewId;
+                const imagePreview = document.querySelector(`.imagePreview[data-preview-id="${previewId}"]`);
+                const file = this.files[0];
 
-                            if (file && imagePreview) {
-                                const reader = new FileReader();
+                if (file && imagePreview) {
+                    const reader = new FileReader();
 
-                                reader.onload = function (e) {
-                                    imagePreview.src = e.target.result;
-                                    imagePreview.classList.remove('d-none');
-                                };
+                    reader.onload = function (e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.classList.remove('d-none');
+                    };
 
-                                reader.readAsDataURL(file);
-                            } else if (imagePreview) {
-                                imagePreview.src = "#";
-                                imagePreview.classList.add('d-none');
-                            }
-                        });
-                    });
-                });
+                    reader.readAsDataURL(file);
+                } else if (imagePreview) {
+                    imagePreview.src = "#";
+                    imagePreview.classList.add('d-none');
+                }
+            });
+        });
+    });
 
-            </script>
+</script>
 
-            <script>
-                function setupTagInput({ inputId, suggestionsId, containerId, hiddenInputId }) {
-                    const tagInput = document.getElementById(inputId);
-                    const tagSuggestions = document.getElementById(suggestionsId);
-                    const tagContainer = document.getElementById(containerId);
-                    const tagsSelectedInput = document.getElementById(hiddenInputId);
+<script>
+    function setupTagInput({ inputId, suggestionsId, containerId, hiddenInputId }) {
+        const tagInput = document.getElementById(inputId);
+        const tagSuggestions = document.getElementById(suggestionsId);
+        const tagContainer = document.getElementById(containerId);
+        const tagsSelectedInput = document.getElementById(hiddenInputId);
 
-                    let selectedTags = [];
-                    let selectedIndex = -1;
+        let selectedTags = [];
+        let selectedIndex = -1;
 
-                    // Cargar las etiquetas existentes (si las hay)
-                    function loadTags(existingTags) {
-                        selectedTags = existingTags.split(",").filter(tag => tag.trim() !== "");
-                        renderTags();
-                    }
+        // Cargar las etiquetas existentes (si las hay)
+        function loadTags(existingTags) {
+            selectedTags = existingTags.split(",").filter(tag => tag.trim() !== "");
+            renderTags();
+        }
 
-                    function renderTags() {
-                        tagContainer.innerHTML = '';  // Limpiar el contenedor
-                        selectedTags.forEach(tag => {
-                            const tagDiv = document.createElement("div");
-                            tagDiv.className = "badge bg-secondary text-white rounded-pill px-3 py-2 d-flex align-items-center gap-2";
-                            tagDiv.innerHTML = `
+        function renderTags() {
+            tagContainer.innerHTML = '';  // Limpiar el contenedor
+            selectedTags.forEach(tag => {
+                const tagDiv = document.createElement("div");
+                tagDiv.className = "badge bg-secondary text-white rounded-pill px-3 py-2 d-flex align-items-center gap-2";
+                tagDiv.innerHTML = `
                       ${tag}
                       <button type="button" class="btn-close btn-close-white btn-sm ms-2" aria-label="Remove"></button>
                   `;
 
-                            tagDiv.querySelector("button").addEventListener("click", () => {
-                                removeTag(tag);
-                            });
+                tagDiv.querySelector("button").addEventListener("click", () => {
+                    removeTag(tag);
+                });
 
-                            tagContainer.appendChild(tagDiv);
-                        });
-                        updateHiddenInput();
-                    }
+                tagContainer.appendChild(tagDiv);
+            });
+            updateHiddenInput();
+        }
 
-                    // Al cargar la página con tags preexistentes
-                    const existingTags = tagsSelectedInput.value; // Suponiendo que ya tienes las etiquetas separadas por coma
-                    loadTags(existingTags);
+        // Al cargar la página con tags preexistentes
+        const existingTags = tagsSelectedInput.value; // Suponiendo que ya tienes las etiquetas separadas por coma
+        loadTags(existingTags);
 
-                    tagInput.addEventListener("input", async () => {
-                        const query = tagInput.value.trim();
-                        const terms = query.split(" ");
-                        const lastTerm = terms[terms.length - 1];
+        tagInput.addEventListener("input", async () => {
+            const query = tagInput.value.trim();
+            const terms = query.split(" ");
+            const lastTerm = terms[terms.length - 1];
 
-                        if (lastTerm.length < 1) {
-                            tagSuggestions.classList.add("d-none");
-                            tagSuggestions.innerHTML = "";
-                            selectedIndex = -1;
-                            return;
-                        }
+            if (lastTerm.length < 1) {
+                tagSuggestions.classList.add("d-none");
+                tagSuggestions.innerHTML = "";
+                selectedIndex = -1;
+                return;
+            }
 
-                        const response = await fetch(`/tags-suggest/?q=${encodeURIComponent(lastTerm)}`);
-                        const tags = await response.json();
+            const response = await fetch(`/tags-suggest/?q=${encodeURIComponent(lastTerm)}`);
+            const tags = await response.json();
 
-                        tagSuggestions.innerHTML = "";
-                        if (tags.length > 0) {
-                            tagSuggestions.innerHTML = tags.map(tag => `
+            tagSuggestions.innerHTML = "";
+            if (tags.length > 0) {
+                tagSuggestions.innerHTML = tags.map(tag => `
                       <div class="p-2 suggestion-item" style="cursor:pointer;">
                           ${tag}
                       </div>
                   `).join('');
 
-                            tagSuggestions.classList.remove("d-none");
+                tagSuggestions.classList.remove("d-none");
 
-                            document.querySelectorAll(`#${suggestionsId} .suggestion-item`).forEach((item, index) => {
-                                item.addEventListener("click", () => {
-                                    addTag(item.textContent);
-                                    tagInput.value = "";
-                                    tagSuggestions.classList.add("d-none");
-                                    selectedIndex = -1;
-                                    tagInput.focus();
-                                });
-                            });
-
-                            selectedIndex = -1;
-                        } else {
-                            tagSuggestions.classList.add("d-none");
-                        }
+                document.querySelectorAll(`#${suggestionsId} .suggestion-item`).forEach((item, index) => {
+                    item.addEventListener("click", () => {
+                        addTag(item.textContent);
+                        tagInput.value = "";
+                        tagSuggestions.classList.add("d-none");
+                        selectedIndex = -1;
+                        tagInput.focus();
                     });
+                });
 
-                    tagInput.addEventListener("keydown", e => {
-                        const suggestions = tagSuggestions.querySelectorAll(".suggestion-item");
+                selectedIndex = -1;
+            } else {
+                tagSuggestions.classList.add("d-none");
+            }
+        });
 
-                        // Flechas arriba/abajo mantienen tu lógica
-                        if (e.key === "ArrowDown") {
-                            e.preventDefault();
-                            selectedIndex = (selectedIndex + 1) % suggestions.length;
-                            updateActiveSuggestion(suggestions);
-                        }
-                        else if (e.key === "ArrowUp") {
-                            e.preventDefault();
-                            selectedIndex = (selectedIndex - 1 + suggestions.length) % suggestions.length;
-                            updateActiveSuggestion(suggestions);
-                        }
-                        // Tab: si moviste con flechas, toma esa; si no, la primera sugerencia
-                        else if (e.key === "Tab") {
-                            if (suggestions.length > 0) {
-                                e.preventDefault();
-                                const idx = selectedIndex >= 0 ? selectedIndex : 0;
-                                addTag(suggestions[idx].textContent);
-                                tagInput.value = "";
-                                tagSuggestions.classList.add("d-none");
-                                selectedIndex = -1;
-                            }
-                        }
-                        // Enter: si moviste con flechas, toma esa; sino, toma lo que escribiste
-                        else if (e.key === "Enter") {
-                            e.preventDefault();
-                            if (suggestions.length > 0 && selectedIndex >= 0) {
-                                addTag(suggestions[selectedIndex].textContent);
-                            } else if (tagInput.value.trim() !== "") {
-                                addTag(tagInput.value.trim());
-                            }
-                            tagInput.value = "";
-                            tagSuggestions.classList.add("d-none");
-                            selectedIndex = -1;
-                        }
-                    });
+        tagInput.addEventListener("keydown", e => {
+            const suggestions = tagSuggestions.querySelectorAll(".suggestion-item");
 
-                    function updateActiveSuggestion(suggestions) {
-                        suggestions.forEach((item, index) => {
-                            if (index === selectedIndex) {
-                                item.classList.add("bg-light", "active");
-                                item.scrollIntoView({ block: "nearest" });
-                            } else {
-                                item.classList.remove("bg-light", "active");
-                            }
-                        });
-                    }
+            // Flechas arriba/abajo mantienen tu lógica
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                selectedIndex = (selectedIndex + 1) % suggestions.length;
+                updateActiveSuggestion(suggestions);
+            }
+            else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                selectedIndex = (selectedIndex - 1 + suggestions.length) % suggestions.length;
+                updateActiveSuggestion(suggestions);
+            }
+            // Tab: si moviste con flechas, toma esa; si no, la primera sugerencia
+            else if (e.key === "Tab") {
+                if (suggestions.length > 0) {
+                    e.preventDefault();
+                    const idx = selectedIndex >= 0 ? selectedIndex : 0;
+                    addTag(suggestions[idx].textContent);
+                    tagInput.value = "";
+                    tagSuggestions.classList.add("d-none");
+                    selectedIndex = -1;
+                }
+            }
+            // Enter: si moviste con flechas, toma esa; sino, toma lo que escribiste
+            else if (e.key === "Enter") {
+                e.preventDefault();
+                if (suggestions.length > 0 && selectedIndex >= 0) {
+                    addTag(suggestions[selectedIndex].textContent);
+                } else if (tagInput.value.trim() !== "") {
+                    addTag(tagInput.value.trim());
+                }
+                tagInput.value = "";
+                tagSuggestions.classList.add("d-none");
+                selectedIndex = -1;
+            }
+        });
 
-                    function addTag(tagText) {
-                        const cleanTag = tagText.trim();
-                        if (cleanTag === "" || selectedTags.includes(cleanTag)) return;
+        function updateActiveSuggestion(suggestions) {
+            suggestions.forEach((item, index) => {
+                if (index === selectedIndex) {
+                    item.classList.add("bg-light", "active");
+                    item.scrollIntoView({ block: "nearest" });
+                } else {
+                    item.classList.remove("bg-light", "active");
+                }
+            });
+        }
 
-                        selectedTags.push(cleanTag);
+        function addTag(tagText) {
+            const cleanTag = tagText.trim();
+            if (cleanTag === "" || selectedTags.includes(cleanTag)) return;
 
-                        const tagDiv = document.createElement("div");
-                        tagDiv.className = "badge bg-secondary text-white rounded-pill px-3 py-2 d-flex align-items-center gap-2";
-                        tagDiv.innerHTML = `
+            selectedTags.push(cleanTag);
+
+            const tagDiv = document.createElement("div");
+            tagDiv.className = "badge bg-secondary text-white rounded-pill px-3 py-2 d-flex align-items-center gap-2";
+            tagDiv.innerHTML = `
                   ${cleanTag}
                   <button type="button" class="btn-close btn-close-white btn-sm ms-2" aria-label="Remove"></button>
               `;
 
-                        tagDiv.querySelector("button").addEventListener("click", () => {
-                            tagContainer.removeChild(tagDiv);
-                            selectedTags = selectedTags.filter(t => t !== cleanTag);
-                            updateHiddenInput();
-                        });
+            tagDiv.querySelector("button").addEventListener("click", () => {
+                tagContainer.removeChild(tagDiv);
+                selectedTags = selectedTags.filter(t => t !== cleanTag);
+                updateHiddenInput();
+            });
 
-                        tagContainer.appendChild(tagDiv);
-                        updateHiddenInput();
-                    }
+            tagContainer.appendChild(tagDiv);
+            updateHiddenInput();
+        }
 
-                    function updateHiddenInput() {
-                        tagsSelectedInput.value = selectedTags.join(",");
-                    }
+        function updateHiddenInput() {
+            tagsSelectedInput.value = selectedTags.join(",");
+        }
 
-                }
+    }
 
-                setupTagInput({
-                    inputId: "tagInputArtist",
-                    suggestionsId: "tagSuggestionsArtist",
-                    containerId: "tagContainerArtist",
-                    hiddenInputId: "tagsSelectedArtist"
-                });
-                document.addEventListener('DOMContentLoaded', function () {
-                    const tagContainer = document.getElementById('tagContainerArtist');
-                    const hiddenInput = document.getElementById('tagsSelectedArtist');
+    setupTagInput({
+        inputId: "tagInputArtist",
+        suggestionsId: "tagSuggestionsArtist",
+        containerId: "tagContainerArtist",
+        hiddenInputId: "tagsSelectedArtist"
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const tagContainer = document.getElementById('tagContainerArtist');
+        const hiddenInput = document.getElementById('tagsSelectedArtist');
 
-                    // Delegamos el click en cualquier .btn-close dentro de tagContainerArtist
-                    tagContainer.addEventListener('click', function (e) {
-                        if (!e.target.classList.contains('btn-close')) return;
+        // Delegamos el click en cualquier .btn-close dentro de tagContainerArtist
+        tagContainer.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('btn-close')) return;
 
-                        // encuentra la badge más cercana y la elimina
-                        const badge = e.target.closest('.badge');
-                        if (badge) badge.remove();
+            // encuentra la badge más cercana y la elimina
+            const badge = e.target.closest('.badge');
+            if (badge) badge.remove();
 
-                        // luego actualiza el input oculto con las badges que quedan
-                        const tags = Array.from(tagContainer.querySelectorAll('.badge'))
-                            .map(b => b.firstChild.textContent.trim());
-                        hiddenInput.value = tags.join(',');
-                    });
-                });
+            // luego actualiza el input oculto con las badges que quedan
+            const tags = Array.from(tagContainer.querySelectorAll('.badge'))
+                .map(b => b.firstChild.textContent.trim());
+            hiddenInput.value = tags.join(',');
+        });
+    });
 
 
 
-            </script>
-            <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    document.querySelectorAll('.btn-like').forEach(function (button) {
-                        button.addEventListener('click', function () {
-                            const model = button.getAttribute('data-model');
-                            const id = button.getAttribute('data-id');
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.btn-like').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const model = button.getAttribute('data-model');
+                const id = button.getAttribute('data-id');
 
-                            fetch(`/toggle-like/${model}/${id}/`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRFToken': getCookie('csrftoken'),
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                },
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.liked !== undefined) {
-                                        button.querySelector('.like-count').textContent = data.total_likes;
+                fetch(`/toggle-like/${model}/${id}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.liked !== undefined) {
+                            button.querySelector('.like-count').textContent = data.total_likes;
 
-                                        const likedIcon = button.querySelector('.liked');
-                                        const notLikedIcon = button.querySelector('.not-liked');
+                            const likedIcon = button.querySelector('.liked');
+                            const notLikedIcon = button.querySelector('.not-liked');
 
-                                        if (data.liked) {
-                                            likedIcon.style.opacity = '1';
-                                            notLikedIcon.style.opacity = '0';
-                                        } else {
-                                            likedIcon.style.opacity = '0';
-                                            notLikedIcon.style.opacity = '1';
-                                        }
-                                    }
-                                });
-                        });
-                    });
-
-                    function getCookie(name) {
-                        let cookieValue = null;
-                        if (document.cookie && document.cookie !== '') {
-                            document.cookie.split(';').forEach(function (cookie) {
-                                cookie = cookie.trim();
-                                if (cookie.startsWith(name + '=')) {
-                                    cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
-                                }
-                            });
+                            if (data.liked) {
+                                likedIcon.style.opacity = '1';
+                                notLikedIcon.style.opacity = '0';
+                            } else {
+                                likedIcon.style.opacity = '0';
+                                notLikedIcon.style.opacity = '1';
+                            }
                         }
-                        return cookieValue;
+                    });
+            });
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                document.cookie.split(';').forEach(function (cookie) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
                     }
                 });
-            </script>
-            <style>
-                /* Contenedor del ícono: tamaño fijo para que no salte el layout */
-                .btn-like .position-relative {
-                    width: 24px;
-                    height: 24px;
-                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+<style>
+    /* Contenedor del ícono: tamaño fijo para que no salte el layout */
+    .btn-like .position-relative {
+        width: 24px;
+        height: 24px;
+    }
 
-                /* Ambos íconos superpuestos */
-                .like-icon {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    transition: opacity 0.3s ease;
-                    /* transición de la opacidad */
-                    will-change: opacity;
-                    /* mejora el rendimiento */
-                }
+    /* Ambos íconos superpuestos */
+    .like-icon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transition: opacity 0.3s ease;
+        /* transición de la opacidad */
+        will-change: opacity;
+        /* mejora el rendimiento */
+    }
 
-                /* Opcional: efecto hover en el botón */
-                .btn-like:hover .like-icon {
-                    transform: scale(1.2);
-                    transition: transform 0.2s ease;
-                }
-            </style>
-
-
-
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const editor = document.getElementById('comentarioEditable');
-                    const inputOculto = document.getElementById('id_comentario');
-
-                    let ultimaTextoPlano = '';
-
-                    editor.addEventListener('input', function () {
-                        const textoPlano = editor.innerText;
-
-                        if (textoPlano !== ultimaTextoPlano) {
-                            ultimaTextoPlano = textoPlano;
-
-                            const textoHTML = textoPlano.replace(/(@\w+)/g, '<span class="mencion">$1</span>');
-
-                            editor.innerHTML = textoHTML;
-
-                            const range = document.createRange();
-                            range.selectNodeContents(editor);
-                            range.collapse(false);
-                            const selection = window.getSelection();
-                            selection.removeAllRanges();
-                            selection.addRange(range);
-                        }
-
-                        // Copia texto plano sin estilos
-                        inputOculto.value = textoPlano;
-                    });
-                });
-            </script>
-            <style>
-                .mencion {
-                    color: #007bff;
-                    /* azul */
-                    font-weight: bold;
-                }
-            </style>
-
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    document.querySelectorAll('.comentario p').forEach(function (parrafo) {
-                        const textoPlano = parrafo.textContent;
-
-                        const textoHTML = textoPlano.replace(/@(\w+)/g, function (match, username) {
-                            const url = `/profile/${username}`;  // Ruta basada en tu URL Django
-                            return `<a href="${url}" class="mencion">@${username}</a>`;
-                        });
-
-                        parrafo.innerHTML = textoHTML;
-                    });
-                });
-            </script>
+    /* Opcional: efecto hover en el botón */
+    .btn-like:hover .like-icon {
+        transform: scale(1.2);
+        transition: transform 0.2s ease;
+    }
+</style>
 
 
-            {% endblock %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editor = document.getElementById('comentarioEditable');
+        const inputOculto = document.getElementById('id_comentario');
+
+        let ultimaTextoPlano = '';
+
+        editor.addEventListener('input', function () {
+            const textoPlano = editor.innerText;
+
+            if (textoPlano !== ultimaTextoPlano) {
+                ultimaTextoPlano = textoPlano;
+
+                const textoHTML = textoPlano.replace(/(@\w+)/g, '<span class="mencion">$1</span>');
+
+                editor.innerHTML = textoHTML;
+
+                const range = document.createRange();
+                range.selectNodeContents(editor);
+                range.collapse(false);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+
+            // Copia texto plano sin estilos
+            inputOculto.value = textoPlano;
+        });
+    });
+</script>
+
+
+<style>
+    .mencion {
+        color: #007bff;
+        /* azul */
+        font-weight: bold;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.comentario p').forEach(function (parrafo) {
+            const textoPlano = parrafo.textContent;
+
+            const textoHTML = textoPlano.replace(/@(\w+)/g, function (match, username) {
+                const url = `/userProfile/${username}`;  // Ruta basada en tu URL Django
+                return `<a href="${url}" class="mencion">@${username}</a>`;
+            });
+
+            parrafo.innerHTML = textoHTML;
+        });
+    });
+</script>
+
+
+{% endblock %}
