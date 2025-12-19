@@ -393,49 +393,55 @@
 </nav>
 
 
-
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const badgeEscritorio = document.getElementById('notificacion-badge');
     const badgeMovil = document.getElementById('notificacion-badge-movil');
-
     const panelEscritorio = document.getElementById('panel-notificaciones');
     const panelMovil = document.getElementById('panel-notificaciones-movil');
-
     const listaEscritorio = document.getElementById('lista-notificaciones');
     const listaMovil = document.getElementById('lista-notificaciones-movil');
 
-    // Obtiene el CSRF token
+    let ultimoConteo = -1;
+    let intervaloNotificaciones;
+
     function getCookie(name) {
       let cookieValue = null;
       if (document.cookie && document.cookie !== '') {
-        document.cookie.split(';').forEach(cookie => {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
           cookie = cookie.trim();
-          if (cookie.startsWith(name + '=')) {
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
             cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
           }
-        });
+        }
       }
       return cookieValue;
     }
 
-    // Actualiza el conteo en ambos badges
-    /*async function actualizarNotificaciones() {
+    async function actualizarNotificaciones() {
+      if (document.hidden) return;
+
       try {
         const response = await fetch("{% url 'index:notificaciones_count' %}");
         const data = await response.json();
         const count = data.count;
 
+        if (count === ultimoConteo) return;
+        ultimoConteo = count;
+
         [badgeEscritorio, badgeMovil].forEach(badge => {
-          badge.innerText = count;
-          badge.style.display = 'inline-block';
+          if (badge) {
+            badge.innerText = count;
+            badge.style.display = count > 0 ? 'inline-block' : 'none';
+          }
         });
       } catch (e) {
         console.error("Error al actualizar el badge", e);
       }
     }
 
-    // Carga notificaciones en el panel y lista que indique
     async function cargarNotificaciones(panel, lista) {
       try {
         const res = await fetch("{% url 'index:obtener_notificaciones' %}");
@@ -443,13 +449,13 @@
         lista.innerHTML = '';
 
         if (data.notificaciones.length === 0) {
-          lista.innerHTML = '<p class="text-muted mb-0">No tienes notificaciones pendientes.</p>';
+          lista.innerHTML = '<p class="text-muted mb-0 p-2 small">No tienes notificaciones pendientes.</p>';
           return;
         }
 
         data.notificaciones.forEach(n => {
           const item = document.createElement('div');
-          item.classList.add('notificacion-item', 'mb-2', 'small', 'd-flex', 'align-items-center', 'justify-content-between');
+          item.classList.add('notificacion-item', 'mb-2', 'small', 'd-flex', 'align-items-center', 'justify-content-between', 'p-2', 'border-bottom');
 
           item.innerHTML = `
               <a href="${n.url}" class="text-decoration-none text-dark flex-grow-1 me-2 ${n.leida ? '' : 'fw-bold'}">
@@ -457,10 +463,9 @@
                   ${n.mensaje}<br><small class="text-muted">${n.fecha}</small>
                 </div>
               </a>
-              ${n.imagen ? `<img src="${n.imagen}" alt="Imagen notificación" style="height:60px;width:auto;border-radius:5px;">` : ''}
+              ${n.imagen ? `<img src="${n.imagen}" alt="Imagen" style="height:50px;width:50px;border-radius:5px;object-fit:cover;">` : ''}
             `;
 
-          // Marcar como leída
           item.querySelector('a').addEventListener('click', async (e) => {
             e.preventDefault();
             if (!n.leida) {
@@ -476,7 +481,6 @@
                 const result = await resp.json();
                 if (result.success) {
                   n.leida = true;
-                  item.querySelector('a').classList.remove('fw-bold');
                   actualizarNotificaciones();
                 }
               } catch (err) {
@@ -490,11 +494,15 @@
         });
       } catch (err) {
         console.error('Error cargando notificaciones:', err);
-        lista.innerHTML = '<p class="text-danger">Error al cargar notificaciones.</p>';
+        lista.innerHTML = '<p class="text-danger p-2 small">Error al cargar notificaciones.</p>';
       }
-    }*/
+    }
 
-    // Toggle panel escritorio
+    function iniciarTemporizador() {
+      clearInterval(intervaloNotificaciones);
+      intervaloNotificaciones = setInterval(actualizarNotificaciones, 60000);
+    }
+
     badgeEscritorio.addEventListener('click', function (e) {
       e.stopPropagation();
       if (panelEscritorio.style.display === 'block') {
@@ -506,7 +514,6 @@
       }
     });
 
-    // Toggle panel móvil
     badgeMovil.addEventListener('click', function (e) {
       e.stopPropagation();
       if (panelMovil.style.display === 'block') {
@@ -518,35 +525,25 @@
       }
     });
 
-    // Cierra ambos paneles al clicar fuera
     document.addEventListener('click', function (e) {
-      if (!panelEscritorio.contains(e.target) && !badgeEscritorio.contains(e.target)) {
+      if (panelEscritorio.style.display === 'block' && !panelEscritorio.contains(e.target) && !badgeEscritorio.contains(e.target)) {
         panelEscritorio.style.display = 'none';
       }
-      if (!panelMovil.contains(e.target) && !badgeMovil.contains(e.target)) {
+      if (panelMovil.style.display === 'block' && !panelMovil.contains(e.target) && !badgeMovil.contains(e.target)) {
         panelMovil.style.display = 'none';
       }
     });
 
-    // Inicializa
-    actualizarNotificaciones();
-    setInterval(actualizarNotificaciones, 15000);
-  });
-
-
-
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let cookie of cookies) {
-        cookie = cookie.trim();
-        if (cookie.startsWith(name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
+    document.addEventListener("visibilitychange", function() {
+      if (!document.hidden) {
+        actualizarNotificaciones();
+        iniciarTemporizador();
+      } else {
+        clearInterval(intervaloNotificaciones);
       }
-    }
-    return cookieValue;
-  }
+    });
+
+    actualizarNotificaciones();
+    iniciarTemporizador();
+  });
 </script>
