@@ -5,7 +5,7 @@
 <div class="container-fluid mt-4">
   <div class="row mb-3">
     <div class="col-12 border-bottom border-3 border-primary">
-      <h1 class="fw-bold text-dark">Descargador Multimedia Universal</h1>
+      <h1 class="fw-bold text-dark">Descargador de videos </h1>
     </div>
     <div class="col-12">
       <div id="result" class="mb-4">
@@ -35,11 +35,9 @@
         <div class="mb-4">
           <label for="url-input" class="form-label fw-bold text-primary">URL del video o archivo directo</label>
           <div class="input-group input-group-lg border border-secondary rounded-3 overflow-hidden shadow-sm">
-            <span class="input-group-text bg-light border-0" style="color: #007bff;">
-              <i class="fas fa-link"></i>
-            </span>
+
             <input id="url-input" class="form-control py-2 px-3 border-0" type="url" name="url"
-              placeholder="Pega el enlace de YouTube o link directo (.mp4, .mp3...)" required>
+              placeholder="Link de YouTube o link" required>
           </div>
         </div>
 
@@ -48,7 +46,7 @@
             <label for="download-type" class="form-label fw-bold text-primary">Formato de Salida</label>
             <select id="download-type" name="download_type"
               class="form-select form-select-lg py-2 rounded-3 shadow-sm border-secondary">
-              <option value="video" selected> Video (Original/MP4)</option>
+              <option value="video" selected> Video (MP4)</option>
               <option value="audio"> Audio (MP3)</option>
             </select>
           </div>

@@ -1,0 +1,89 @@
+{% load static %}
+ {% if instancia.tipo_objeto == "character" %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="artist_form">
+        <div class="row my-5 justify-content-center" id="artistForm">
+
+            <div class="col-lg-6 my-3 my-lg-0 col-12 text-center">
+                {% if instancia.image %}
+                <label for="imageInput2" style="cursor: pointer;">
+
+
+                    <img src="{{ instancia.image.url }}" alt="{{ mediafile.name }} Thumbnail"
+                        class="img-thumbnail d-block imagePreview w-100 h-auto" style="object-fit: cover;"
+                        style="max-height: 500px; object-fit: contain;" data-preview-id="2">
+
+                    {% else %}
+                    <label for="imageInput2" style="cursor: pointer;">
+
+                        <img src="{% static 'img/noImage.jpg' %}" alt="Sin imagen"
+                            class="img-thumbnail d-block imagePreview w-100 h-auto" style="object-fit: cover;"
+                            style="max-height: 500px; object-fit: contain;" data-preview-id="2">
+                        {% endif %}
+
+                        <input type="file" name="image" id="imageInput2" accept="image/*" class="d-none imageInput"
+                            data-preview-id="2">
+            </div>
+
+            <div class="col-lg-6  my-3 my-lg-0 col-12 text-start">
+                <div class="my-2">
+                    Nombre: *
+                    {{ form.name }}
+                </div>
+                <div class="my-2">
+                    Sexo:
+                    {{ form.gender }}
+
+                </div>
+                <div class="my-2">
+                    Juego:
+                    {{ form.game }}
+
+                </div>
+                <div class="my-2 position-relative">
+                    Etiquetas:
+                    <input type="text" id="tagInputArtist" class="rounded-3 border-3 border-primary px-4 w-100 py-2"
+                        placeholder="Escribe una etiqueta y presiona Enter o Tab para autocompletar">
+                    <div id="tagSuggestionsArtist"
+                        class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
+                    </div>
+                    <div id="tagContainerArtist" class="mt-2 d-flex flex-wrap gap-2">
+                        {% for tag in instancia.tags.all %}
+                        <div class="badge bg-secondary text-white rounded-pill px-3 py-2 d-flex align-items-center gap-2"
+                            id="tag-{{ tag.id }}">
+                            {{ tag.name }}
+                            <button type="button" class="btn-close btn-close-white btn-sm ms-2"
+                                aria-label="Remove"></button>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+                <div class=" my-2">
+                    Descripción:
+                    {{ form.description }}
+                </div>
+
+                <div class="my-2">
+                    Cumpleaños:
+                    {{ form.birthdate }}
+                </div>
+                <div class="my-2">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+
+                    <a href="{% url 'index:detailsAbout' tipo instancia %}" class="btn btn-secondary">Cancelar
+                    </a>
+                </div>
+            </div>
+
+
+
+        </div>
+        <input type="text" name="tags_selectedArtist" id="tagsSelectedArtist" hidden
+            value="{% for tag in instancia.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+
+
+    </form>
+    {% endif %}

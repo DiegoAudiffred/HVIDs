@@ -243,30 +243,9 @@
     <h3 class="mt-4">Videos Recientemente Gustados</h3>
     {% if mediafiles %}
     <div class="row">
-        {% for item in mediafiles %}
-        <div class="col-lg-3 col-md-6 mb-4 col-12">
-            <a href="{% url 'index:watchVideo' item.id %}" class="text-decoration-none text-dark">
-                <!-- Completa el href -->
-                <div class="card shadow-sm h-100">
-                    {% if item.image %}
+        {% for mediafile in mediafiles %}
+         {% include 'index/cardsTemplate.html' %}
 
-                    <img src="{{ item.image.url }}" class="card-img-top img-fixed" alt="{{ item.name }}" style="width: 100%;
-                    height: 300px; object-fit: cover;">
-
-                    {% else %}
-
-                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top img-fixed"
-                        style="width: 100%;
-                    height: 300px; /* o el alto que desees */
-                    object-fit: cover;" alt="{{ item.name }}">
-
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title  text-truncate">{{ item.name }}</h5>
-                    </div>
-                </div>
-            </a>
-        </div>
         {% endfor %}
     </div>
     <div class="col-12">
@@ -319,30 +298,9 @@
     <h3 class="mt-4">Imagenes Recientemente Gustadas</h3>
     {% if comics %}
     <div class="row">
-        {% for item in comics %}
-        <div class="col-lg-3 col-md-6 mb-4 col-12">
-            <a href="{% url 'index:watchComic' item.id %}" class="text-decoration-none text-dark">
-                <div class="card shadow-sm h-100">
-                    {% if item.image %}
+        {% for mediafile in comics %}
+        {% include 'index/cardsTemplate.html' %}
 
-                    <img src="{{ item.image.url }}" class="card-img-top img-fixed" alt="{{ item.name }}" style="width: 100%;
-                    height: 300px; /* o el alto que desees */
-                    object-fit: cover;">
-
-                    {% else %}
-
-                    <img src="{% static 'img/noImage.jpg' %}" alt="Previsualización" class="card-img-top img-fixed"
-                        style="width: 100%;
-                    height: 300px; /* o el alto que desees */
-                    object-fit: cover;" alt="{{ item.name }}">
-
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
-                    </div>
-                </div>
-            </a>
-        </div>
         {% endfor %}
     </div>
     <div class="col-12">

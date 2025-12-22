@@ -110,10 +110,16 @@ class Game(models.Model):
 
     
 class Character(models.Model):
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('femboy', 'Femboy'),
+
+    ]
     name = models.CharField(max_length=255)    
     image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
     game= models.ForeignKey(Game, on_delete=models.CASCADE,blank=True,null=True)
-    gender=models.BooleanField(default=False)
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='female')    
     tags = models.ManyToManyField(Tags, blank=True)
     published_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, null=True)#,max_length=255
@@ -131,9 +137,15 @@ class Character(models.Model):
     
     
 class Artist(models.Model):
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('femboy', 'Femboy'),
+
+    ]
     name = models.CharField(max_length=100,unique=True)    
     image = models.ImageField(upload_to="uploads/gallery/",blank=True, null=True)
-    gender=models.BooleanField(default=False)
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='female')    
     tags = models.ManyToManyField(Tags, blank=True)
     published_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, null=True)
@@ -161,6 +173,7 @@ class MediaFile(models.Model):
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
     image = models.ImageField(upload_to='media_files/thumbnails/%Y%m%d/', blank=True, null=True)
     likes = models.ManyToManyField(User, related_name='liked_mediafiles', blank=True)
+    original_link = models.URLField(blank=True, null=True)
 
     def total_likes(self):
         return self.likes.count()
@@ -214,7 +227,7 @@ class Comic(models.Model):
     user=models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True)
     likes = models.ManyToManyField(User, related_name='liked_comic', blank=True)
     nsfw = models.BooleanField(default=False)
-
+    original_link = models.URLField(blank=True, null=True)
     def total_likes(self):
         return self.likes.count()
     
@@ -259,6 +272,9 @@ class ComicPage(models.Model):
     comic = models.ForeignKey(Comic, related_name='pages', on_delete=models.CASCADE)
     image = models.ImageField(upload_to=comic_page_upload_to)
     order = models.PositiveIntegerField(default=0)
+    tags = models.ManyToManyField(Tags, blank=True)
+    link = models.URLField(blank=True, null=True)
+
     def __str__(self):
         return self.comic.name
 

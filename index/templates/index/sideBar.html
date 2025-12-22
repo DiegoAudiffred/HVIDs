@@ -66,7 +66,7 @@
 <div class="sidebar border-primary-3 mt-4">
 
   <form id="multiSearchForm" method="GET" action="{% url 'index:multi_search_results' %}"
-    hx-get="{% url 'index:multi_search_results' %}" hx-target="#main-content" hx-push-url="true"
+
     class="position-relative m-0 mb-md-4">
     <div class="input-group">
       <input type="text" id="multiSearchInput" name="q"
@@ -98,7 +98,7 @@
     <h5 class="px-4 text-truncate" style="max-width: 100%;">
       <a href="{% url 'index:filtered_media' 'tag' tag.name %}"
         class="d-inline-block text-tercero shine-underline text-truncate w-100"
-        hx-get="{% url 'index:filtered_media' 'tag' tag.name %}" hx-target="#main-content" hx-push-url="true">
+        >
         {{ tag.name }} ({{ tag.num_mediafiles }})
       </a>
     </h5>
@@ -116,10 +116,9 @@
 
       <a href="{% url 'index:filtered_media' 'artist' artist.name %}"
         class="d-inline-block text-tercero shine-underline text-truncate w-100"
-        hx-get="{% url 'index:filtered_media' 'artist' artist.name %}" hx-target="#main-content" hx-push-url="true">
+>
         {{ artist.name }}
       </a>
-      <!--         hx-get="{% url 'index:filtered_media' 'artist' artist.name %}" hx-target="#main-content" hx-push-url="true" -->
     </h5>
     {% endfor %}
     {% else %}
@@ -135,8 +134,7 @@
 
       <a href="{% url 'index:filtered_media' 'character' character.name %}"
         class="d-inline-block text-tercero shine-underline text-truncate w-100"
-        hx-get="{% url 'index:filtered_media' 'character' character.name %}" hx-target="#main-content"
-        hx-push-url="true">
+>
         {{ character.name }}
       </a>
 
@@ -154,7 +152,7 @@
 
       <a href="{% url 'index:filtered_media' 'game' game.name %}"
         class="d-inline-block text-tercero shine-underline text-truncate w-100"
-        hx-get="{% url 'index:filtered_media' 'game' game.name %}" hx-target="#main-content" hx-push-url="true">
+        >
         {{ game.name }}
       </a>
     </h5>

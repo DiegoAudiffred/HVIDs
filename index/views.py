@@ -1093,7 +1093,6 @@ def enviar_telegram_mensaje(texto, image_path=None):
 
 @login_required(login_url='/login/')
 def edit_objeto(request, tipo, pk):
-    # Mapea tipo a modelo y formulario
     modelo_map = {
         'character': (Character, addCharsForm),
         'artist': (Artist, addArtistForm),
@@ -1108,26 +1107,37 @@ def edit_objeto(request, tipo, pk):
     if request.method == 'POST':
         form = Formulario(request.POST, request.FILES, instance=instancia)
         if form.is_valid():
-            # guarda campos del formulario
-            form.save()
-            instancia = form.instance
+            instancia = form.save(commit=False)
+            
+            if tipo == 'artist':
+                redes_disponibles = [
+                    'facebook', 'twitter', 'instagram', 'youtube', 
+                    'tiktok', 'onlyfans', 'rule34', 'patreon', 'coomer'
+                ]
+                social_data = {}
+                for red in redes_disponibles:
+                    valor = request.POST.get(f'{red}_url', '').strip()
+                    if valor:
+                        social_data[red] = valor
+                
+                instancia.social_media = social_data
 
-            # si el modelo tiene campo ManyToMany 'tags', actualizarlo
+            instancia.save()
+            form.save_m2m()
+
             if hasattr(instancia, 'tags'):
-                # opcional: limpiar etiquetas previas
                 instancia.tags.clear()
-                # agregar nuevas etiquetas desde el input oculto
-                for tag in request.POST.get('tags_selectedArtist', '').split(','):
-                    tag = tag.strip()
-                    if tag:
-                        obj, _ = Tags.objects.get_or_create(name=tag.upper())
+                tags_data = request.POST.get('tags_selectedArtist', '')
+                for tag in tags_data.split(','):
+                    tag_name = tag.strip()
+                    if tag_name:
+                        obj, _ = Tags.objects.get_or_create(name=tag_name.upper())
                         instancia.tags.add(obj)
 
             return redirect('index:detailsAbout', filtro=tipo, valor=instancia.name)
     else:
         form = Formulario(instance=instancia)
 
-    # Contexto lateral u otros datos
     sidebar_context = get_sidebar_context()
     context = {
         'form': form,

@@ -135,9 +135,9 @@ class addArtistForm(forms.ModelForm):
     youtube   = forms.CharField(required=False, label="YouTube", max_length=255)
     tiktok    = forms.CharField(required=False, label="TikTok", max_length=255)
     onlyfans  = forms.CharField(required=False, label="OnlyFans", max_length=255)
-    extra1    = forms.CharField(required=False, label="Red extra 1", max_length=255)
-    extra2    = forms.CharField(required=False, label="Red extra 2", max_length=255)
-    extra3    = forms.CharField(required=False, label="Red extra 3", max_length=255)
+    rule34    = forms.CharField(required=False, label="Rule34", max_length=255)
+    patreon    = forms.CharField(required=False, label="Patreon", max_length=255)
+    coomer_kemono    = forms.CharField(required=False, label="Coomer_Kemono ", max_length=255)
 
     # 🔵 Aquí defines birthdate manualmente:
     birthdate = forms.DateField(
@@ -168,7 +168,7 @@ class addArtistForm(forms.ModelForm):
     def clean(self):
         cleaned = super().clean()
         social = {}
-        for key in ['facebook','twitter','instagram','youtube','tiktok','onlyfans','extra1','extra2','extra3']:
+        for key in ['facebook','twitter','instagram','youtube','tiktok','onlyfans','rule34','patreon','coomer_kemono']:
             val = cleaned.get(key)
             if val:
                 social[key] = val
@@ -207,11 +207,11 @@ class addArtistForm(forms.ModelForm):
 
         # inicializar los valores desde el JSON existente
         social = self.instance.social_media or {}
-        for field in ['facebook','twitter','instagram','youtube','tiktok','onlyfans','extra1','extra2','extra3']:
+        for field in ['facebook','twitter','instagram','youtube','tiktok','onlyfans','rule34','patreon','coomer_kemono']:
             self.fields[field].initial = social.get(field,'')
 
         # aplica clase bootstrap a los virtuales
-        for field in ['facebook','twitter','instagram','youtube','tiktok','onlyfans','extra1','extra2','extra3']:
+        for field in ['facebook','twitter','instagram','youtube','tiktok','onlyfans','rule34','patreon','coomer_kemono']:
             self.fields[field].widget.attrs.setdefault('class','form-control')
 
 
