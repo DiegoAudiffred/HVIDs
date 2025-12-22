@@ -123,7 +123,7 @@
 
                 <div class="col-12 col-lg-6 fnBubbleSansRegular p-lg-4">
                     <div
-                        class="d-flex align-items-center justify-content-between mb-4 bg-dark bg-opacity-25 p-3 rounded-4">
+                        class="d-flex align-items-center justify-content-between mb-4 bg-dark bg-opacity-25  rounded-4">
                         <span class="fw-bold">Likes:</span>
                         <button class="btn btn-like p-0 border-0 bg-transparent d-flex align-items-center gap-2"
                             data-model="{{ resultado.tipo_objeto }}" data-id="{{ resultado.id }}"
@@ -148,8 +148,9 @@
                             ({{resultado.tags.all.count }})</p>
                         <div class="d-flex flex-wrap gap-1">
                             {% for tag in resultado.tags.all %}
-                            <span class="badge bg-sexto text-tercero rounded-pill small px-2 py-1">
-                                {{ tag.name }}</span>
+                            <a class="badge bg-sexto text-tercero rounded-pill small px-2 py-1 text-decoration-none"
+                                href="{% url 'index:filtered_media' 'tag' tag.name %}">
+                                {{ tag.name }}</a>
                             {% endfor %}
                         </div>
                     </div>

@@ -111,8 +111,8 @@ class Game(models.Model):
     
 class Character(models.Model):
     GENDER_CHOICES = [
-        ('male', 'Male'),
-        ('female', 'Female'),
+        ('hombre', 'Hombre'),
+        ('mujer', 'Mujer'),
         ('femboy', 'Femboy'),
 
     ]
@@ -138,8 +138,8 @@ class Character(models.Model):
     
 class Artist(models.Model):
     GENDER_CHOICES = [
-        ('male', 'Male'),
-        ('female', 'Female'),
+        ('hombre', 'Hombre'),
+        ('mujer', 'Mujer'),
         ('femboy', 'Femboy'),
 
     ]
