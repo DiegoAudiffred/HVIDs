@@ -260,7 +260,9 @@ class Post(models.Model):
 
 class PostImage(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='media_files/postImages/')
+    #image = models.ImageField(upload_to='media_files/postImages/')
+    #image = models.FieldFile(upload_to='media_files/postImages/')
+    image = models.FileField(upload_to='media_files/postImages/', blank=True, null=True,max_length=255)
 
     
 def comic_page_upload_to(instance, filename):

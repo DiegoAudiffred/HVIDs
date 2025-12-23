@@ -42,7 +42,7 @@
                 <h5 class="card-title fw-bold text-truncate mb-0 text-white w-100">{{ mediafile.name }}</h5>
               </div>
 
-              <div class="col-3 p-0 text-center d-flex align-items-center justify-content-center">
+              <div class="col-4 p-0 text-center d-flex align-items-center justify-content-center">
                 {% if mediafile.tipo_objeto == 'mediafile' %}
                 <button class="btn btn-sm btn-success text-white border-2 border-white w-100"
                   hx-get="{% url 'index:load_audio' mediafile.id %}" hx-target="#audio-container" hx-swap="innerHTML">
@@ -51,7 +51,7 @@
                 {% endif %}
               </div>
 
-              <div class="col-2 p-0 d-flex align-items-center justify-content-start">
+              <div class="col-2 p-0 d-flex align-items-center justify-content-center">
                 <div class="d-flex align-items-center text-white">
                   <img src="{% static 'img/Liked.png' %}" width="20px" height="20px" class="me-1">
                   <span>{{ mediafile.total_likes }}</span>

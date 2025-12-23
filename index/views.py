@@ -151,7 +151,7 @@ def userProfile(request, username):
     sidebar_context = get_sidebar_context()
 
     context = {
-        'combined_media': combined_media[:6],
+        'combined_media': combined_media[:8],
         'mediafiles': allThigs['mediafiles'],
         'artists': allThigs['artists'],
         'comics': allThigs['comics'],
@@ -1313,23 +1313,29 @@ def videoDownloader(request):
     context.update(sidebar_context)
     return render(request, 'index/videoDownloader.html', context)
 
+import os
+
+import os
+
 @login_required(login_url='/login/')
 def recentPosts(request):
     posts_list = Post.objects.select_related('user').prefetch_related('likes', 'images').filter(hide=False).order_by('-uploaded_at')
     sidebar_context = get_sidebar_context()
-    paginator = Paginator(posts_list, 6) 
+    
+    paginator = Paginator(posts_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    posts = page_obj.object_list 
-    if request.user.is_authenticated:
-        user = request.user
-        for post in posts:
-            post.liked_by_user = post.likes.filter(id=user.id).exists()
-    else:
-        for post in posts:
-            post.liked_by_user = False     
+    
+    video_extensions = ['.mp4', '.mov', '.avi', '.webm', '.mkv']
+    user = request.user
+
+    for post in page_obj:
+        post.liked_by_user = post.likes.filter(id=user.id).exists()
+        for media in post.images.all():
+            extension = os.path.splitext(media.image.name)[1].lower()
+            media.is_video = extension in video_extensions
+            
     context = {
-        'posts': posts,
         'page_obj': page_obj, 
         **sidebar_context
     } 
