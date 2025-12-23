@@ -12,12 +12,14 @@
         {% if already_downloaded %}
         <div class="alert alert-info border-start border-4 border-info rounded-3" role="alert">
           <i class="fas fa-info-circle me-2"></i>
-          El archivo ya estaba: <a href="/media/{{ filename }}" target="_blank" class="alert-link fw-semibold">{{ filename }}</a>
+          El archivo ya estaba: <a href="/media/{{ filename }}" target="_blank" class="alert-link fw-semibold">{{
+            filename }}</a>
         </div>
         {% elif filename %}
         <div class="alert alert-success border-start border-4 border-success rounded-3" role="alert">
           <i class="fas fa-check-circle me-2"></i>
-          ¡Descarga completada! <a href="/media/{{ filename }}" target="_blank" class="alert-link fw-semibold">{{ filename }}</a>
+          ¡Descarga completada! <a href="/media/{{ filename }}" target="_blank" class="alert-link fw-semibold">{{
+            filename }}</a>
         </div>
         {% elif error %}
         <div class="alert alert-danger border-start border-4 border-danger rounded-3" role="alert">
@@ -34,9 +36,9 @@
 
         <div class="mb-4">
           <label for="url-input" class="form-label fw-bold text-primary">URL del video o archivo directo</label>
-          <div class="input-group input-group-lg border border-secondary rounded-3 overflow-hidden shadow-sm">
+          <div class="input-group input-group-lg border border-tercero rounded-4 overflow-hidden shadow-sm">
 
-            <input id="url-input" class="form-control py-2 px-3 border-0" type="url" name="url"
+            <input id="url-input" class="form-control py-1 px-3 border-0" type="url" name="url"
               placeholder="Link de YouTube o link" required>
           </div>
         </div>
@@ -45,22 +47,31 @@
           <div class="col-lg-6 col-12 my-2">
             <label for="download-type" class="form-label fw-bold text-primary">Formato de Salida</label>
             <select id="download-type" name="download_type"
-              class="form-select form-select-lg py-2 rounded-3 shadow-sm border-secondary">
+              class="form-select form-select-lg py-1 rounded-4 shadow-sm border-tercero">
               <option value="video" selected> Video (MP4)</option>
               <option value="audio"> Audio (MP3)</option>
             </select>
           </div>
 
-          <div class="col-lg-6 col-12 my-2">
+          <div class="col-lg-3 col-12 my-2">
             <label for="download-btn" class="form-label fw-bold text-white d-none d-md-block">.</label>
             <button id="download-btn" type="submit"
-              class="btn btn-primary btn-lg fw-bold text-uppercase py-2 shadow-sm w-100">
-              <i class="fas fa-arrow-alt-circle-down me-2"></i> Iniciar Descarga
+              class="btn btn-primary btn-lg fw-bold text-uppercase py-1 shadow-sm w-100">
+              Iniciar Descarga
             </button>
             <button id="cancel-btn" type="button" class="btn btn-outline-danger mt-2" style="display:none;">
               <i class="fas fa-times me-1"></i> Cancelar Proceso
             </button>
           </div>
+          <div class="col-lg-3 col-12 my-2">
+            <label for="download-btn" class="form-label fw-bold text-white d-none d-md-block">.</label>
+
+            <a href="{% url 'index:viewDownloadedVideos' %}"
+              class="btn btn-secondary btn-lg fw-bold text-uppercase py-1 shadow-sm w-100 text-white">
+              Ver Descargas
+            </a>
+          </div>
+
         </div>
       </form>
 
@@ -75,13 +86,7 @@
       </div>
     </div>
 
-    <div class="col-12 text-start">
-      <div class=" pt-3 ">
-        <a href="{% url 'index:viewDownloadedVideos' %}" class="btn btn-sm btn-outline-secondary text-out">
-          Ver Descargas
-        </a>
-      </div>
-    </div>
+
   </div>
 </div>
 

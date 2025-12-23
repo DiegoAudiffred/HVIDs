@@ -249,15 +249,22 @@
 
         {% if is_audio %}
         <div class="d-flex justify-content-center mt-4">
-            <div class="position-relative" style="display: inline-block;">
+            <div class="position-relative " style="display: inline-block;">
                 {% if mediafile.image %}
                 <img id="audio-image" src="{{ mediafile.image.url }}" alt="Imagen del audio" class="img-fluid"
                     style="max-width: 400px; cursor: pointer;">
+                {% else %}
+                <img id="audio-image" src="{% static 'img/noImage.jpg' %}" alt="Imagen del audio"
+                    class="img-fluid border border-3 border-primary rounded-4"
+                    style="max-width: 400px; cursor: pointer;">
+
+
+
                 {% endif %}
 
                 <!-- Reproductor de audio centrado abajo -->
                 <div class="position-absolute bottom-0 start-50 translate-middle-x mb-2">
-                    <audio id="audio-player" controls>
+                    <audio id="audio-player" controls class="border border-3 border-tercero rounded-5">
                         <source src="{% url 'index:media_stream' mediafile.id %}" type="audio/mpeg">
                         Tu navegador no soporta audio.
                     </audio>

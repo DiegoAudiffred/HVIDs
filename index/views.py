@@ -1313,16 +1313,12 @@ def videoDownloader(request):
     context.update(sidebar_context)
     return render(request, 'index/videoDownloader.html', context)
 
-import os
-
-import os
-
 @login_required(login_url='/login/')
 def recentPosts(request):
     posts_list = Post.objects.select_related('user').prefetch_related('likes', 'images').filter(hide=False).order_by('-uploaded_at')
     sidebar_context = get_sidebar_context()
     
-    paginator = Paginator(posts_list, 10)
+    paginator = Paginator(posts_list, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     

@@ -3,43 +3,57 @@
 {% block body %}
 <div class="container-fluid mt-4">
     <div class="row mb-3">
-    <div class="col-12 border-bottom border-3 border-primary">
+        <div class="col-12 border-bottom border-3 border-primary">
 
 
-      <h1 class="fw-bold text-dark">Videos descargados</h1>
-    </div>
+            <h1 class="fw-bold text-dark">Videos descargados</h1>
+        </div>
     </div>
 
     {% for archivo in archivos %}
-    <div class="row align-items-center mb-2 border-bottom pb-2">
-        <div class="col-md-6">
-            <a href="{{ MEDIA_URL }}{{ archivo }}" download class="text-decoration-none">
-                {{ archivo }}
+    <div class="row align-items-center mb-2 border-bottom pb-2 border-secondary border-2">
+        <div class="col-lg-8 col-12">
+            <a href="{{ MEDIA_URL }}{{ archivo }}" download class="text-decoration-none ">
+                <p class="text-truncate text-break">
+                    {{ archivo }}
+                </p>
             </a>
         </div>
-        <div class="col-md-6 text-end">
-            <a href="{{ MEDIA_URL }}{{ archivo }}" target="_blank" class="btn btn-primary">
-                Abrir video
-            </a>
-            {% if request.user.is_superuser%}
-            <form method="post" action="{% url 'index:deleteDownloadedVideo' archivo %}" class="d-inline">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline-tercero text-white btn-primary">
-                    <i class="bi bi-trash"></i> Eliminar
-                </button>
-            </form>
-            <form method="post" action="{% url 'index:uploadDownloadedVideo' archivo %}" class="d-inline">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline-tercero text-white btn-primary">
-                    <i class="bi bi-trash"></i> Subir a la pagina
-                </button>
-            </form>
-            {% endif %}
+        <div class="col-lg-4 col-12 text-end">
+            <div class="row">
+                <div class="col-4 text-center">
+                    <a href="{{ MEDIA_URL }}{{ archivo }}" target="_blank" class="btn btn-secondary text-white w-100">
+                        Abrir video
+                    </a>
+                </div>
+
+
+                {% if request.user.is_superuser%}
+
+
+                <div class="col-4  text-center">
+                    <form method="post" action="{% url 'index:uploadDownloadedVideo' archivo %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-tercero text-white btn-primary w-100">
+                            <i class="bi bi-trash"></i> Subir
+                        </button>
+                    </form>
+                </div>
+                <div class="col-4  text-center">
+                    <form method="post" action="{% url 'index:deleteDownloadedVideo' archivo %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-tercero text-white btn-tercero w-100">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 
     <!-- Modal de reproducción -->
- 
+
     {% empty %}
     <div class="row">
         <div class="col-12">
