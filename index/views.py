@@ -64,27 +64,34 @@ def error_404(request, exception):
         'exception': exception,
     }, status=404)
 
-def get_top_items(model, related_fields, limit=5):
+def get_top_items(model, related_fields,user):
+    limit=5
     annotations = [Count(field) for field in related_fields]
+
+
     queryset = model.objects.annotate(
         num_mediafiles=sum(annotations)
     ).order_by('-num_mediafiles')[:limit]
     return queryset
 
-def get_sidebar_context():
+def get_sidebar_context(user):
     return {
-        'popular_tags': get_top_items(Tags, ['mediafile', 'comic']),
-        'popular_artists': get_top_items(Artist, ['mediafile', 'comic']),
-        'popular_characters': get_top_items(Character, ['mediafile', 'comic']),
-        'popular_games': get_top_items(Game, ['mediafile', 'comic']),
+        'popular_tags': get_top_items(Tags, ['mediafile', 'comic'],user),
+        'popular_artists': get_top_items(Artist, ['mediafile', 'comic'],user),
+        'popular_characters': get_top_items(Character, ['mediafile', 'comic'],user),
+        'popular_games': get_top_items(Game, ['mediafile', 'comic'],user),
     }
 
 @login_required(login_url='/login/')
 def index(request):
     user = request.user
     limit = 12
-    media_files_qs = MediaFile.objects.order_by('-uploaded_at')[:limit]
-    comics_qs = Comic.objects.order_by('-uploaded_at')[:limit]
+    if user.can_nsfw:
+        media_files_qs = MediaFile.objects.order_by('-uploaded_at')[:limit]
+        comics_qs = Comic.objects.order_by('-uploaded_at')[:limit]
+    else:
+        media_files_qs = MediaFile.objects.order_by('-uploaded_at').filter(nsfw=False)[:limit]
+        comics_qs = Comic.objects.order_by('-uploaded_at').filter(nsfw=False)[:limit]
     media_files = list(media_files_qs)
     comics = list(comics_qs)
     combined_media = sorted(
@@ -92,7 +99,7 @@ def index(request):
         key=lambda x: x.uploaded_at,
         reverse=True
     )[:12]
-    sidebar_context = get_sidebar_context()
+    sidebar_context = get_sidebar_context(user)
     context = {
         'user': user,
         'media_files': combined_media,
@@ -147,8 +154,8 @@ def userProfile(request, username):
             favTags.extend(item.tags.all())
 
     top5_tags = [tag for tag, _ in Counter(favTags).most_common(5)]
-
-    sidebar_context = get_sidebar_context()
+    usu=request.user
+    sidebar_context = get_sidebar_context(usu)
 
     context = {
         'combined_media': combined_media[:8],
@@ -193,7 +200,8 @@ def toggle_like(request, model, pk):
 @login_required(login_url='/login/')  
 def adminPage(request):
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
-    sidebar_context = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
 
     formTag = addTagsForm()
     formArtist = addArtistForm()
@@ -327,7 +335,8 @@ def navbarFilterHeader(request):
     except Exception:
         page_obj = paginator.get_page(1)
 
-    sidebar_context = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
 
     context = {
         'media_files': page_obj.object_list, 
@@ -367,7 +376,8 @@ def multi_search_results(request):
    
     terms = query.split()
     
-    sidebar_context = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
     media_files_all = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
 
     media_results = MediaFile.objects.filter(hide=False)
@@ -466,7 +476,8 @@ def watchVideo(request, id):
     mediafile.liked_by_user = request.user.is_authenticated and mediafile.likes.filter(id=request.user.id).exists()
     comentarios = Comentario.objects.filter(mediaFileID=mediafile)
     comentarios = reversed(comentarios)
-    sidebar_data = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
     
     return render(request, 'index/watchVideo.html', {
         'mediafile': mediafile,
@@ -477,7 +488,7 @@ def watchVideo(request, id):
                     'MEDIA_URL': settings.MEDIA_URL,
 
 
-        **sidebar_data,
+        **sidebar_context,
     })
 
 @login_required(login_url='/login/')
@@ -558,7 +569,8 @@ def watchComic(request, id):
     comentarios = Comentario.objects.filter(comicID=comic)
     comentarios = reversed(comentarios)
     comic_pages = ComicPage.objects.filter(comic=comic).order_by('order')
-    sidebar_data = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
     return render(request, 'index/watchComic.html', {
         'mediafile':    comic,
         'comentarios':  comentarios,
@@ -566,7 +578,7 @@ def watchComic(request, id):
         'form':         form_comentario,
         'form_page':    form_page,
         'formComic':    formComic,
-        **sidebar_data
+        **sidebar_context
     })
 
 def procesar_menciones(comentario_texto, autor, contenido_obj):
@@ -730,7 +742,8 @@ def uploadDownloadedVideo(request, filename):
     return redirect('index:viewDownloadedVideos')
 @login_required(login_url='/login/')
 def detailsAbout(request, filtro, valor):
-    sidebar_context = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
 
     # helper para saber si el user ha likeado un objeto
     def mark_liked(obj):
@@ -852,7 +865,8 @@ def stream_video(request, id):
 
 @login_required(login_url='/login/')  
 def filtered_media(request, filter_type, string):
-    sidebar_context = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
 
  
     filter_map = {
@@ -1033,7 +1047,8 @@ def uploadFile(request):
     form = uploadFileForm()
     formComic = UploadComicForm()
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
-    sidebar_context = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
     context = {
         'form': form,
         'formComic': formComic,
@@ -1138,7 +1153,8 @@ def edit_objeto(request, tipo, pk):
     else:
         form = Formulario(instance=instancia)
 
-    sidebar_context = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
     context = {
         'form': form,
         'tipo': tipo,
@@ -1213,10 +1229,11 @@ def safe_filename(name):
     return name.strip('_')
 
 
-#@login_required(login_url='/login/')  
+@login_required(login_url='/login/')
 def videoDownloader(request):
     context = {}
-    sidebar_context = get_sidebar_context()
+    user = request.user
+    sidebar_context = get_sidebar_context(user)
 
     if request.method == 'POST':
         url = request.POST.get('url')
@@ -1229,6 +1246,7 @@ def videoDownloader(request):
                     os.makedirs(output_dir)
 
                 ffmpeg_path = r'C:\ffmpeg\bin\ffmpeg.exe'
+                cookie_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'cookies.txt')
                 
                 is_direct_link = any(url.lower().endswith(ext) or ext + "?" in url.lower() for ext in ['.mp4', '.mkv', '.avi', '.mov', '.mp3'])
 
@@ -1253,7 +1271,12 @@ def videoDownloader(request):
                         context['title'] = clean_title
                         context['filename'] = final_filename
                 else:
-                    with YoutubeDL({'quiet': True}) as ydl:
+                    base_opts = {
+                        'quiet': True,
+                        'cookiefile': cookie_path if os.path.exists(cookie_path) else None,
+                    }
+                    
+                    with YoutubeDL(base_opts) as ydl:
                         info = ydl.extract_info(url, download=False)
                         title = info.get('title', 'video')
                         ext = 'mp3' if download_type == 'audio' else info.get('ext', 'mp4')
@@ -1268,6 +1291,7 @@ def videoDownloader(request):
                     else:
                         ydl_opts = {
                             'ffmpeg_location': ffmpeg_path,
+                            'cookiefile': cookie_path if os.path.exists(cookie_path) else None,
                             'noplaylist': True,
                             'quiet': True,
                             'nooverwrites': True,
@@ -1276,7 +1300,7 @@ def videoDownloader(request):
                         }
                         if download_type == 'audio':
                             ydl_opts.update({
-                                'format': 'bestaudio',
+                                'format': 'bestaudio/best',
                                 'postprocessors': [{
                                     'key': 'FFmpegExtractAudio',
                                     'preferredcodec': 'mp3',
@@ -1284,7 +1308,9 @@ def videoDownloader(request):
                                 }]
                             })
                         else:
-                            ydl_opts.update({'format': 'bestvideo+bestaudio/best'})
+                            ydl_opts.update({
+                                'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best',
+                            })
 
                         with YoutubeDL(ydl_opts) as ydl:
                             info = ydl.extract_info(url, download=True)
@@ -1301,7 +1327,7 @@ def videoDownloader(request):
                             context['filename'] = final_filename
 
             except Exception as e:
-                context['error'] = f"⚠️ Error al descargar: {str(e)}"
+                context['error'] = f"Error al descargar: {str(e)}"
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
@@ -1312,11 +1338,11 @@ def videoDownloader(request):
 
     context.update(sidebar_context)
     return render(request, 'index/videoDownloader.html', context)
-
 @login_required(login_url='/login/')
 def recentPosts(request):
     posts_list = Post.objects.select_related('user').prefetch_related('likes', 'images').filter(hide=False).order_by('-uploaded_at')
-    sidebar_context = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
     
     paginator = Paginator(posts_list, 5)
     page_number = request.GET.get('page')
@@ -1357,7 +1383,8 @@ def eliminar_post(request,id):
 
 @login_required(login_url='/login/')  
 def createPost(request):
-    sidebar_context = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
 
     if request.method == 'POST':
       form = PostForm(request.POST, request.FILES)
@@ -1446,7 +1473,8 @@ def marcar_leida(request):
 
 @login_required(login_url='/login/')  
 def pastNotifications(request):
-    sidebar_context = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
     user = request.user
 
     noti = Notificacion.objects.filter(destinatario=user).order_by('-fecha')[:9]
@@ -1516,7 +1544,8 @@ def allVideosHide(request):
         key=lambda x: x.uploaded_at,
         reverse=True
     )
-    sidebar_context = get_sidebar_context()
+    user=request.user
+    sidebar_context = get_sidebar_context(user)
 
     context = {
         'combined_media': combined_media,
