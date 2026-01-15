@@ -1,0 +1,140 @@
+<!-- Formulario para Comics -->
+{% block body %}
+
+<form action="{% url 'index:uploadFile' %}" method="post" enctype="multipart/form-data" id="comicForm"
+    style="display:none">
+    {% csrf_token %}
+    <input type="hidden" name="form_type" id="formType" value="comic">
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Nombre del Comic *
+        </div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ formComic.name }}</div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Artista</div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ formComic.artist }}</div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Etiquetas</div>
+        <div class="col-9 my-auto position-relative">
+            <input type="text" id="tagInputComic" class="rounded-4 border-3 px-4 w-100 py-2"
+                placeholder="Escribe una etiqueta y presiona Enter o Tab para autocompletar">
+            <div id="tagSuggestionsComic" class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
+            </div>
+            <div id="tagContainerComic" class="mt-2 d-flex flex-wrap gap-2"></div>
+        </div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Juego</div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ formComic.game }}</div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Personajes</div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ formComic.character }}</div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Ocultar</div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ formComic.hide }}</div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            NSFW?
+        </div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ form.nsfw }}
+        </div>
+    </div>
+    <!-- Subida de imágenes -->
+    <div class="row p-2">
+        Agregar páginas:
+
+        <input type="file" id="comicImageInput" accept="image/*" style="display:none" name="comicImages" multiple>
+        <div id="comicPagesPreview" class="d-flex flex-wrap gap-2 my-2">
+            <div id="uploadBox" class="border border-primary text-center py-5 col-md-2 col-12" style="cursor:pointer;">
+                <strong>+</strong><br>Agregar imagen
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <div class="row p-2 justify-content-end">
+        <div class="col-4 text-center">
+            <button type="submit" id="submitComicBtn" class="btn btn-secondary py-2 px-4 w-100 fw-bold text-white">
+                Subir galería/comic
+            </button>
+        </div>
+    </div>
+    <input type="hidden" name="tags_selectedComic" id="tagsSelectedComic">
+
+</form>
+
+<script>
+    const uploadBox = document.getElementById("uploadBox");
+    const imageInput = document.getElementById("comicImageInput");
+    const previewContainer = document.getElementById("comicPagesPreview");
+
+    let selectedImages = [];
+
+    uploadBox.addEventListener("click", () => {
+        imageInput.click();
+    });
+
+    imageInput.addEventListener("change", function () {
+        for (let file of this.files) {
+            // Verificamos que no esté repetido (opcional)
+            if (selectedImages.some(f => f.name === file.name && f.size === file.size)) continue;
+
+            selectedImages.push(file);
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const wrapper = document.createElement("div");
+                wrapper.classList.add("text-center");
+                wrapper.style.position = "relative";
+
+                const img = document.createElement("img");
+                img.src = e.target.result;
+                img.style.width = "100px";
+                img.style.height = "100px";
+                img.classList.add("border", "rounded", "col-2");
+
+                const removeBtn = document.createElement("button");
+                removeBtn.textContent = "Eliminar";
+                removeBtn.type = "button";
+                removeBtn.classList.add("btn", "btn-sm", "btn-danger", "mt-1", "border", "border-3", "border-primary");
+                removeBtn.style.display = "block";
+                removeBtn.style.margin = "0 auto";
+
+                removeBtn.addEventListener("click", () => {
+                    // Eliminar del array de selectedImages
+                    selectedImages = selectedImages.filter(f => f !== file);
+
+                    // Eliminar del DOM
+                    wrapper.remove();
+
+                    console.log('Imagen eliminada. Lista de imágenes:', selectedImages); // Para depuración
+                });
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(removeBtn);
+                previewContainer.appendChild(wrapper);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+{% endblock %}

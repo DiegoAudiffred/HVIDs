@@ -1,0 +1,95 @@
+{% block body %}
+
+<form action="{% url 'index:uploadFile' %}" method="post" enctype="multipart/form-data" id="videoForm"
+    style="display:none">
+    {% csrf_token %}
+    <input type="hidden" name="form_type" id="formType" value="video">
+
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Titulo del video *
+        </div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ form.name }}
+        </div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Artista/Actor
+        </div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ form.artist }}
+        </div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Etiquetas
+        </div>
+        <div class="col-9 my-auto position-relative">
+            <input type="text" id="tagInputVideo" class="rounded-4 border-3 px-4 w-100 py-2"
+                placeholder="Escribe una etiqueta y presiona Enter">
+            <div id="tagSuggestionsVideo" class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
+            </div>
+            <div id="tagContainerVideo" class="mt-2 d-flex flex-wrap gap-2"></div>
+        </div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Juego/Anime
+        </div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ form.game }}
+        </div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Personaje
+        </div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ form.character }}
+        </div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Ocultar
+        </div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ form.hide }}
+        </div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Link del Archivo *
+        </div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ form.file }}
+        </div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            NSFW?
+        </div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ form.nsfw }}
+        </div>
+    </div>
+    <div class="row p-2">
+        <div class="col-md-3 col-12  my-auto">
+            Miniatura
+        </div>
+        <div class="col-md-9 col-12  my-auto">
+            {{ form.image }}
+        </div>
+    </div>
+    <div class="row p-2 justify-content-end">
+        <div class="col-md-3 col-12  my-auto">
+            <button type="submit" class="btn btn-primary py-2 px-4 w-100 fw-bold">Subir Video/Canción</button>
+        </div>
+    </div>
+
+    <div>
+        <input type="hidden" name="tags_selectedVideo" id="tagsSelectedVideo">
+    </div>
+
+</form>
+{% endblock %}

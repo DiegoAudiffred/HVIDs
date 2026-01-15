@@ -406,3 +406,200 @@
     });
 </script>
 {% endblock %}
+
+
+{% block body %}
+<form action="{% url 'index:uploadFile' %}" method="post" enctype="multipart/form-data" id="comicForm"
+    style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="form_type" value="comic">
+
+    <div class="card border-0 rounded-4 p-4 bg-cuarto">
+        <div class="row g-3">
+            <div class="col-12">
+                <label class="fw-bold mb-1">Nombre del Comic *</label>
+                {{ formComic.name }}
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold mb-1">Artista</label>
+                <div class="position-relative">
+                    {{ formComic.artist }}
+                    <div id="artistSuggestions" class="list-group position-absolute z-3 w-100 shadow d-none"></div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="fw-bold mb-1">Juego / Anime</label>
+                {{ formComic.game }}
+            </div>
+
+            <div class="col-12">
+                <label class="fw-bold mb-1">Personajes</label>
+                <div class="position-relative">
+                    <input type="text" id="charInput" class="rounded-4 border-3 px-4 w-100 py-2"
+                        placeholder="Escribe y selecciona personajes...">
+                    <div id="charSuggestions" class="list-group position-absolute z-3 w-100 shadow d-none"></div>
+                </div>
+                <div id="charContainer" class="mt-2 d-flex flex-wrap gap-2"></div>
+                <input type="hidden" name="selected_characters" id="selectedCharacters">
+            </div>
+
+            <div class="col-12">
+                <label class="fw-bold mb-1">Etiquetas</label>
+                <div class="position-relative">
+                    <input type="text" id="tagInputComic" class="rounded-4 border-3 px-4 w-100 py-2"
+                        placeholder="Acción, Comedia...">
+                    <div id="tagSuggestionsComic" class="list-group position-absolute z-3 w-100 shadow d-none"></div>
+                </div>
+                <div id="tagContainerComic" class="mt-2 d-flex flex-wrap gap-2"></div>
+                <input type="hidden" name="tags_selectedComic" id="tagsSelectedComic">
+            </div>
+
+            <div class="col-12">
+                <div class="d-flex gap-4 p-2 bg-light rounded-4">
+                    <div class="form-check form-switch">
+                        {{ formComic.hide }}
+                        <label class="form-check-label fw-bold">Ocultar</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        {{ formComic.nsfw }}
+                        <label class="form-check-label fw-bold text-danger">NSFW</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="fw-bold mb-2">Páginas del Comic</label>
+                <input type="file" id="comicImageInput" accept="image/*" class="d-none" name="comicImages" multiple>
+                <div id="comicPagesPreview" class="row g-2">
+                    <div class="col-6 col-md-3 col-lg-2 order-last">
+                        <div id="uploadBox"
+                            class="border border-primary border-2 border-dashed rounded-4 text-center py-4 h-100 d-flex flex-column justify-content-center"
+                            style="cursor:pointer; border-style: dashed !important;">
+                            <i class="bi bi-plus-circle fs-2 text-primary"></i>
+                            <span class="small fw-bold text-primary">Añadir página</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 text-end mt-4">
+                <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow">
+                    Subir galería
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    // Lógica de Previsualización (Mejorada)
+    const uploadBox = document.getElementById("uploadBox");
+    const imageInput = document.getElementById("comicImageInput");
+    const previewContainer = document.getElementById("comicPagesPreview");
+    let selectedImages = [];
+
+    uploadBox.addEventListener("click", () => imageInput.click());
+
+    imageInput.addEventListener("change", function () {
+        for (let file of this.files) {
+            if (selectedImages.some(f => f.name === file.name && f.size === file.size)) continue;
+            selectedImages.push(file);
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const col = document.createElement("div");
+                col.className = "col-6 col-md-3 col-lg-2 position-relative";
+                col.innerHTML = `
+                    <div class="ratio ratio-1x1">
+                        <img src="${e.target.result}" class="img-thumbnail rounded-3 object-fit-cover shadow-sm">
+                    </div>
+                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 rounded-circle shadow">
+                        <i class="bi bi-x"></i>
+                    </button>
+                `;
+                col.querySelector("button").onclick = () => {
+                    selectedImages = selectedImages.filter(f => f !== file);
+                    col.remove();
+                };
+                previewContainer.insertBefore(col, uploadBox.parentNode);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Función genérica para Autocompletado y Chips
+    function initAutocomplete({ inputId, suggestionsId, containerId, hiddenInputId, url }) {
+        const input = document.getElementById(inputId);
+        const suggs = document.getElementById(suggestionsId);
+        const container = document.getElementById(containerId);
+        const hidden = document.getElementById(hiddenInputId);
+        let items = [];
+
+        input.addEventListener("input", async () => {
+            const query = input.value.trim();
+            if (query.length < 1) { suggs.classList.add("d-none"); return; }
+
+            const res = await fetch(`${url}?q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+
+            suggs.innerHTML = data.map(item => `
+                <button type="button" class="list-group-item list-group-item-action border-0">${item}</button>
+            `).join('');
+
+            suggs.classList.toggle("d-none", data.length === 0);
+
+            suggs.querySelectorAll("button").forEach(btn => {
+                btn.onclick = () => {
+                    addItem(btn.textContent);
+                    input.value = "";
+                    suggs.classList.add("d-none");
+                };
+            });
+        });
+
+        function addItem(val) {
+            if (items.includes(val)) return;
+            items.push(val);
+            const chip = document.createElement("span");
+            chip.className = "badge bg-primary rounded-pill px-3 py-2 d-flex align-items-center gap-2";
+            chip.innerHTML = `${val} <i class="bi bi-x-circle-fill cursor-pointer"></i>`;
+            chip.querySelector("i").onclick = () => {
+                items = items.filter(i => i !== val);
+                chip.remove();
+                hidden.value = items.join(",");
+            };
+            container.appendChild(chip);
+            hidden.value = items.join(",");
+        }
+
+        // Permitir agregar con Enter si no hay sugerencia
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && input.value.trim() !== "") {
+                e.preventDefault();
+                addItem(input.value.trim());
+                input.value = "";
+                suggs.classList.add("d-none");
+            }
+        });
+    }
+
+    // Inicializar Personajes y Tags
+    initAutocomplete({
+        inputId: "charInput",
+        suggestionsId: "charSuggestions",
+        containerId: "charContainer",
+        hiddenInputId: "selectedCharacters",
+        url: "/characters-suggest/" // Debes crear esta ruta en Django
+    });
+
+    initAutocomplete({
+        inputId: "tagInputComic",
+        suggestionsId: "tagSuggestionsComic",
+        containerId: "tagContainerComic",
+        hiddenInputId: "tagsSelectedComic",
+        url: "/tags-suggest/"
+    });
+</script>
+{% endblock %}
