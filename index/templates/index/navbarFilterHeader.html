@@ -69,7 +69,7 @@
 
     {% for mediafile in page_obj.object_list %}
     <div
-        class="col-12 col-lg-6 col-xl-3 {% if mediafile.tipo_objeto == 'comic' or mediafile.tipo_objeto == 'mediafile' %} col-xxl-3 {% else %} col-xxl-2 {% endif %} my-3 perspective-container">
+        class="col-12 col-lg-6 col-xl-3 {% if mediafile.tipo_objeto == 'comic' or mediafile.tipo_objeto == 'mediafile' %} col-xxl-3 {% else %} col-xxl-3 {% endif %} my-3 perspective-container">
         <div class="card h-100 shadow-sm rounded-4 overflow-hidden hover-shadow rainbow-hover border-3 border-primary">
 
             {% if mediafile.tipo_objeto == 'comic' %}

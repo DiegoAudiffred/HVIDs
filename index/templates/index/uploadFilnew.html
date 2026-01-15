@@ -1,0 +1,408 @@
+{% extends 'layout/layout.html' %}
+{% block body %}
+<style>
+    :root {
+        --primary-color: #0d6efd;
+        --secondary-color: #6c757d;
+        --bg-light: #f8f9fa;
+    }
+
+    .form-card {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        border: none;
+        overflow: hidden;
+    }
+
+    .selector-btn {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        padding: 15px;
+    }
+
+    .selector-btn.active {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+
+    .form-label-custom {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .input-group-custom input,
+    .input-group-custom select,
+    .input-group-custom textarea {
+        border-radius: 8px !important;
+        border: 1px solid #dee2e6;
+        padding: 10px 15px;
+    }
+
+    .input-group-custom input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+    }
+
+    #uploadBox {
+        border: 2px dashed #cbd5e0;
+        background-color: var(--bg-light);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 150px;
+    }
+
+    #uploadBox:hover {
+        border-color: var(--primary-color);
+        background-color: #edf2ff;
+    }
+
+    .suggestion-item:hover {
+        background-color: #f0f0f0;
+    }
+
+    .suggestion-item.active {
+        background-color: #95acc4;
+    }
+
+    .tag-badge {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+        background: #e9ecef;
+        color: #495057;
+        border: none;
+    }
+
+    .preview-img-container {
+        position: relative;
+        width: 120px;
+    }
+
+    .preview-img-container img {
+        object-fit: cover;
+        width: 120px;
+        height: 120px;
+        border-radius: 10px;
+    }
+
+    .remove-img-btn {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background: #ff4757;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="mb-4">
+                <h1 class="fw-bold text-dark h2">Subir nuevo elemento</h1>
+                <p class="text-muted">Selecciona el tipo de contenido que deseas compartir.</p>
+            </div>
+
+            <div class="row g-3 mb-5">
+                <div class="col-md-6">
+                    <button class="btn w-100 selector-btn active shadow-sm bg-white fw-bold rounded-4" id="comicBtn">
+                        <i class="bi bi-images d-block mb-2 fs-3"></i>
+                        Imagen / Galería
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <button class="btn w-100 selector-btn shadow-sm bg-white fw-bold rounded-4" id="videoBtn">
+                        <i class="bi bi-play-circle d-block mb-2 fs-3"></i>
+                        Video / Canción
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-card p-4 p-md-5">
+                <form action="{% url 'index:uploadFile' %}" method="post" enctype="multipart/form-data" id="videoForm"
+                    style="display:none">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" id="formType" value="video">
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Título del video *</label>
+                            <div class="input-group-custom">{{ form.name }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Artista / Actor</label>
+                            <div class="input-group-custom">{{ form.artist }}</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label-custom">Etiquetas</label>
+                            <div class="position-relative">
+                                <input type="text" id="tagInputVideo" class="form-control rounded-3 py-2"
+                                    placeholder="Escribe y presiona Enter">
+                                <div id="tagSuggestionsVideo"
+                                    class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100 shadow-sm">
+                                </div>
+                                <div id="tagContainerVideo" class="mt-2 d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-custom">Juego / Anime</label>
+                            <div class="input-group-custom">{{ form.game }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-custom">Personaje</label>
+                            <div class="input-group-custom">{{ form.character }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-custom">Ocultar contenido</label>
+                            <div class="form-check form-switch pt-2">{{ form.hide }}</div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label-custom">Enlace del archivo *</label>
+                            <div class="input-group-custom">{{ form.file }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Miniatura</label>
+                            <div class="input-group-custom">{{ form.image }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">¿Contenido NSFW?</label>
+                            <div class="form-check form-switch pt-2">{{ form.nsfw }}</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 text-end">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold rounded-3">Publicar
+                            Video</button>
+                    </div>
+                    <input type="hidden" name="tags_selectedVideo" id="tagsSelectedVideo">
+                </form>
+
+                <form action="{% url 'index:uploadFile' %}" method="post" enctype="multipart/form-data" id="comicForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" id="formType" value="comic">
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Nombre de la Galería *</label>
+                            <div class="input-group-custom">{{ formComic.name }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Artista</label>
+                            <div class="input-group-custom">{{ formComic.artist }}</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label-custom">Etiquetas</label>
+                            <div class="position-relative">
+                                <input type="text" id="tagInputComic" class="form-control rounded-3 py-2"
+                                    placeholder="Ej: fanart, wallpaper...">
+                                <div id="tagSuggestionsComic"
+                                    class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100 shadow-sm">
+                                </div>
+                                <div id="tagContainerComic" class="mt-2 d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-custom">Juego</label>
+                            <div class="input-group-custom">{{ formComic.game }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-custom">Personajes</label>
+                            <div class="input-group-custom">{{ formComic.character }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label-custom">Ocultar</label>
+                            <div class="form-check pt-2">{{ formComic.hide }}</div>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label-custom">NSFW?</label>
+                            <div class="form-check pt-2">{{ form.nsfw }}</div>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <label class="form-label-custom">Páginas de la galería</label>
+                            <input type="file" id="comicImageInput" accept="image/*" style="display:none"
+                                name="comicImages" multiple>
+                            <div id="comicPagesPreview" class="d-flex flex-wrap gap-3 mt-2">
+                                <div id="uploadBox" class="col-12 col-md-3" style="cursor:pointer;">
+                                    <span class="fs-2 fw-light">+</span>
+                                    <span class="text-muted small">Añadir imágenes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 text-end">
+                        <button type="submit" id="submitComicBtn"
+                            class="btn btn-primary btn-lg px-5 fw-bold rounded-3">Publicar Galería</button>
+                    </div>
+                    <input type="hidden" name="tags_selectedComic" id="tagsSelectedComic">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const uploadBox = document.getElementById("uploadBox");
+    const imageInput = document.getElementById("comicImageInput");
+    const previewContainer = document.getElementById("comicPagesPreview");
+
+    let selectedImages = [];
+
+    uploadBox.addEventListener("click", () => imageInput.click());
+
+    imageInput.addEventListener("change", function () {
+        for (let file of this.files) {
+            if (selectedImages.some(f => f.name === file.name && f.size === file.size)) continue;
+
+            selectedImages.push(file);
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const wrapper = document.createElement("div");
+                wrapper.classList.add("preview-img-container");
+
+                const img = document.createElement("img");
+                img.src = e.target.result;
+                img.classList.add("shadow-sm", "border");
+
+                const removeBtn = document.createElement("button");
+                removeBtn.innerHTML = "&times;";
+                removeBtn.type = "button";
+                removeBtn.classList.add("remove-img-btn");
+
+                removeBtn.addEventListener("click", () => {
+                    selectedImages = selectedImages.filter(f => f !== file);
+                    wrapper.remove();
+                });
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(removeBtn);
+                previewContainer.insertBefore(wrapper, uploadBox);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const comicBtn = document.getElementById('comicBtn');
+        const videoBtn = document.getElementById('videoBtn');
+        const comicForm = document.getElementById('comicForm');
+        const videoForm = document.getElementById('videoForm');
+
+        function toggleActive(btnActive, btnInactive, formShow, formHide) {
+            btnActive.classList.add('active');
+            btnInactive.classList.remove('active');
+            formShow.style.display = 'block';
+            formHide.style.display = 'none';
+        }
+
+        comicBtn.addEventListener('click', () => toggleActive(comicBtn, videoBtn, comicForm, videoForm));
+        videoBtn.addEventListener('click', () => toggleActive(videoBtn, comicBtn, videoForm, comicForm));
+    });
+
+    function setupTagInput({ inputId, suggestionsId, containerId, hiddenInputId }) {
+        const tagInput = document.getElementById(inputId);
+        const tagSuggestions = document.getElementById(suggestionsId);
+        const tagContainer = document.getElementById(containerId);
+        const tagsSelectedInput = document.getElementById(hiddenInputId);
+
+        let selectedTags = [];
+        let selectedIndex = -1;
+
+        tagInput.addEventListener("input", async () => {
+            const query = tagInput.value.trim();
+            const terms = query.split(" ");
+            const lastTerm = terms[terms.length - 1];
+
+            if (lastTerm.length < 1) {
+                tagSuggestions.classList.add("d-none");
+                tagSuggestions.innerHTML = "";
+                return;
+            }
+
+            const response = await fetch(`/tags-suggest/?q=${encodeURIComponent(lastTerm)}`);
+            const tags = await response.json();
+
+            tagSuggestions.innerHTML = "";
+            if (tags.length > 0) {
+                tagSuggestions.innerHTML = tags.map(tag => `
+                    <div class="p-2 suggestion-item" style="cursor:pointer;">${tag}</div>
+                `).join('');
+                tagSuggestions.classList.remove("d-none");
+
+                document.querySelectorAll(`#${suggestionsId} .suggestion-item`).forEach((item) => {
+                    item.addEventListener("click", () => {
+                        addTag(item.textContent.trim());
+                        tagInput.value = "";
+                        tagSuggestions.classList.add("d-none");
+                    });
+                });
+            } else {
+                tagSuggestions.classList.add("d-none");
+            }
+        });
+
+        tagInput.addEventListener("keydown", e => {
+            const suggestions = tagSuggestions.querySelectorAll(".suggestion-item");
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const val = tagInput.value.trim();
+                if (val) addTag(val);
+                tagInput.value = "";
+                tagSuggestions.classList.add("d-none");
+            }
+        });
+
+        function addTag(tagText) {
+            const cleanTag = tagText.trim();
+            if (!cleanTag || selectedTags.includes(cleanTag)) return;
+
+            selectedTags.push(cleanTag);
+            const tagDiv = document.createElement("div");
+            tagDiv.className = "badge tag-badge rounded-pill d-flex align-items-center gap-2";
+            tagDiv.innerHTML = `${cleanTag} <i class="bi bi-x-circle-fill text-muted" style="cursor:pointer"></i>`;
+
+            tagDiv.querySelector("i").addEventListener("click", () => {
+                tagContainer.removeChild(tagDiv);
+                selectedTags = selectedTags.filter(t => t !== cleanTag);
+                updateHiddenInput();
+            });
+
+            tagContainer.appendChild(tagDiv);
+            updateHiddenInput();
+        }
+
+        function updateHiddenInput() {
+            tagsSelectedInput.value = selectedTags.join(",");
+        }
+    }
+
+    setupTagInput({
+        inputId: "tagInputVideo",
+        suggestionsId: "tagSuggestionsVideo",
+        containerId: "tagContainerVideo",
+        hiddenInputId: "tagsSelectedVideo"
+    });
+
+    setupTagInput({
+        inputId: "tagInputComic",
+        suggestionsId: "tagSuggestionsComic",
+        containerId: "tagContainerComic",
+        hiddenInputId: "tagsSelectedComic"
+    });
+</script>
+{% endblock %}

@@ -1,6 +1,9 @@
 {% extends 'layout/layout.html' %}
 {% load static %}
 {% block body %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 <style>
   .delete-btn {
     transition: all 0.2s ease-in-out;
@@ -8,9 +11,7 @@
 
   .delete-btn:hover {
     background-color: var(--bs-primary);
-    /* Color de fondo primario de Bootstrap */
     transform: scale(1.1);
-    /* Efecto de zoom */
   }
 
   .delete-icon {
@@ -19,7 +20,6 @@
 
   .delete-btn:hover .delete-icon {
     filter: brightness(0) invert(1);
-    /* Invierte colores para que se vea blanco */
   }
 
   .delete-btn .icon-hover {
@@ -33,9 +33,7 @@
   .delete-btn:hover .icon-hover {
     display: inline;
   }
-</style>
-<style>
-  /* Animación de borde multicolor para el hover */
+
   @keyframes rainbow-glow {
     0% {
       box-shadow: 0 0 10px red;
@@ -62,7 +60,6 @@
     }
   }
 
-
   .zoom-hover {
     transition: transform 0.4s ease, box-shadow 0.4s ease;
     display: inline-block;
@@ -80,15 +77,11 @@
     width: 100%;
     border-radius: 1rem;
   }
-</style>
 
-
-<style>
   #tagSuggestions .suggestion-item:hover {
     background-color: #f0f0f0;
   }
 
-  /* Para resaltar la sugerencia activa si no tienes bg-light */
   .suggestion-item.active {
     background-color: #95acc4;
   }
@@ -99,20 +92,135 @@
     transform: translateY(-5px);
     transition: transform 0.3s ease;
   }
+
+  .carousel-item {
+    transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+  }
+
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 70px;
+    height: 70px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #F5EDE3;
+    border-radius: 50%;
+    z-index: 10;
+  }
+
+  .carousel-control-prev {
+    left: -90px;
+  }
+
+  .carousel-control-next {
+    right: -90px;
+  }
+
+  .thumbnail-selector {
+    cursor: pointer;
+    transition: transform 0.2s, border 0.2s;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .thumbnail-selector:hover {
+    transform: scale(1.05);
+    animation: rainbow-glow 1.5s infinite alternate;
+  }
+
+  .comic-img {
+    max-width: 95vw;
+    max-height: 80vh;
+    object-fit: contain;
+  }
+
+  .character-tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  .character-tooltip .preview-image {
+    visibility: hidden;
+    width: 150px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    padding: 5px;
+    position: absolute;
+    z-index: 10;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .character-tooltip:hover .preview-image {
+    visibility: visible;
+  }
+
+  .comic-item {
+    position: relative;
+  }
+
+  .ratio-comic {
+    --bs-aspect-ratio: 133%;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 12px;
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .ratio-comic:hover {
+    transform: scale(1.03);
+  }
+
+  .img-comic {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+
+  .delete-overlay {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    z-index: 5;
+  }
+
+  .btn-delete-mini {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #dc3545;
+    color: #dc3545;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .btn-delete-mini:hover {
+    background: #dc3545;
+    color: white;
+  }
 </style>
 
-<div class="container-fluid mt-4">
-  <div class="row border-bottom border-primary mb-4">
-    <div class="col-lg-8 col-12">
-      <h1 class="">{{ mediafile.name }}</h1>
+<div class="container-fluid mt-4 ">
+  <div class="row align-items-center border-bottom border-3 border-primary mb-3"> <!-- Titulo -->
+    <div class="col-12 col-lg-8 align-self-end">
+      <h1 class="fw-bold text-dark m-0 pb-2 text-truncate">{{ mediafile.name }}</h1>
     </div>
     {% if request.user == mediafile.user %}
 
-    <div class="col-lg-2 col-6 ">
-      <button class="btn btn-quinto w-100 my-2 my-lg-0" data-bs-toggle="modal"
-        data-bs-target="#imageFileEdit">Editar</button>
-
+    <div class="col-lg-2 col-6  align-self-end">
+      <div class="pb-2">
+        <button class="btn btn-quinto w-100" data-bs-toggle="modal" data-bs-target="#imageFileEdit">Editar</button>
+      </div>
     </div>
+
     <div class="modal fade" id="imageFileEdit" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content bg-cuarto comic-modal m-auto">
@@ -264,10 +372,12 @@
       </div>
     </div>
 
-    <div class="col-lg-2 col-6 ">
-      <button class="btn btn-primary w-100 my-2 my-lg-0" data-bs-toggle="modal"
-        data-bs-target="#imageModalDelete">Borrar</button>
+    <div class="col-lg-2 col-6  align-self-end">
+      <div class="pb-2">
+        <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#imageModalDelete">Borrar</button>
+      </div>
     </div>
+
     <div class="modal fade" id="imageModalDelete" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content bg-cuarto comic-modal m-auto">
@@ -296,512 +406,89 @@
         </div>
       </div>
     </div>
+
     {% endif %}
   </div>
   <div class="row">
     {% for page in comic_pages %}
-    <div class="col-12 col-sm-6 col-md-4 mb-4 d-flex flex-column align-items-center ">
-      <!-- Imagen principal con botón para abrir el visor (ya existente) -->
-      <button class="zoom-hover border-0 bg-transparent w-100 p-0 mb-2" data-bs-toggle="modal"
-        data-bs-target="#imageModal">
-        <div class="ratio w-100" style="--bs-aspect-ratio: 133%;">
-          <img src="{{ page.image.url }}" class="img-fluid shadow" />
-        </div>
-      </button>
+    <div class="col-12 col-sm-6 col-md-3 mb-4 position-relative comic-item">
 
-      <!-- Botón de editar (en este caso eliminar imagen) -->
       {% if request.user == mediafile.user %}
-      <button
-        class="btn delete-btn btn-sm btn-outline-danger w-25 border border-3 border-primary rounded rounded-4 my-2"
-        data-bs-toggle="modal" data-bs-target="#deleteImageModal{{ page.id }}">
-
-        <img src="{% static 'img/deleteIcon.png' %}" alt="Editar" width="42" height="auto" class="icon-default">
-        <img src="{% static 'img/deleteBotonWhite.png' %}" alt="Editar" width="42" height="auto" class="icon-hover">
-      </button>
+      <div class="delete-overlay">
+        <button class="btn btn-delete-mini rounded-circle shadow-sm" data-bs-toggle="modal"
+          data-bs-target="#deleteImageModal{{ page.id }}">
+          <i class="bi bi-trash-fill"></i>
+        </button>
+      </div>
       {% endif %}
-    </div>
 
-    <!-- Modal de confirmación para eliminar -->
-    <div class="modal fade" id="deleteImageModal{{ page.id }}" tabindex="-1"
-      aria-labelledby="deleteImageLabel{{ page.id }}" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="deleteImageLabel{{ page.id }}">Eliminar imagen</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="row">
-            <img src="{{ page.image.url }}" class="img-fluid shadow" />
+      <a href="{{ page.image.url }}" data-fancybox="gallery"
+        data-caption="{{ mediafile.name }} - Página {{ forloop.counter }}" class="text-decoration-none">
+        <div class="ratio ratio-comic shadow-sm border">
+          <img src="{{ page.image.url }}" class="img-comic" alt="Página {{ forloop.counter }}" />
+        </div>
+      </a>
 
-          </div>
-          <div class="modal-body text-center">
-            ¿Deseas eliminar esta imagen de la galería?
-          </div>
-          <div class="modal-footer">
-            <form method="post" action="{% url 'index:deleteComicImage' page.id %}">
-              {% csrf_token %}
-              <button type="button" class="btn btn-secondary text-white" data-bs-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-primary">Eliminar</button>
-            </form>
+      <div class="modal fade" id="deleteImageModal{{ page.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header border-0">
+              <h5 class="modal-title fw-bold">Eliminar página</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+              <img src="{{ page.image.url }}" class="img-fluid rounded shadow-sm mb-3" style="max-height: 250px;">
+              <p class="mb-0 text-muted">¿Estás seguro de que deseas eliminar esta imagen de la galería?</p>
+            </div>
+            <div class="modal-footer border-0">
+              <form method="post" action="{% url 'index:deleteComicImage' page.id %}" class="w-100">
+                {% csrf_token %}
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn btn-light w-100" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="submit" class="btn btn-danger w-100">Eliminar</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
     {% endfor %}
-
-
-    <!-- Botón para subir múltiples imágenes -->
-    <div class="col-12 col-sm-6 col-md-4 mb-4 d-flex justify-content-center">
-      <form id="uploadForm" method="post" enctype="multipart/form-data" class="w-100 text-center">
-        {% csrf_token %}
-        <input type="file" name="images" id="newPagesInput" class="d-none" multiple accept="image/*"
-          onchange="previewImages(this)">
-        <label for="newPagesInput" class="zoom-hover border border-4 bg-transparent border-sexto w-100 p-0"
-          style="cursor:pointer;">
-          <div class="ratio w-100" style="--bs-aspect-ratio: 133%;">
-            <span class="d-flex justify-content-center align-items-center h-100 fs-1 text-secondary">＋</span>
-          </div>
-        </label>
-      </form>
-    </div>
-
-    <div class="modal fade" id="confirmUploadModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">¿Estás seguro de subir estas imágenes?</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body" id="imagePreviewContainer" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="cancelUpload()"
-              data-bs-dismiss="modal">Cancelar</button>
-
-            <!-- Botón con spinner -->
-            <button type="button" class="btn btn-primary d-flex align-items-center gap-2" id="confirmButton"
-              onclick="submitUpload()">
-              <span class="spinner-border spinner-border-sm d-none" id="uploadSpinner" role="status"
-                aria-hidden="true"></span>
-              <span id="uploadText">Sí, subir</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Scripts -->
-    <script>
-      function previewImages(input) {
-        const files = input.files;
-        const container = document.getElementById("imagePreviewContainer");
-        container.innerHTML = "";
-
-        if (files.length === 0) return;
-
-        for (const file of files) {
-          if (file.type.startsWith("image/")) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              const img = document.createElement("img");
-              img.src = e.target.result;
-              img.style.height = "100px";
-              img.style.objectFit = "cover";
-              img.classList.add("rounded", "shadow");
-              container.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-          }
-        }
-
-        const modal = new bootstrap.Modal(document.getElementById("confirmUploadModal"));
-        modal.show();
-      }
-
-      function cancelUpload() {
-        const input = document.getElementById("newPagesInput");
-        input.value = "";
-        document.getElementById("imagePreviewContainer").innerHTML = "";
-      }
-
-      function submitUpload() {
-        // Mostrar spinner
-        document.getElementById("uploadSpinner").classList.remove("d-none");
-        document.getElementById("uploadText").textContent = "Subiendo...";
-        document.getElementById("confirmButton").disabled = true;
-
-        // Enviar formulario
-        document.getElementById("uploadForm").submit();
-      }
-    </script>
   </div>
 
-  <!-- Archivos  -->
-  <div class="row gy-3"> <!-- Espaciado vertical entre elementos -->
+  <script>
+    Fancybox.bind("[data-fancybox='gallery']", {
+      Toolbar: {
+        display: {
+          left: ["infobar"],
+          middle: ["prev", "next"],
+          right: ["iterateZoom", "fullscreen", "download", "close"],
+        },
+      },
+      Images: {
+        Panzoom: {
+          maxScale: 2,
+        },
+      },
+      Thumbs: {
+        autoStart: true,
+      },
+      display: "flex"
+    });
+  </script>
+  {% include 'Index/fileInformation.html' %}
 
-    <!-- Info de subida -->
-    <div class="col-12">
-      <p class="mb-1 text-muted">
-        <strong>Subido el:</strong>
-        {{ mediafile.uploaded_at|date:"d \d\e F \d\e Y \a \l\a\s H:i" }}
-        {% if mediafile.user %}
-        <strong>por</strong>
-        {% if mediafile.user.image %}
-        <img src="{{ mediafile.user.image.url}}" alt="Imagen de usuario" class="rounded-circle me-2"
-          style="width: 40px; height: 40px; object-fit: cover;">
-        <a href="{% url 'index:userProfile' mediafile.user.username %}">{{ mediafile.user.username }}</a>
-        {% else %}
-        <img src="{% static 'img/noImage.jpg' %}" alt="Imagen de usuario" class="rounded-circle me-2"
-          style="width: 40px; height: 40px; object-fit: cover;">
-        <a href="{% url 'index:userProfile' mediafile.user.username %}">{{ mediafile.user.username }}</a>
-        {% endif %}
-        {% else %}
-        <span class="text-danger">Sin usuario</span>
-        {% endif %}
-      </p>
-    </div>
 
-    <!-- Artista -->
-    <div class="col-12">
-      <p class="mb-1">
-        <strong>Artista:</strong>
-        {% if mediafile.artist %}
-        <a href="{% url 'index:detailsAbout' 'artist' mediafile.artist.name %}">
-          {{ mediafile.artist }}
-        </a>
-        {% else %}
-        <span class="text-danger">Sin artista</span>
-        {% endif %}
-      </p>
 
-    </div>
-    <style>
-      .character-tooltip {
-        position: relative;
-        display: inline-block;
-        cursor: pointer;
-      }
+  {% include 'Index/comentarySection.html' %}
+</div>
 
-      .character-tooltip .preview-image {
-        visibility: hidden;
-        width: 150px;
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 0.5rem;
-        padding: 5px;
-        position: absolute;
-        z-index: 10;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        transition: all 0.2s ease-in-out;
-      }
-
-      .character-tooltip:hover .preview-image {
-        visibility: visible;
-      }
-    </style>
-
-    <!-- pERSONAJE -->
-    <div class="col-12">
-      {% if mediafile.character.exists %}
-      <p class="mb-1"><strong>Personajes:</strong></p>
-      <div class="d-flex flex-wrap gap-2">
-        {% for char in mediafile.character.all %}
-        <div class="character-tooltip">
-          <a href="{% url 'index:detailsAbout' 'character' char.name %}"
-            class="d-inline-block rounded-pill bg-sexto text-black text-decoration-none py-2 px-4">
-            {{ char.name }}
-          </a>
-          <div class="preview-image text-center">
-            <img src="{{ char.image.url }}" alt="{{ char.name }}" class="img-fluid rounded" />
-            <div class="small mt-1">{{ char.name }}</div>
-          </div>
-        </div>
-        {% endfor %}
-
-      </div>
-      {% else %}
-      <p class="text-danger">Sin personajes</p>
-      {% endif %}
-
-    </div>
-
-    <!-- Likes -->
-    <div class="col-12">
-      <label class="form-label">Likes:</label>
-      <button class="btn btn-like p-0 border-0 bg-transparent d-flex align-items-center gap-2"
-        data-model="{{ mediafile.tipo_objeto }}" data-id="{{ mediafile.id }}">
-        <div class="position-relative">
-          <!-- Ícono Like -->
-          <img src="{% static 'img/Liked.png' %}" alt="Liked" class="like-icon liked position-absolute top-0 start-0"
-            style="{% if not mediafile.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: opacity 0.3s ease;" />
-
-          <!-- Ícono Not Liked -->
-          <img src="{% static 'img/Likend.png' %}" alt="Not Liked"
-            class="like-icon not-liked position-absolute top-0 start-0"
-            style="{% if mediafile.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: opacity 0.3s ease;" />
-        </div>
-        <span class="like-count text-black">{{ mediafile.total_likes }}</span>
-      </button>
-    </div>
-
-    <!-- Tags -->
-    <div class="col-12">
-      <p class="mb-1"><strong>Tags:</strong></p>
-      <div class="d-flex flex-wrap gap-2">
-        {% for tag in mediafile.tags.all %}
-        <a href="{% url 'index:filtered_media' 'tag' tag.name %}" class="badge bg-secondary text-decoration-none">
-          {{ tag.name }}</a>
-        {% endfor %}
-      </div>
-    </div>
-
-    <!-- Botón de descarga -->
-    <div class="col-12">
-      <a href="{{ mediafile.file }}" class="btn btn-primary">Download</a>
-    </div>
-
-  </div>
-
-  <!-- Archivos  -->
-  <!-- Comentarios -->
-  <div class="row my-5">
-    <div class="col-12">
-      <h2 class="mb-3 border-bottom pb-2">💬 Comentarios</h2>
-    </div>
-
-    <!-- Agregar comentario -->
-    <div class="col-12 mb-3">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title mb-3">Agrega tu comentario</h5>
-          <form class="row" method="post" id="comentarioForm">
-            {% csrf_token %}
-            <div class="col-md-9 mb-2 mb-md-0">
-              <style>
-                #comentarioEditable:empty::before {
-                  content: attr(placeholder);
-                  color: #888;
-                  pointer-events: none;
-                }
-              </style>
-              <div id="comentarioEditable" class="form-control shadow-none bg-corporateTan200 px-2 py-1"
-                contenteditable="true" placeholder="Introduce tu comentario" style="min-height: 38px;"></div>
-
-              <!-- Campo oculto que realmente se envía al backend -->
-              <input type="hidden" name="comentario" id="id_comentario">
-            </div>
-            <div class="col-md-3 text-end">
-              <button class="btn btn-primary w-100" type="submit">Enviar ✉️</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Lista de comentarios -->
-    <div class="col-12 mt-4">
-      <div id="comentariosContainer">
-        {% for comentario in comentarios %}
-        <div class="card mb-3 shadow-sm border-start border-5 border-primary comentario">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <div class="d-flex align-items-center">
-                {% if comentario.usuario.image %}
-                <img src="{{ comentario.usuario.image.url }}" alt="Imagen de usuario" class="rounded-circle me-2"
-                  alt="Imagen de usuario" class="rounded-circle me-2"
-                  style="width: 30px; height: 30px; object-fit: cover;">
-                {% else %}
-                <img src="{% static 'img/noImage.jpg' %}" alt="Imagen de usuario" class="rounded-circle me-2"
-                  alt="Imagen de usuario" class="rounded-circle me-2"
-                  style="width: 30px; height: 30px; object-fit: cover;">
-                {% endif %}
-
-                <a href="{% url 'index:userProfile' comentario.usuario.username %}"
-                  class="fw-bold text-decoration-none text-primary">
-                  {{ comentario.usuario }}
-                </a>
-              </div>
-              <small class="text-muted">{{ comentario.uploaded_at }}</small>
-            </div>
-            <p class="mb-0">{{ comentario.comentario }}</p>
-          </div>
-        </div>
-        {% empty %}
-        <p class="text-muted">Sé el primero en comentar 😃</p>
-        {% endfor %}
-
-      </div>
-
-      <!-- Controles de paginación -->
-      <div class="d-flex justify-content-between align-items-center mt-3">
-        <button id="prevBtn" class="btn btn-outline-primary">⬅ Anterior</button>
-        <span id="pageIndicator" class="fw-bold"></span>
-        <button id="nextBtn" class="btn btn-outline-primary">Siguiente ➡</button>
-      </div>
-    </div>
-    <style>
-      .comentario {
-        display: none;
-      }
-    </style>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const comentarios = document.querySelectorAll(".comentario");
-        const prevBtn = document.getElementById("prevBtn");
-        const nextBtn = document.getElementById("nextBtn");
-        const pageIndicator = document.getElementById("pageIndicator");
-
-        const itemsPerPage = 10;
-        let currentPage = 1;
-        const totalPages = Math.ceil(comentarios.length / itemsPerPage);
-
-        function mostrarPagina(pagina) {
-          const start = (pagina - 1) * itemsPerPage;
-          const end = start + itemsPerPage;
-
-          comentarios.forEach((comentario, index) => {
-            comentario.style.display = index >= start && index < end ? "block" : "none";
-          });
-
-          // Actualiza indicador
-          pageIndicator.textContent = `Página ${pagina} de ${totalPages}`;
-
-          // Habilita o deshabilita botones
-          prevBtn.disabled = pagina === 1;
-          nextBtn.disabled = pagina === totalPages;
-        }
-
-        // Listeners
-        prevBtn.addEventListener("click", () => {
-          if (currentPage > 1) {
-            currentPage--;
-            mostrarPagina(currentPage);
-          }
-        });
-
-        nextBtn.addEventListener("click", () => {
-          if (currentPage < totalPages) {
-            currentPage++;
-            mostrarPagina(currentPage);
-          }
-        });
-
-        // Mostrar página inicial
-        mostrarPagina(currentPage);
-      });
-    </script>
-
-  </div>
-
-  <!-- Comentairios -->
+<!-- Comentairios -->
 </div>
 <!-- Modal -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl">
-    <div class="modal-content bg-cuarto comic-modal m-0">
-
-      <!-- Header -->
-      <div class="modal-header">
-        <h5 class="modal-title fnBadComicTitle" id="modalLabel">{{ mediafile.name }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-
-      <!-- Body: ocupa todo el alto restante del modal -->
-      <div class="modal-body p-0 d-flex flex-column" style="height: calc(100vh - 56px);"> <!-- 56px es el alto aproximado del header -->
-
-        <!-- Carrusel -->
-        <div id="comicCarousel" class="carousel slide flex-grow-1 w-100" data-bs-ride="false">
-          <div class="carousel-inner h-100">
-
-            {% for page in comic_pages %}
-            <div class="carousel-item {% if forloop.first %}active{% endif %} h-100">
-              <div class="w-100 h-100 d-flex justify-content-center align-items-center">
-                <img src="{{ page.image.url }}"
-                     class="comic-img shadow rounded"
-                     alt="Página del cómic"
-                     style="max-height: 100%; max-width: 100%; object-fit: contain;">
-              </div>
-            </div>
-            {% endfor %}
-
-          </div>
-
-          <!-- Controles -->
-          <button class="carousel-control-prev" type="button" data-bs-target="#comicCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-            <span class="visually-hidden">Anterior</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#comicCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-            <span class="visually-hidden">Siguiente</span>
-          </button>
-        </div>
-
-        <!-- Miniaturas -->
-        <div class="row g-2 justify-content-center mt-3 px-3">
-          {% for page in comic_pages %}
-          <div class="col-2 mx-2">
-            <img src="{{ page.image.url }}"
-                 class="img-thumbnail thumbnail-selector p-0"
-                 data-bs-target="#comicCarousel"
-                 data-bs-slide-to="{{ forloop.counter0 }}"
-                 aria-current="{% if forloop.first %}true{% endif %}"
-                 alt="Miniatura {{ forloop.counter }}">
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 
-<style>
-  .carousel-item {
-    transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
-  }
 
-  .carousel-control-prev,
-  .carousel-control-next {
-    width: 70px;
-    height: 70px;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #F5EDE3;
-    border-radius: 50%;
-    z-index: 10;
-  }
-
-  .carousel-control-prev {
-    left: -90px;
-  }
-
-  .carousel-control-next {
-    right: -90px;
-  }
-
-  .thumbnail-selector {
-    cursor: pointer;
-    transition: transform 0.2s, border 0.2s;
-    aspect-ratio: 4/3;
-    object-fit: cover;
-    width: 100%;
-  }
-
-  .thumbnail-selector:hover {
-    transform: scale(1.05);
-    animation: rainbow-glow 1.5s infinite alternate;
-
-  }
-
-  .comic-img {
-    max-width: 95vw;
-    max-height: 80vh;
-    object-fit: contain;
-  }
-</style>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const imageInputs = document.querySelectorAll('.imageInput');
@@ -998,15 +685,12 @@
     const tagContainer = document.getElementById('tagContainerArtist');
     const hiddenInput = document.getElementById('tagsSelectedArtist');
 
-    // Delegamos el click en cualquier .btn-close dentro de tagContainerArtist
     tagContainer.addEventListener('click', function (e) {
       if (!e.target.classList.contains('btn-close')) return;
 
-      // encuentra la badge más cercana y la elimina
       const badge = e.target.closest('.badge');
       if (badge) badge.remove();
 
-      // luego actualiza el input oculto con las badges que quedan
       const tags = Array.from(tagContainer.querySelectorAll('.badge'))
         .map(b => b.firstChild.textContent.trim());
       hiddenInput.value = tags.join(',');
@@ -1094,59 +778,51 @@
 
 </script>
 
-
+<!-- Scripts -->
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const editor = document.getElementById('comentarioEditable');
-    const inputOculto = document.getElementById('id_comentario');
+  function previewImages(input) {
+    const files = input.files;
+    const container = document.getElementById("imagePreviewContainer");
+    container.innerHTML = "";
 
-    let ultimaTextoPlano = '';
+    if (files.length === 0) return;
 
-    editor.addEventListener('input', function () {
-      const textoPlano = editor.innerText;
-
-      if (textoPlano !== ultimaTextoPlano) {
-        ultimaTextoPlano = textoPlano;
-
-        const textoHTML = textoPlano.replace(/(@\w+)/g, '<span class="mencion">$1</span>');
-
-        editor.innerHTML = textoHTML;
-
-        const range = document.createRange();
-        range.selectNodeContents(editor);
-        range.collapse(false);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
+    for (const file of files) {
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          img.style.height = "100px";
+          img.style.objectFit = "cover";
+          img.classList.add("rounded", "shadow");
+          container.appendChild(img);
+        };
+        reader.readAsDataURL(file);
       }
+    }
 
-      // Copia texto plano sin estilos
-      inputOculto.value = textoPlano;
-    });
-  });
-</script>
-<style>
-  .mencion {
-    color: #007bff;
-    /* azul */
-    font-weight: bold;
+    const modal = new bootstrap.Modal(document.getElementById("confirmUploadModal"));
+    modal.show();
   }
-</style>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.comentario p').forEach(function (parrafo) {
-      const textoPlano = parrafo.textContent;
+  function cancelUpload() {
+    const input = document.getElementById("newPagesInput");
+    input.value = "";
+    document.getElementById("imagePreviewContainer").innerHTML = "";
+  }
 
-      const textoHTML = textoPlano.replace(/@(\w+)/g, function (match, username) {
-        const url = `/profile/${username}`;  // Ruta basada en tu URL Django
-        return `<a href="${url}" class="mencion">@${username}</a>`;
-      });
+  function submitUpload() {
+    // Mostrar spinner
+    document.getElementById("uploadSpinner").classList.remove("d-none");
+    document.getElementById("uploadText").textContent = "Subiendo...";
+    document.getElementById("confirmButton").disabled = true;
 
-      parrafo.innerHTML = textoHTML;
-    });
-  });
+    // Enviar formulario
+    document.getElementById("uploadForm").submit();
+  }
 </script>
+
 
 
 {% endblock %}

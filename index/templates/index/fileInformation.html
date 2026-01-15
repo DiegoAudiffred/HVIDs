@@ -1,0 +1,97 @@
+<!-- Archivo  -->
+{% load static %}
+{% block body %}
+<div class="row border-top border-3 border-primary my-4 pt-3">
+
+    <div class="col-12 mb-3">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="d-flex align-items-center">
+                {% if mediafile.user %}
+                <img src="{% if mediafile.user.image %}{{ mediafile.user.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
+                    alt="User" class="rounded-circle shadow-sm border border-2 border-primary me-2"
+                    style="width: 45px; height: 45px; object-fit: cover;">
+                <div>
+                    <a href="{% url 'index:userProfile' mediafile.user.username %}"
+                        class="fw-bold text-decoration-none d-block">@{{ mediafile.user.username }}</a>
+                    <small class="text-muted"><i class="fas fa-calendar-alt me-1"></i>
+                        {{ mediafile.uploaded_at|date:"d \d\e F, Y" }}</small>
+                </div>
+                {% else %}
+                <span class="badge bg-danger-subtle text-danger p-2"><i class="fas fa-user-slash me-1"></i>Sin
+                    usuario</span>
+                {% endif %}
+            </div>
+
+            <button
+                class="btn btn-light shadow-sm border-primary rounded-pill px-3 py-2 btn-like d-flex align-items-center gap-2"
+                data-model="{{ mediafile.tipo_objeto }}" data-id="{{ mediafile.id }}">
+                <div class="position-relative" style="width: 24px; height: 24px;">
+                    <img src="{% static 'img/Liked.png' %}" alt="Liked"
+                        class="like-icon liked position-absolute top-0 start-0"
+                        style="{% if not mediafile.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: 0.3s;" />
+                    <img src="{% static 'img/Likend.png' %}" alt="Not Liked"
+                        class="like-icon not-liked position-absolute top-0 start-0"
+                        style="{% if mediafile.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: 0.3s;" />
+                </div>
+                <span class="like-count fw-bold">{{ mediafile.total_likes }}</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <h6 class="text-primary fw-bold text-uppercase small mb-2">Artistas
+        </h6>
+        {% if mediafile.artist %}
+        <a href="{% url 'index:detailsAbout' 'artist' mediafile.artist.name %}"
+            class="btn btn-secondary rounded-pill py-1 px-3 text-white border-tercero border-2">
+            {{ mediafile.artist }}
+        </a>
+        {% else %}
+        <span class="text-muted small italic">Desconocido</span>
+        {% endif %}
+    </div>
+
+    <div class="col-12 mb-3">
+        <h6 class="text-primary fw-bold text-uppercase small mb-2">Personajes</h6>
+        {% if mediafile.character.exists %}
+        <div class="d-flex flex-wrap gap-2">
+            {% for char in mediafile.character.all %}
+            <div class="character-tooltip position-relative">
+                <a href="{% url 'index:detailsAbout' 'character' char.name %}"
+                    class="d-inline-flex align-items-center rounded-pill bg-sexto text-black text-decoration-none py-1 px-3 border-cuarto border-2">
+                    {{ char.name }} </a>
+                <div class="preview-image shadow-lg border rounded p-1 bg-white">
+                    <img src="{% if char.image %}{{ char.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
+                        alt="{{ char.name }}" class="img-fluid rounded mb-1" />
+                    <div class=" fw-bold small text-dark">{{ char.name }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted small mb-0">No se han etiquetado personajes</p>
+        {% endif %}
+    </div>
+
+    <div class="col-12 mb-4">
+        <h6 class="text-primary fw-bold text-uppercase small mb-2">
+            Tags
+        </h6>
+        <div class="d-flex flex-wrap gap-1">
+            {% for tag in mediafile.tags.all %}
+            <a href="{% url 'index:filtered_media' 'tag' tag.name %}"
+                class="badge bg-secondary-subtle text-secondary border border-secondary-subtle text-decoration-none px-3 py-2">
+                #{{ tag.name }}
+            </a>
+            {% empty %}
+            <span class="text-danger small">Sin tags</span>
+            {% endfor %}
+        </div>
+    </div>
+
+
+</div>
+
+
+{% endblock %}
