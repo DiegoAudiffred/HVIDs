@@ -261,25 +261,39 @@
         display: {
           left: ["infobar"],
           middle: ["prev", "next"],
-          right: ["iterateZoom", "fullscreen", "download", "close"],
+          right: ["fullscreen", "download", "close"],
         },
       },
       Images: {
         Panzoom: {
-          maxScale: 2,
+          maxScale: 3,
         },
+        wheel: "zoom",
       },
       Thumbs: {
         autoStart: true,
+      }, Hash: true,
+      Keyboard: {
+        Escape: "close",
+        Delete: "close",
+        Backspace: "close",
+        PageUp: "next",
+        PageDown: "prev",
+        ArrowUp: "next",
+        ArrowDown: "prev",
+        ArrowLeft: "prev",
+        ArrowRight: "next",
       },
+
+      animated: true,
+      dragToClose: true,
+
       display: "flex"
     });
   </script>
-  {% include 'Index/fileInformation.html' %}
+  {% include 'Index/watchFileInformation.html' %}
 
-
-
-  {% include 'Index/comentarySection.html' %}
+  {% include 'Index/watchComentarySection.html' %}
 </div>
 
 <!-- Comentairios -->
