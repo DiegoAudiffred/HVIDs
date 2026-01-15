@@ -328,7 +328,7 @@ def navbarFilterHeader(request):
     else:
         queryset = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
 
-    paginator = Paginator(queryset, 24) 
+    paginator = Paginator(queryset, 12) 
     
     try:
         page_obj = paginator.get_page(page_number)

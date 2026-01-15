@@ -9,7 +9,7 @@
         </div>
 
         <!-- Banner para móviles (pantallas < 768px) -->
-        <div class="d-lg-none position-relative rounded overflow-hidden border border-secondary my-3"
+        <div class="d-lg-none position-relative rounded overflow-hidden border border-secondary my-4"
             style="height: 230px; background-image: url('{% if user.banner %}{{ user.banner.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}'); background-size: cover; background-position: center;">
 
             <img src="{% if user.image %}{{ user.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
@@ -26,7 +26,6 @@
             {% endif %}
 
             <div class="position-absolute bottom-0 start-0 end-0 bg-quinto bg-opacity-50 text-white p-2">
-                <h6 class="mb-1">{{ user.username }}</h6>
                 <small><strong>Publicaciones:</strong> {{ total }}</small><br>
                 <small><strong>Likes:</strong> {{ total_likes }}</small>
                 <small class="d-flex flex-wrap align-items-center mb-2">
@@ -39,13 +38,13 @@
                     </a>
                     {% endfor %}
                 </small>
-                <small><strong>Miembro desde:</strong> {{ user.date_joined }}</small>
+                <small class="text-truncate"><strong>Miembro desde:</strong> {{ user.date_joined }}</small>
 
             </div>
         </div>
 
         <!-- Banner para pantallas medianas o mayores (≥ 768px) -->
-        <div class="d-none d-lg-block position-relative rounded overflow-hidden border border-4 border-tercero rounded-5 my-3"
+        <div class="d-none d-lg-block position-relative rounded overflow-hidden border border-4 border-tercero rounded-5 my-4"
             style="height: 340px; background-image: url('{% if user.banner %}{{ user.banner.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}'); background-size: cover; background-position: center;">
 
             <!-- Imagen de perfil -->
@@ -56,6 +55,10 @@
 
             <!-- Información del perfil en la parte superior derecha -->
             <div class="position-absolute top-0 end-0 m-5 bg-tercero bg-opacity-75 text-white p-3 rounded w-50">
+
+                <p><strong>Miembro desde:</strong> {{ user.date_joined }}</p>
+                <p><strong>Publicaciones:</strong> {{ total }}</p>
+                <p><strong>Likes dados:</strong> {{ total_likes }}</p>
                 <p class="d-flex flex-wrap align-items-center mb-2">
                     <strong class="me-2">Tags favoritos:</strong>
                     {% for tag in favTags %}
@@ -66,9 +69,6 @@
                     </a>
                     {% endfor %}
                 </p>
-                <p><strong>Miembro desde:</strong> {{ user.date_joined }}</p>
-                <p><strong>Publicaciones:</strong> {{ total }}</p>
-                <p><strong>Likes dados:</strong> {{ total_likes }}</p>
             </div>
 
             <!-- Botón de editar al fondo a la derecha -->
@@ -173,12 +173,13 @@
 
 
     {% if combined_media %}
-    <div class="col-12 border-bottom border-3 border-primary">
-        <h4 class="fw-bold text-dark">Recientes subidos por {{user}}</h4>
-    </div>
-    <div class="row mt-4">
+
+    <div class="row my-4">
+        <div class="col-12 border-bottom border-3 border-primary mb-2">
+            <h3 class="fw-bold text-dark">Recientes subidos por {{user}}</h3>
+        </div>
         {% for item in combined_media %}
-        <div class="col-lg-3 col-md-6 mb-4 col-12">
+        <div class="col-lg-3 col-md-6 mb-2 col-12 my-3">
             <div
                 class="card h-100 shadow-sm rounded-4 overflow-hidden hover-shadow rainbow-hover border-3 border-primary">
                 {% if item.tipo_objeto == 'comic' %}
@@ -231,37 +232,54 @@
     </div>
 
     {% else %}
-    <p>Este usuario no ha subido nada aun unu</p>
-    {% endif %}
-    <!-- Tags -->
+    <div class="row my-4">
 
+        <div class="col-12  border-bottom border-3 border-primary">
+            <h3 class="fw-bold text-dark">Sin Contenido Reciente unu</h3>
+
+        </div>
+    </div>
+    <!-- Tags -->
+    {% endif %}
 
 
     <!-- Tags -->
 
     <!-- MediaFiles -->
-    <h3 class="mt-4">Videos Recientemente Gustados</h3>
+
     {% if mediafiles %}
-    <div class="row">
+    <div class="row my-4">
+        <div class="col-12 border-bottom border-3 border-primary mb-2">
+            <h3 class="fw-bold text-dark">Videos Favoritos</h3>
+        </div>
         {% for mediafile in mediafiles %}
-         {% include 'index/cardsTemplate.html' %}
+        {% include 'index/cardsTemplate.html' %}
 
         {% endfor %}
-    </div>
-    <div class="col-12">
-        <a href="">Ver todos los likes de videos</a>
 
+        <div class="col-12">
+            <a href="">Ver todos los likes de videos</a>
+
+        </div>
     </div>
     {% else %}
-    <p>Nada que mostrar.</p>
+    <div class="row my-4">
+
+        <div class="col-12  border-bottom border-3 border-primary">
+            <h3 class="fw-bold text-dark">Sin Videos Favoritos</h3>
+
+        </div>
+    </div>
     {% endif %}
 
     <!-- Artistas -->
-    <h3 class="mt-4">Artistas Recientemente Gustados</h3>
     {% if artists %}
-    <div class="row">
+    <div class="row my-4">
+        <div class="col-12 border-bottom border-3 border-primary mb-2">
+            <h3 class="fw-bold text-dark">Artistas Favoritos</h3>
+        </div>
         {% for item in artists %}
-        <div class="col-lg-3 col-md-6 mb-4 col-12">
+        <div class="col-lg-3 col-md-6 mb-2 col-12 my-3">
             <a href="{% url 'index:detailsAbout' 'artist' item.name %}" class="text-decoration-none text-dark">
                 <div class="card shadow-sm h-100">
                     {% if item.image %}
@@ -278,26 +296,36 @@
                     object-fit: cover;" alt="{{ item.name }}">
 
                     {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                    <div class="card-body p-1">
+                        <h5 class="card-title text-center text-truncate m-0">{{ item.name }}</h5>
                     </div>
                 </div>
             </a>
         </div>
         {% endfor %}
-    </div>
-    <div class="col-12">
-        <a href="">Ver todos los likes de artistas</a>
 
+        <div class="col-12">
+            <a href="">Ver todos los likes de artistas</a>
+
+        </div>
     </div>
     {% else %}
-    <p>Nada que mostrar.</p>
+    <div class="row my-4">
+
+        <div class="col-12  border-bottom border-3 border-primary">
+            <h3 class="fw-bold text-dark">Sin Artistas Favoritos</h3>
+
+        </div>
+    </div>
     {% endif %}
 
     <!-- Cómics -->
-    <h3 class="mt-4">Imagenes Recientemente Gustadas</h3>
     {% if comics %}
-    <div class="row">
+    <div class="row my-4">
+        <div class="col-12 border-bottom border-3 border-primary mb-2">
+            <h3 class="fw-bold text-dark">Imagenes Favoritas</h3>
+        </div>
+
         {% for mediafile in comics %}
         {% include 'index/cardsTemplate.html' %}
 
@@ -308,15 +336,22 @@
 
     </div>
     {% else %}
-    <p>Nada que mostrar.</p>
-    {% endif %}
+    <div class="row my-4">
+
+        <div class="col-12  border-bottom border-3 border-primary">
+            <h3 class="fw-bold text-dark">Sin Imagenes Favoritas</h3>
+
+        </div>
+    </div> {% endif %}
 
     <!-- Personajes -->
-    <h3 class="mt-4">Personajes Recientemente Gustados</h3>
     {% if characters %}
-    <div class="row">
+    <div class="row my-4">
+        <div class="col-12 border-bottom border-3 border-primary mb-2">
+            <h3 class="fw-bold text-dark">Personajes Favoritos</h3>
+        </div>
         {% for item in characters %}
-        <div class="col-lg-3 col-md-6 mb-4 col-12">
+        <div class="col-lg-3 col-md-6 mb-2 col-12 my-3">
             <a href="{% url 'index:detailsAbout' 'character' item.name %}" class="text-decoration-none text-dark">
                 <div class="card shadow-sm h-100">
                     {% if item.image %}
@@ -333,28 +368,37 @@
                     object-fit: cover;" alt="{{ item.name }}">
 
                     {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title text-center text-truncate">{{ item.name }}</h5>
+                    <div class="card-body p-1">
+                        <h5 class="card-title text-center text-truncate m-0">{{ item.name }}</h5>
                     </div>
                 </div>
             </a>
         </div>
         {% endfor %}
-    </div>
-    <div class="col-12">
-        <a href="">Ver todos los likes de personajes</a>
 
+        <div class="col-12">
+            <a href="">Ver todos los likes de personajes</a>
+
+        </div>
     </div>
     {% else %}
-    <p>Nada que mostrar.</p>
+    <div class="row my-4">
+
+        <div class="col-12  border-bottom border-3 border-primary">
+            <h3 class="fw-bold text-dark">Sin Personajes Favoritos</h3>
+
+        </div>
+    </div>
     {% endif %}
 
     <!-- Juegos -->
-    <h3 class="mt-4">Juegos Recientemente Gustados</h3>
     {% if games %}
-    <div class="row">
+    <div class="row my-4">
+        <div class="col-12 border-bottom border-3 border-primary mb-2">
+            <h3 class="fw-bold text-dark">Juegos Favoritos</h3>
+        </div>
         {% for item in games %}
-        <div class="col-lg-3 col-md-6 mb-4 col-12">
+        <div class="col-lg-3 col-md-6 mb-2 col-12 my-3">
             <a href="{% url 'index:detailsAbout' 'game' item.name %}" class="text-decoration-none text-dark">
                 <div class="card shadow-sm h-100">
                     {% if item.image %}
@@ -377,14 +421,20 @@
             </a>
         </div>
         {% endfor %}
-    </div>
-    <div class="col-12">
-        <a href="">Ver todos los likes de juegos</a>
 
+        <div class="col-12">
+            <a href="">Ver todos los likes de juegos</a>
+
+        </div>
     </div>
     {% else %}
-    <p>Nada que mostrar.</p>
-    {% endif %}
+    <div class="row my-4">
+
+        <div class="col-12  border-bottom border-3 border-primary">
+            <h3 class="fw-bold text-dark">Sin Juegos Favoritos</h3>
+
+        </div>
+    </div> {% endif %}
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', () => {

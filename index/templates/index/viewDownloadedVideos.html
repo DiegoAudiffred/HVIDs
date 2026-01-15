@@ -12,18 +12,18 @@
 
     {% for archivo in archivos %}
     <div class="row align-items-center mb-2 border-bottom pb-2 border-secondary border-2">
-        <div class="col-lg-8 col-12">
+        <div class="col-lg-7 col-12">
             <a href="{{ MEDIA_URL }}{{ archivo }}" download class="text-decoration-none ">
                 <p class="text-truncate text-break">
                     {{ archivo }}
                 </p>
             </a>
         </div>
-        <div class="col-lg-4 col-12 text-end">
+        <div class="col-lg-5 col-12 text-end">
             <div class="row">
                 <div class="col-4 text-center">
                     <a href="{{ MEDIA_URL }}{{ archivo }}" target="_blank" class="btn btn-secondary text-white w-100">
-                        Abrir video
+                        Ver
                     </a>
                 </div>
 
