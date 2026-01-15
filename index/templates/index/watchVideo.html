@@ -1,24 +1,7 @@
 {% extends 'layout/layout.html' %}
 {% load static %}
 {% block body %}
-<style>
-    #tagSuggestions .suggestion-item:hover {
-        background-color: #f0f0f0;
-    }
-
-    /* Para resaltar la sugerencia activa si no tienes bg-light */
-    .suggestion-item.active {
-        background-color: #95acc4;
-    }
-
-    .adminLink:hover {
-        color: #fff !important;
-        background-color: #8B0000 !important;
-        transform: translateY(-5px);
-        transition: transform 0.3s ease;
-    }
-</style>
-
+<link rel="stylesheet" href="{% static 'css/watchComic.css' %}">
 
 
 
@@ -338,179 +321,13 @@
     </style>
 
     <!-- Archivo  -->
-    <div class="row border-top border-3 border-primary my-4 pt-3">
 
-        <div class="col-12 mb-3">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <div class="d-flex align-items-center">
-                    {% if mediafile.user %}
-                    <img src="{% if mediafile.user.image %}{{ mediafile.user.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
-                        alt="User" class="rounded-circle shadow-sm border border-2 border-primary me-2"
-                        style="width: 45px; height: 45px; object-fit: cover;">
-                    <div>
-                        <a href="{% url 'index:userProfile' mediafile.user.username %}"
-                            class="fw-bold text-decoration-none d-block">@{{ mediafile.user.username }}</a>
-                        <small class="text-muted"><i class="fas fa-calendar-alt me-1"></i>
-                            {{ mediafile.uploaded_at|date:"d \d\e F, Y" }}</small>
-                    </div>
-                    {% else %}
-                    <span class="badge bg-danger-subtle text-danger p-2"><i class="fas fa-user-slash me-1"></i>Sin
-                        usuario</span>
-                    {% endif %}
-                </div>
-
-                <button
-                    class="btn btn-light shadow-sm border-primary rounded-pill px-3 py-2 btn-like d-flex align-items-center gap-2"
-                    data-model="{{ mediafile.tipo_objeto }}" data-id="{{ mediafile.id }}">
-                    <div class="position-relative" style="width: 24px; height: 24px;">
-                        <img src="{% static 'img/Liked.png' %}" alt="Liked"
-                            class="like-icon liked position-absolute top-0 start-0"
-                            style="{% if not mediafile.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: 0.3s;" />
-                        <img src="{% static 'img/Likend.png' %}" alt="Not Liked"
-                            class="like-icon not-liked position-absolute top-0 start-0"
-                            style="{% if mediafile.liked_by_user %}opacity: 0;{% else %}opacity: 1;{% endif %} width: 24px; height: 24px; transition: 0.3s;" />
-                    </div>
-                    <span class="like-count fw-bold">{{ mediafile.total_likes }}</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="col-md-6 mb-3">
-            <h6 class="text-primary fw-bold text-uppercase small mb-2">Artistas
-            </h6>
-            {% if mediafile.artist %}
-            <a href="{% url 'index:detailsAbout' 'artist' mediafile.artist.name %}"
-                class="btn btn-secondary rounded-pill py-1 px-3 text-white border-tercero border-2">
-                {{ mediafile.artist }}
-            </a>
-            {% else %}
-            <span class="text-muted small italic">Desconocido</span>
-            {% endif %}
-        </div>
-
-        <div class="col-12 mb-3">
-            <h6 class="text-primary fw-bold text-uppercase small mb-2">Personajes</h6>
-            {% if mediafile.character.exists %}
-            <div class="d-flex flex-wrap gap-2">
-                {% for char in mediafile.character.all %}
-                <div class="character-tooltip position-relative">
-                    <a href="{% url 'index:detailsAbout' 'character' char.name %}"
-                        class="d-inline-flex align-items-center rounded-pill bg-sexto text-black text-decoration-none py-1 px-3 border-cuarto border-2">
-                        {{ char.name }} </a>
-                    <div class="preview-image shadow-lg border rounded p-1 bg-white">
-                        <img src="{% if char.image %}{{ char.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
-                            alt="{{ char.name }}" class="img-fluid rounded mb-1" />
-                        <div class=" fw-bold small text-dark">{{ char.name }}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="text-muted small mb-0">No se han etiquetado personajes</p>
-            {% endif %}
-        </div>
-
-        <div class="col-12 mb-4">
-            <h6 class="text-primary fw-bold text-uppercase small mb-2">
-                Tags
-            </h6>
-            <div class="d-flex flex-wrap gap-1">
-                {% for tag in mediafile.tags.all %}
-                <a href="{% url 'index:filtered_media' 'tag' tag.name %}"
-                    class="badge bg-secondary-subtle text-secondary border border-secondary-subtle text-decoration-none px-3 py-2">
-                    #{{ tag.name }}
-                </a>
-                {% empty %}
-                <span class="text-danger small">Sin tags</span>
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="col-12">
-            <a href="{{ MEDIA_URL }}{{ mediafile.file }}"
-                class="btn btn-primary btn-lg w-100 shadow rounded-pill d-flex align-items-center justify-content-center gap-1 py-1">
-                <i class="fas fa-cloud-download-alt"></i>
-                Descargar </a>
-        </div>
-
-    </div>
-
-    <!-- Comentarios -->
-    <div class="row  border-top border-3 border-primary my-4">
-        <div class="col-12 my-3">
-            <h2 class="">Comentarios</h2>
-        </div>
-
-        <!-- Agregar comentario -->
-        <div class="col-12 mb-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">Agrega tu comentario</h5>
-                    <form class="row" method="post" id="comentarioForm">
-                        {% csrf_token %}
-                        <div class="col-md-9 mb-2 mb-md-0">
-                            <style>
-                                #comentarioEditable:empty::before {
-                                    content: attr(placeholder);
-                                    color: #888;
-                                    pointer-events: none;
-                                }
-                            </style>
-                            <div id="comentarioEditable" class="form-control shadow-none bg-corporateTan200 px-2 py-1"
-                                contenteditable="true" placeholder="Introduce tu comentario" style="min-height: 38px;">
-                            </div>
-
-                            <!-- Campo oculto que realmente se envía al backend -->
-                            <input type="hidden" name="comentario" id="id_comentario">
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <button class="btn btn-primary w-100" type="submit">Enviar</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Lista de comentarios -->
-        <div class="col-12 mt-4">
-            <div id="comentariosContainer">
-                {% for comentario in comentarios %}
-                <div class="card mb-3 shadow-sm border-start border-5 border-primary comentario">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="d-flex align-items-center">
-                                {% if comentario.usuario.image %}
-                                <img src="{{ comentario.usuario.image.url }}" alt="Imagen de usuario"
-                                    class="rounded-circle me-2" alt="Imagen de usuario" class="rounded-circle me-2"
-                                    style="width: 30px; height: 30px; object-fit: cover;">
-                                {% else %}
-                                <img src="{% static 'img/noImage.jpg' %}" alt="Imagen de usuario"
-                                    class="rounded-circle me-2" alt="Imagen de usuario" class="rounded-circle me-2"
-                                    style="width: 30px; height: 30px; object-fit: cover;">
-                                {% endif %}
-
-                                <a href="{% url 'index:userProfile' comentario.usuario.username %}"
-                                    class="fw-bold text-decoration-none text-primary">
-                                    {{ comentario.usuario }}
-                                </a>
-                            </div>
-                            <small class="text-muted">{{ comentario.uploaded_at }}</small>
-                        </div>
-                        <p class="mb-0">{{ comentario.comentario }}</p>
-                    </div>
-                </div>
-                {% empty %}
-                <p class="text-muted">Sé el primero en comentar</p>
-                {% endfor %}
-
-            </div>
-
-            <!-- Comentairios -->
-        </div>
+    {% include 'Index/fileInformation.html' %}
 
 
-    </div>
+
+    {% include 'Index/comentarySection.html' %}
+
 </div>
 
 
