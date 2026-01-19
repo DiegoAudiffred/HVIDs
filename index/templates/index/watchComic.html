@@ -253,6 +253,89 @@
       </div>
     </div>
     {% endfor %}
+<div class="col-12 col-sm-4 col-md-3 mb-4 d-flex justify-content-center">
+  <form id="uploadForm" method="post" enctype="multipart/form-data" class="w-100 text-center">
+    {% csrf_token %}
+    <input type="file" name="images" id="newPagesInput" class="d-none" multiple accept="image/*" onchange="previewImages(this)">
+    <label for="newPagesInput" class="zoom-hover border border-4 bg-transparent border-sexto w-100 p-0" style="cursor:pointer;">
+      <div class="ratio w-100" style="--bs-aspect-ratio: 133%;">
+        <span class="d-flex justify-content-center align-items-center h-100 fs-1 text-secondary">＋</span>
+      </div>
+    </label>
+  </form>
+</div>
+
+<div class="modal fade" id="confirmUploadModal" tabindex="-1" aria-labelledby="confirmUploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="confirmUploadModalLabel">Confirmar subida de imágenes</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small mb-3">Se han seleccionado las siguientes imágenes para cargar:</p>
+        <div class="row g-2 justify-content-center" id="imagePreviewContainer">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" onclick="cancelUpload()" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary d-flex align-items-center gap-2" id="confirmButton" onclick="submitUpload()">
+          <span class="spinner-border spinner-border-sm d-none" id="uploadSpinner" role="status" aria-hidden="true"></span>
+          <span id="uploadText">Sí, subir imágenes</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function previewImages(input) {
+    const files = input.files;
+    const container = document.getElementById("imagePreviewContainer");
+    container.innerHTML = "";
+
+    if (files.length === 0) return;
+
+    for (const file of files) {
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const col = document.createElement("div");
+          col.className = "col-4 col-sm-3 col-md-2";
+          
+          const imgWrapper = document.createElement("div");
+          imgWrapper.className = "ratio ratio-1x1 border rounded overflow-hidden shadow-sm";
+          
+          const img = document.createElement("img");
+          img.src = e.target.result;
+          img.style.objectFit = "cover";
+          
+          imgWrapper.appendChild(img);
+          col.appendChild(imgWrapper);
+          container.appendChild(col);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    const modalElement = document.getElementById("confirmUploadModal");
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+  }
+
+  function cancelUpload() {
+    const input = document.getElementById("newPagesInput");
+    input.value = "";
+    document.getElementById("imagePreviewContainer").innerHTML = "";
+  }
+
+  function submitUpload() {
+    document.getElementById("uploadSpinner").classList.remove("d-none");
+    document.getElementById("uploadText").textContent = "Subiendo...";
+    document.getElementById("confirmButton").disabled = true;
+    document.getElementById("uploadForm").submit();
+  }
+</script>
   </div>
 
   <script>

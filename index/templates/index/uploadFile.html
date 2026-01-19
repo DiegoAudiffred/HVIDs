@@ -192,7 +192,6 @@
         tagInput.addEventListener("keydown", e => {
             const suggestions = tagSuggestions.querySelectorAll(".suggestion-item");
 
-            // Flechas arriba/abajo mantienen tu lógica
             if (e.key === "ArrowDown") {
                 e.preventDefault();
                 selectedIndex = (selectedIndex + 1) % suggestions.length;
@@ -203,7 +202,6 @@
                 selectedIndex = (selectedIndex - 1 + suggestions.length) % suggestions.length;
                 updateActiveSuggestion(suggestions);
             }
-            // Tab: si moviste con flechas, toma esa; si no, la primera sugerencia
             else if (e.key === "Tab") {
                 if (suggestions.length > 0) {
                     e.preventDefault();
@@ -214,7 +212,6 @@
                     selectedIndex = -1;
                 }
             }
-            // Enter: si moviste con flechas, toma esa; sino, toma lo que escribiste
             else if (e.key === "Enter") {
                 e.preventDefault();
                 if (suggestions.length > 0 && selectedIndex >= 0) {
