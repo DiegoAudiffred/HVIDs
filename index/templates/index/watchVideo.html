@@ -170,14 +170,16 @@
                                         </div>
                                     </div>
 
-                                    <div class="row p-2">
-                                        <div class="col-md-3 col-12 my-auto">
-                                            Personajes
-                                        </div>
-                                        <div class="col-md-9 col-12 my-auto">
-                                            {{ formVideo.character }}
-                                        </div>
-                                    </div>
+<div class="row mb-3">
+    <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
+        Personajes
+    </div>
+    <div class="col-md-9 col-12">
+        <div id="character-container-video" class="border rounded-3 p-3 bg-white" style="max-height: 200px; overflow-y: auto;">
+            {{ formVideo.character }}
+        </div>
+    </div>
+</div>
 
                                     <div class="row p-2">
                                         <div class="col-md-3 col-12 my-auto">
@@ -667,6 +669,83 @@
             parrafo.innerHTML = textoHTML;
         });
     });
+</script>
+<script>
+ document.addEventListener('DOMContentLoaded', function() {
+    const gameSelectComic = document.getElementById('id_video-game');
+    const containerId = 'character-container-video';
+    const prefix = 'video';
+
+    function setupCharacterFilter(gameId, selectedIds = []) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (!gameId) {
+            container.innerHTML = '<p class="text-muted small mb-0">Selecciona un juego primero</p>';
+            return;
+        }
+
+        container.innerHTML = '<p class="text-muted small mb-0">Cargando personajes...</p>';
+
+        fetch(`/get_characters_by_game/?game_id=${gameId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    container.innerHTML = '<p class="text-muted small mb-0">No hay personajes para este juego</p>';
+                    return;
+                }
+
+                container.innerHTML = '<div class="row row-cols-2 row-cols-md-3 g-2"></div>';
+                const row = container.querySelector('.row');
+
+                data.forEach(char => {
+                    // Verificamos si el ID del personaje está en la lista de seleccionados
+                    const isChecked = selectedIds.includes(char.id) ? 'checked' : '';
+                    
+                    const col = document.createElement('div');
+                    col.classList.add('col');
+                    col.innerHTML = `
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" 
+                                   name="${prefix}-character" 
+                                   value="${char.id}" 
+                                   id="char_${prefix}_${char.id}" 
+                                   ${isChecked}>
+                            <label class="form-check-label small" for="char_${prefix}_${char.id}">
+                                ${char.name}
+                            </label>
+                        </div>
+                    `;
+                    row.appendChild(col);
+                });
+            })
+            .catch(error => {
+                container.innerHTML = '<p class="text-danger small mb-0">Error al cargar personajes</p>';
+            });
+    }
+
+    // LÓGICA DE EDICIÓN:
+    // Extraemos los IDs de los personajes que el comic ya tiene asociados
+    // Pasamos los IDs desde Django al JS usando una lista simple
+    const initialSelectedIds = [
+        {% if mediafile.character.all %}
+            {% for char in mediafile.character.all %}{{ char.id }}{% if not forloop.last %},{% endif %}{% endfor %}
+        {% endif %}
+    ];
+
+    // Si hay un juego seleccionado al cargar el modal, poblar personajes
+    if (gameSelectComic && gameSelectComic.value) {
+        setupCharacterFilter(gameSelectComic.value, initialSelectedIds);
+    }
+
+    // LÓGICA DE CAMBIO:
+    if (gameSelectComic) {
+        gameSelectComic.addEventListener('change', function() {
+            // Al cambiar manualmente, enviamos lista vacía de seleccionados
+            setupCharacterFilter(this.value, []);
+        });
+    }
+});
 </script>
 
 

@@ -30,6 +30,11 @@ class UploadComicForm(forms.ModelForm):
                 self.fields['character'].queryset = Character.objects.filter(game_id=game_id)
             except (ValueError, TypeError):
                 self.fields['character'].queryset = Character.objects.none()
+        
+        # 2. Si no hay POST pero hay una instancia (Edición inicial)
+        elif self.instance and self.instance.pk and self.instance.game:
+            self.fields['character'].queryset = Character.objects.filter(game_id=self.instance.game.id)
+        
         else:
             self.fields['character'].queryset = Character.objects.none()
 
@@ -68,8 +73,15 @@ class uploadFileForm(forms.ModelForm):
                 self.fields['character'].queryset = Character.objects.filter(game_id=game_id)
             except (ValueError, TypeError):
                 self.fields['character'].queryset = Character.objects.none()
+        
+        # 2. Si no hay POST pero hay una instancia (Edición inicial)
+        elif self.instance and self.instance.pk and self.instance.game:
+            self.fields['character'].queryset = Character.objects.filter(game_id=self.instance.game.id)
+        
         else:
             self.fields['character'].queryset = Character.objects.none()
+
+
 
         self.fields['tags'].required = False
         self.fields['tags'].widget = forms.CheckboxSelectMultiple()

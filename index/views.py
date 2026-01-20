@@ -438,11 +438,11 @@ def deleteComicImage(request, id):
 @login_required(login_url='/login/')
 def watchVideo(request, id):
     mediafile = get_object_or_404(MediaFile, id=id)
-    formVideo = uploadFileForm(instance=mediafile)
+    formVideo = uploadFileForm(instance=mediafile, prefix='video')
     form = addComentariosForm()
     if request.method == 'POST':
         if 'update_video' in request.POST:
-            formVideo = uploadFileForm(request.POST, request.FILES, instance=mediafile)
+            formVideo = uploadFileForm(request.POST, request.FILES, instance=mediafile,prefix='video')
             if formVideo.is_valid():
                 formVideo.save()
                 mediafile = formVideo.instance
@@ -492,95 +492,90 @@ def watchVideo(request, id):
     })
 
 @login_required(login_url='/login/')
+@login_required(login_url='/login/')
 def watchComic(request, id):
     comic = get_object_or_404(Comic, id=id)
     form_comentario = addComentariosForm()
     form_page = ComicPageForm()
-    formComic = UploadComicForm(instance=comic)
+    
+    # Carga inicial del formulario con la instancia actual
+    formComic = UploadComicForm(instance=comic, prefix='comic')
+    
     if request.method == 'POST':
         if 'update_comic' in request.POST:
-            formComic = UploadComicForm(request.POST, request.FILES, instance=comic)
+            formComic = UploadComicForm(request.POST, request.FILES, instance=comic, prefix='comic')
             if formComic.is_valid():
-                formComic.save()
-                mediafile = formComic.instance
-                if hasattr(mediafile, 'tags'):
+                # save() maneja automáticamente los personajes (ManyToMany)
+                mediafile = formComic.save()
+                
+                # Lógica manual para Tags
+                tags_input = request.POST.get('tags_selectedArtist', '')
+                if tags_input:
                     mediafile.tags.clear()
-                    for tag in request.POST.get('tags_selectedArtist', '').split(','):
-                        tag = tag.strip()
-                        if tag:
-                            obj, _ = Tags.objects.get_or_create(name=tag.upper())
+                    for tag in tags_input.split(','):
+                        tag_name = tag.strip()
+                        if tag_name:
+                            obj, _ = Tags.objects.get_or_create(name=tag_name.upper())
                             mediafile.tags.add(obj)
-               
 
                 return redirect('index:watchComic', comic.id)
+        
         elif 'comentario' in request.POST:
             form_comentario = addComentariosForm(request.POST)
             if form_comentario.is_valid():
-                    c = form_comentario.save(commit=False)
-                    c.usuario = request.user
-                    c.comicID = comic
-                    c.save()
+                c = form_comentario.save(commit=False)
+                c.usuario = request.user
+                c.comicID = comic
+                c.save()
+                procesar_menciones(comentario_texto=c.comentario, autor=request.user, contenido_obj=comic)
+                return redirect('index:watchComic', comic.id)
 
-                    # Pasamos el objeto 'comic' directamente sin url ni tipo
-                    procesar_menciones(
-                        comentario_texto=c.comentario,
-                        autor=request.user,
-                        contenido_obj=comic
-                    )
-
-                    return redirect('index:watchComic', comic.id)
-
-
-
+        # Lógica de subida de imágenes adicionales
         images = request.FILES.getlist('images')
         if images:
             current = ComicPage.objects.filter(comic=comic).count()
             for i, img in enumerate(images, start=1):
-                ComicPage(comic=comic, image=img, order=current + i).save()
+                ComicPage.objects.create(comic=comic, image=img, order=current + i)
+            
             file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.id]))
-                
             texto = (
-    f"🎬 <b>¡{len(images)} Nuevas imagenes subidas!</b>\n"
-    f"📤 <i>Cortesía de</i> <b>{comic.user}</b>\n\n"
-    f"📎 <b>Nombre:</b> <a href='{file_url}'>{comic.name}</a>\n"
-    f"📺 <i>Haz clic en el nombre para verlo o descargarlo.</i>\n\n"
-    f"🔞 <i>Contenido variado: anime, series, y más...</i>"
-)
-            # construye image_url absoluto si existe
-            if hasattr(comic, 'image') and comic.image:
-                image_path = comic.image.path  # <-- Path local físico
-                print(image_path)
-            else:
-                image_path = None
+                f"🎬 <b>¡{len(images)} Nuevas imagenes subidas!</b>\n"
+                f"📤 <i>Cortesía de</i> <b>{comic.user}</b>\n\n"
+                f"📎 <b>Nombre:</b> <a href='{file_url}'>{comic.name}</a>\n"
+                f"📺 <i>Haz clic en el nombre para verlo o descargarlo.</i>\n\n"
+                f"🔞 <i>Contenido variado: anime, series, y más...</i>"
+            )
+            
+            image_path = None
+            if comic.image and hasattr(comic.image, 'path'):
+                try:
+                    with Image.open(comic.image.path) as img:
+                        img.thumbnail((1280, 1280))
+                        temp = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+                        img.save(temp.name, format='JPEG')
+                        image_path = temp.name
+                except Exception as e:
+                    print(f"Error: {e}")
 
-            if image_path:
-                with Image.open(image_path) as img:
-                    img.thumbnail((1280, 1280))
-                    temp = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
-                    img.save(temp, format='JPEG')
-                    temp.close()
-                    image_path = temp.name  # esto ya es un path que puedes mandar
-
-            print('DEBUG: enviando Telegram', texto, image_path)
-            resp = enviar_telegram_mensaje(texto, image_path)
-            print('DEBUG: respuesta Telegram', resp)
+            enviar_telegram_mensaje(texto, image_path)
             return redirect('index:watchComic', comic.id)
-    comic.liked_by_user = request.user.is_authenticated and comic.likes.filter(id=request.user.id).exists()
-    comentarios = Comentario.objects.filter(comicID=comic)
-    comentarios = reversed(comentarios)
-    comic_pages = ComicPage.objects.filter(comic=comic).order_by('order')
-    user=request.user
-    sidebar_context = get_sidebar_context(user)
-    return render(request, 'index/watchComic.html', {
-        'mediafile':    comic,
-        'comentarios':  comentarios,
-        'comic_pages':  comic_pages,
-        'form':         form_comentario,
-        'form_page':    form_page,
-        'formComic':    formComic,
-        **sidebar_context
-    })
 
+    # Contexto para el renderizado
+    comic.liked_by_user = request.user.is_authenticated and comic.likes.filter(id=request.user.id).exists()
+    comentarios = Comentario.objects.filter(comicID=comic).order_by('-id')
+    comic_pages = ComicPage.objects.filter(comic=comic).order_by('order')
+    sidebar_context = get_sidebar_context(request.user)
+    
+    context = {
+        'mediafile': comic,
+        'comentarios': comentarios,
+        'comic_pages': comic_pages,
+        'form': form_comentario,
+        'form_page': form_page,
+        'formComic': formComic,
+        **sidebar_context
+    }
+    return render(request, 'index/watchComic.html', context)
 def procesar_menciones(comentario_texto, autor, contenido_obj):
     print("📝 Texto del comentario:", comentario_texto)
     menciones = re.findall(r'@(\w+)', comentario_texto)
