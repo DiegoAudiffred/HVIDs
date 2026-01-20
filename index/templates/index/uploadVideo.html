@@ -1,95 +1,131 @@
 {% block body %}
-
-<form action="{% url 'index:uploadFile' %}" method="post" enctype="multipart/form-data" id="videoForm"
-    style="display:none">
+<form action="{% url 'index:uploadFile' %}" method="post" enctype="multipart/form-data" id="videoForm" class="bg-light p-4 rounded-4 shadow-sm" style="display:none">
     {% csrf_token %}
     <input type="hidden" name="form_type" id="formType" value="video">
 
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
-            Titulo del video *
+    <div class="row mb-3">
+        <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
+            Título del video *
         </div>
-        <div class="col-md-9 col-12  my-auto">
+        <div class="col-md-9 col-12 my-auto">
             {{ form.name }}
         </div>
     </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
+
+    <div class="row mb-3">
+        <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
             Artista/Actor
         </div>
-        <div class="col-md-9 col-12  my-auto">
+        <div class="col-md-9 col-12 my-auto">
             {{ form.artist }}
         </div>
     </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
+
+    <div class="row mb-3">
+        <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
             Etiquetas
         </div>
-        <div class="col-9 my-auto position-relative">
-            <input type="text" id="tagInputVideo" class="rounded-4 border-3 px-4 w-100 py-2"
-                placeholder="Escribe una etiqueta y presiona Enter">
-            <div id="tagSuggestionsVideo" class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
-            </div>
+        <div class="col-md-9 col-12 my-auto position-relative">
+            <input type="text" id="tagInputVideo" class="form-control rounded-3 border-secondary-subtle px-3 py-2" placeholder="Escribe una etiqueta y presiona Enter">
+            <div id="tagSuggestionsVideo" class="list-group position-absolute z-3 w-100 shadow-sm d-none"></div>
             <div id="tagContainerVideo" class="mt-2 d-flex flex-wrap gap-2"></div>
         </div>
     </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
+
+    <div class="row mb-3">
+        <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
             Juego/Anime
         </div>
-        <div class="col-md-9 col-12  my-auto">
+        <div class="col-md-9 col-12 my-auto">
             {{ form.game }}
         </div>
     </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
+
+    <div class="row mb-3">
+        <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
             Personaje
         </div>
-        <div class="col-md-9 col-12  my-auto">
+        <div class="col-md-9 col-12 my-auto">
             {{ form.character }}
         </div>
     </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
-            Ocultar
+
+    <div class="row mb-3 border-top pt-3">
+        <div class="col-md-3 col-6 my-auto">
+            <div class="form-check form-switch">
+                {{ form.hide }}
+                <label class="form-check-label ms-2 fw-bold text-secondary">Ocultar</label>
+            </div>
         </div>
-        <div class="col-md-9 col-12  my-auto">
-            {{ form.hide }}
+        <div class="col-md-3 col-6 my-auto">
+            <div class="form-check form-switch">
+                {{ form.nsfw }}
+                <label class="form-check-label ms-2 fw-bold text-danger">NSFW?</label>
+            </div>
         </div>
     </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
+
+    <div class="row mb-3">
+        <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
             Link del Archivo *
         </div>
-        <div class="col-md-9 col-12  my-auto">
+        <div class="col-md-9 col-12 my-auto">
             {{ form.file }}
         </div>
     </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
-            NSFW?
-        </div>
-        <div class="col-md-9 col-12  my-auto">
-            {{ form.nsfw }}
-        </div>
-    </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
+
+    <div class="row mb-4">
+        <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
             Miniatura
         </div>
-        <div class="col-md-9 col-12  my-auto">
+        <div class="col-md-9 col-12 my-auto">
             {{ form.image }}
         </div>
     </div>
-    <div class="row p-2 justify-content-end">
-        <div class="col-md-3 col-12  my-auto">
-            <button type="submit" class="btn btn-primary py-2 px-4 w-100 fw-bold">Subir Video/Canción</button>
+
+    <div class="row justify-content-end">
+        <div class="col-md-4 col-12">
+            <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm py-2">
+                Subir Video/Canción
+            </button>
         </div>
     </div>
 
-    <div>
-        <input type="hidden" name="tags_selectedVideo" id="tagsSelectedVideo">
-    </div>
-
+    <input type="hidden" name="tags_selectedVideo" id="tagsSelectedVideo">
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const gameSelect = document.getElementById('id_video-game');
+    const characterSelect = document.getElementById('id_video-character');
+
+    if (gameSelect && characterSelect) {
+        gameSelect.addEventListener('change', function() {
+            const gameId = this.value;
+            
+            characterSelect.innerHTML = '<option value="">Cargando personajes...</option>';
+
+            if (!gameId) {
+                characterSelect.innerHTML = '<option value="">---------</option>';
+                return;
+            }
+
+            fetch(`/get_characters_by_game/?game_id=${gameId}`)
+                .then(response => response.json())
+                .then(data => {
+                    characterSelect.innerHTML = '<option value="">Selecciona un personaje</option>';
+                    data.forEach(char => {
+                        const option = document.createElement('option');
+                        option.value = char.id;
+                        option.textContent = char.name;
+                        characterSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    characterSelect.innerHTML = '<option value="">Error al cargar</option>';
+                });
+        });
+    }
+});
+</script>
 {% endblock %}

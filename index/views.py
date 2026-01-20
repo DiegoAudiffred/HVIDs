@@ -904,11 +904,13 @@ AUDIO_FORMATS = ['.mp3', '.wav', '.ogg', '.aac', '.flac']
 def can_upload_check(user):
     return user.is_authenticated and getattr(user, 'can_upload', False)
 
-@user_passes_test(can_upload_check, login_url='/login/')
+def get_characters_by_game(request):
+    game_id = request.GET.get('game_id')
+    characters = Character.objects.filter(game_id=game_id).values('id', 'name')
+    return JsonResponse(list(characters), safe=False)
+
 @login_required(login_url='/login/')
 def uploadFile(request):
-
-  
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
@@ -926,7 +928,6 @@ def uploadFile(request):
                 upload_dir = datetime.datetime.now().strftime("media_files/%Y%m%d/")
                 os.makedirs(os.path.join(settings.MEDIA_ROOT, upload_dir), exist_ok=True)
 
-                # Define el nombre final según tipo
                 if is_audio:
                     final_name = f"{base_name}{ext}"
                 else:
@@ -940,11 +941,8 @@ def uploadFile(request):
                         final_name = f"{base_name}_{count}.mp4"
                     count += 1
 
- 
                 uploaded_file.name = final_name
                 media.file = uploaded_file
-
-
 
                 if 'image' in request.FILES:
                     media.image = request.FILES['image']
@@ -967,27 +965,20 @@ def uploadFile(request):
                 )
 
                 image_path = None
-
                 if media.image and hasattr(media.image, 'path') and os.path.exists(media.image.path):
                     try:
                         with Image.open(media.image.path) as img:
                             if img.mode != 'RGB':
                                 img = img.convert('RGB')
-
                             max_size = (1280, 1280)
                             img.thumbnail(max_size)
-
-                            # Guardar imagen temporal en JPEG
                             with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as temp_img:
                                 img.save(temp_img.name, format='JPEG', quality=85)
                                 image_path = temp_img.name
                     except Exception as e:
-                        print(f"❌ Error al procesar la imagen para Telegram: {e}")
+                        print(f"Error: {e}")
 
-                print('DEBUG: enviando Telegram', texto, image_path)
-                resp = enviar_telegram_mensaje(texto, image_path)
-                print('DEBUG: respuesta Telegram', resp)
-
+                enviar_telegram_mensaje(texto, image_path)
                 return redirect('index:index')
 
         elif form_type == 'comic':
@@ -995,7 +986,6 @@ def uploadFile(request):
             if formComic.is_valid():
                 comic = formComic.save(commit=False)
                 images = request.FILES.getlist('comicImages')
-                print("DEBUG: imágenes recibidas", images)
                 comic.image = images[0]
                 comic.user = request.user
                 comic.save()
@@ -1003,7 +993,6 @@ def uploadFile(request):
             
                 for index, image in enumerate(request.FILES.getlist('comicImages')):
                     ComicPage.objects.create(comic=comic, image=image, order=index)
-
             
                 for tag in request.POST.get('tags_selectedComic', '').split(','):
                     if tag.strip():
@@ -1020,34 +1009,24 @@ def uploadFile(request):
                 )
             
                 image_path = None
-                temp_image_path = None
-            
                 if comic.image:
                     try:
                         with Image.open(comic.image.path) as img:
-                            width, height = img.size
-                            if width > 0 and height > 0:
-                                if img.mode != "RGB":
-                                    img = img.convert("RGB")
-                                temp_file = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
-                                img.save(temp_file.name, format="JPEG")
-                                temp_image_path = temp_file.name
-                                image_path = temp_image_path
-                            else:
-                                print(f"❌ Imagen con dimensiones inválidas: {width}x{height}")
+                            if img.mode != "RGB":
+                                img = img.convert("RGB")
+                            temp_file = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+                            img.save(temp_file.name, format="JPEG")
+                            image_path = temp_file.name
                     except Exception as e:
-                        print(f"❌ Error al abrir la imagen: {e}")
+                        print(f"Error: {e}")
             
-                print('DEBUG: enviando Telegram', texto, image_path)
-                resp = enviar_telegram_mensaje(texto, image_path)
-                print('DEBUG: respuesta Telegram', resp)
-                
+                enviar_telegram_mensaje(texto, image_path)
                 return redirect('index:index')
-    # GET o errores: reconstruir context original
+
     form = uploadFileForm()
     formComic = UploadComicForm()
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
-    user=request.user
+    user = request.user
     sidebar_context = get_sidebar_context(user)
     context = {
         'form': form,
@@ -1056,8 +1035,6 @@ def uploadFile(request):
         **sidebar_context
     }
     return render(request, 'index/uploadFile.html', context)
-
-
 def enviar_telegram_mensaje(texto, image_path=None):
     token = settings.TELEGRAM_BOT_TOKEN
     chat_id = settings.TELEGRAM_GROUP_CHAT_ID

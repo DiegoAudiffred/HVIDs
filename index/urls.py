@@ -24,6 +24,7 @@ urlpatterns = [
     path('downloadedVideos/upload/<str:filename>/', views.uploadDownloadedVideo, name='uploadDownloadedVideo'),
 
     path('adminPage/', views.adminPage, name='adminPage'),
+    path('get_characters_by_game/', views.get_characters_by_game, name='get_characters_by_game'),
 
 
     path('filtrar/<str:filter_type>/<str:string>/', views.filtered_media, name='filtered_media'),
