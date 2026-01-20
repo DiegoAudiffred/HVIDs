@@ -169,7 +169,7 @@
       if (evt.detail.target.id === "audio-container") {
         const audio = document.getElementById("player-audio");
         if (audio) {
-          audio.volume = 0.1;  // Ajustar volumen aquí, justo antes de reproducir
+          audio.volume = 0.1;  
           audio.load();
           audio.play();
         }
@@ -210,7 +210,7 @@
           terms[terms.length - 1] = s;
           input.value = terms.join(" ") + " ";
           container.style.display = 'none';
-          input.focus(); // Volver al input
+          input.focus(); 
         });
         container.appendChild(div);
       });

@@ -279,7 +279,62 @@
     });
 
 </script>
+<script>document.addEventListener('DOMContentLoaded', function() {
+    function setupCharacterFilter(gameId, containerId, prefix) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
 
+        if (!gameId) {
+            container.innerHTML = '<p class="text-muted small mb-0">Selecciona un juego primero</p>';
+            return;
+        }
+
+        container.innerHTML = '<p class="text-muted small mb-0">Cargando...</p>';
+
+        fetch(`/get_characters_by_game/?game_id=${gameId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    container.innerHTML = '<p class="text-muted small mb-0">No hay personajes para este juego</p>';
+                    return;
+                }
+
+                container.innerHTML = '<div class="row row-cols-2 row-cols-md-3 g-2"></div>';
+                const row = container.querySelector('.row');
+
+                data.forEach(char => {
+                    const col = document.createElement('div');
+                    col.classList.add('col');
+                    col.innerHTML = `
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="${prefix}-character" value="${char.id}" id="char_${prefix}_${char.id}">
+                            <label class="form-check-label small" for="char_${prefix}_${char.id}">
+                                ${char.name}
+                            </label>
+                        </div>
+                    `;
+                    row.appendChild(col);
+                });
+            })
+            .catch(error => {
+                container.innerHTML = '<p class="text-danger small mb-0">Error al cargar personajes</p>';
+            });
+    }
+
+    const gameSelectVideo = document.getElementById('id_video-game');
+    if (gameSelectVideo) {
+        gameSelectVideo.addEventListener('change', function() {
+            setupCharacterFilter(this.value, 'character-container-video', 'video');
+        });
+    }
+
+    const gameSelectComic = document.getElementById('id_comic-game');
+    if (gameSelectComic) {
+        gameSelectComic.addEventListener('change', function() {
+            setupCharacterFilter(this.value, 'character-container-comic', 'comic');
+        });
+    }
+});</script>
 
 
 

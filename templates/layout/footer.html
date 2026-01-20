@@ -68,7 +68,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('subscribeForm');
         const phoneInput = document.getElementById('phoneInput');
-        const whatsappContainer = document.getElementById('whatsapp-container'); // ahora solo muestra mensajes
+        const whatsappContainer = document.getElementById('whatsapp-container');
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -91,7 +91,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')  // si no usas @csrf_exempt
+                    'X-CSRFToken': getCookie('csrftoken')  
                 },
                 body: JSON.stringify({ phone: phone })
             })
@@ -110,7 +110,6 @@
                 });
         });
 
-        // Función para obtener CSRF desde cookies (si no usas @csrf_exempt)
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {

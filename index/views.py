@@ -915,12 +915,12 @@ def uploadFile(request):
         form_type = request.POST.get('form_type')
 
         if form_type == 'video':
-            form = uploadFileForm(request.POST, request.FILES)
+            form = uploadFileForm(request.POST, request.FILES, prefix='video')
             if form.is_valid():
                 media = form.save(commit=False)
                 media.user = request.user
 
-                uploaded_file = request.FILES['file']
+                uploaded_file = request.FILES['video-file']
                 base_name, ext = os.path.splitext(uploaded_file.name)
                 ext = ext.lower()
                 is_audio = ext in AUDIO_FORMATS
@@ -944,8 +944,8 @@ def uploadFile(request):
                 uploaded_file.name = final_name
                 media.file = uploaded_file
 
-                if 'image' in request.FILES:
-                    media.image = request.FILES['image']
+                if 'video-image' in request.FILES:
+                    media.image = request.FILES['video-image']
 
                 media.save()
                 form.save_m2m()
@@ -982,7 +982,7 @@ def uploadFile(request):
                 return redirect('index:index')
 
         elif form_type == 'comic':
-            formComic = UploadComicForm(request.POST)
+            formComic = UploadComicForm(request.POST, prefix='comic')
             if formComic.is_valid():
                 comic = formComic.save(commit=False)
                 images = request.FILES.getlist('comicImages')
@@ -1023,8 +1023,8 @@ def uploadFile(request):
                 enviar_telegram_mensaje(texto, image_path)
                 return redirect('index:index')
 
-    form = uploadFileForm()
-    formComic = UploadComicForm()
+    form = uploadFileForm(prefix='video')
+    formComic = UploadComicForm(prefix='comic')
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
     user = request.user
     sidebar_context = get_sidebar_context(user)

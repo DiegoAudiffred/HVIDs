@@ -41,14 +41,16 @@
         </div>
     </div>
 
-    <div class="row mb-3">
-        <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
-            Personaje
-        </div>
-        <div class="col-md-9 col-12 my-auto">
+<div class="row mb-3">
+    <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
+        Personajes
+    </div>
+    <div class="col-md-9 col-12">
+        <div id="character-container-video" class="border rounded-3 p-3 bg-white" style="max-height: 200px; overflow-y: auto;">
             {{ form.character }}
         </div>
     </div>
+</div>
 
     <div class="row mb-3 border-top pt-3">
         <div class="col-md-3 col-6 my-auto">
@@ -96,8 +98,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const gameSelect = document.getElementById('id_video-game');
-    const characterSelect = document.getElementById('id_video-character');
+    const gameSelect = document.getElementById('id_game');
+    const characterSelect = document.getElementById('id_character');
 
     if (gameSelect && characterSelect) {
         gameSelect.addEventListener('change', function() {
@@ -128,4 +130,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
 {% endblock %}

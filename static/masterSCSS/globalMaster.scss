@@ -101,7 +101,7 @@ $theme-colors: (
   "white": $white,
 );
 
-//Shadows for buttons
+//Shadows 
 .orangeShadow {}
 
 .orangeShadow:hover {
@@ -114,7 +114,6 @@ $theme-colors: (
 
 
 
-// ====== FONT IMPORT ====== 
 @font-face {
   font-family: 'BadComic';
   src: url('/static/fonts/BadComic-Regular.ttf') format('truetype');
@@ -129,9 +128,7 @@ $theme-colors: (
   font-style: normal;
 }
 
-// ====== TIPOGRAFÍA ======
 
-// Estilo regular con peso fuerte (bold visual)
 .fnBubbleSansRegularXL {
   font-family: 'BubbleSans', sans-serif;
   font-style: normal;
@@ -173,7 +170,6 @@ $theme-colors: (
   line-height: 20px;
 }
 
-// Estilo en negrita
 .fnBadComicBold {
   font-family: 'BadComic', sans-serif;
   font-style: normal;
@@ -182,7 +178,6 @@ $theme-colors: (
   line-height: 20px;
 }
 
-// Estilo cursiva
 .fnBadComicItalic {
   font-family: 'BadComic', sans-serif;
   font-style: italic;
@@ -191,7 +186,6 @@ $theme-colors: (
   line-height: 20px;
 }
 
-// Variante grande para títulos
 .fnBadComicTitle {
   font-family: 'BadComic', sans-serif;
   font-style: normal;
@@ -201,7 +195,6 @@ $theme-colors: (
   letter-spacing: 1px;
 }
 
-// Variante para botones o llamados a la acción
 .fnBadComicButton {
   font-family: 'BadComic', sans-serif;
   font-style: normal;
@@ -211,7 +204,6 @@ $theme-colors: (
   letter-spacing: 1.5px;
 }
 
-// Variante pequeña para notas o etiquetas
 .fnBadComicSmall {
   font-family: 'BadComic', sans-serif;
   font-style: normal;
@@ -224,7 +216,6 @@ $theme-colors: (
 
 
 
-// Add custom code before this
 
 $form-select-color: $corporateGray900;
 $form-select-indicator-color: #ACACAC;

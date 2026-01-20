@@ -84,7 +84,6 @@
                 selection.addRange(range);
             }
 
-            // Copia texto plano sin estilos
             inputOculto.value = textoPlano;
         });
     });
@@ -103,7 +102,7 @@
             const textoPlano = parrafo.textContent;
 
             const textoHTML = textoPlano.replace(/@(\w+)/g, function (match, username) {
-                const url = `/profile/${username}`;  // Ruta basada en tu URL Django
+                const url = `/profile/${username}`; 
                 return `<a href="${url}" class="mencion">@${username}</a>`;
             });
 

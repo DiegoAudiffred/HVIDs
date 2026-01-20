@@ -424,14 +424,13 @@
     let selectedTags = [];
     let selectedIndex = -1;
 
-    // Cargar las etiquetas existentes (si las hay)
     function loadTags(existingTags) {
       selectedTags = existingTags.split(",").filter(tag => tag.trim() !== "");
       renderTags();
     }
 
     function renderTags() {
-      tagContainer.innerHTML = '';  // Limpiar el contenedor
+      tagContainer.innerHTML = '';  
       selectedTags.forEach(tag => {
         const tagDiv = document.createElement("div");
         tagDiv.className = "badge bg-secondary text-white rounded-pill px-3 py-2 d-flex align-items-center gap-2";
@@ -449,8 +448,7 @@
       updateHiddenInput();
     }
 
-    // Al cargar la página con tags preexistentes
-    const existingTags = tagsSelectedInput.value; // Suponiendo que ya tienes las etiquetas separadas por coma
+    const existingTags = tagsSelectedInput.value; 
     loadTags(existingTags);
 
     tagInput.addEventListener("input", async () => {
@@ -517,7 +515,6 @@
           selectedIndex = -1;
         }
       }
-      // Enter: si moviste con flechas, toma esa; sino, toma lo que escribiste
       else if (e.key === "Enter") {
         e.preventDefault();
         if (suggestions.length > 0 && selectedIndex >= 0) {
@@ -709,12 +706,10 @@
   }
 
   function submitUpload() {
-    // Mostrar spinner
     document.getElementById("uploadSpinner").classList.remove("d-none");
     document.getElementById("uploadText").textContent = "Subiendo...";
     document.getElementById("confirmButton").disabled = true;
 
-    // Enviar formulario
     document.getElementById("uploadForm").submit();
   }
 </script>

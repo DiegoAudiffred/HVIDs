@@ -4,98 +4,66 @@ from db.models import *
 
 
     
-
 class UploadComicForm(forms.ModelForm):
     class Meta:
         model = Comic
-        fields = ['name', 'artist', 'tags', 'game', 'character','user','hide','image','user','nsfw']
+        fields = ['name', 'artist', 'tags', 'game', 'character', 'user', 'hide', 'image', 'nsfw']
+
     def __init__(self, *args, **kwargs):
-            super(UploadComicForm, self).__init__(*args, **kwargs)
+        super(UploadComicForm, self).__init__(*args, **kwargs)
+        checkbox_style = {'class': 'form-check-input fs-2 my-0'}
+        input_style = {'class': 'rounded-4 border-3 px-4 w-100 py-2'}
 
-            self.fields['name'].required = True
-            self.fields['name'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
- # Estilos personalizados para las checkboxes
-            checkbox_style = {
-    'class': 'form-check-input fs-2 my-0',  # Tamaño más grande + margen derecho y vertical
-}
-            self.fields['hide'].widget.attrs.update(checkbox_style)
-
-            self.fields['nsfw'].widget.attrs.update(checkbox_style)
-
-            self.fields['artist'].required = False
-            self.fields['artist'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': '', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
-
-            self.fields['game'].required = False
-            self.fields['game'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Juego', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
-
-            self.fields['character'].required = False
-            self.fields['character'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
-
-            self.fields['nsfw'].widget.attrs.update(checkbox_style)
-            
-            self.fields['user'].required = False
-            self.fields['user'].widget.attrs.update({'class': 'rounded-4 border-3 px-4 w-100 py-2', 'placeholder': ' Personaje', 'rows': '1', 'aria-label': 'Username', 'aria-describedby': 'basic-addon1'})
-
-            self.fields['tags'].required = False
-            self.fields['tags'].widget = forms.CheckboxSelectMultiple()
-            self.fields['tags'].queryset = Tags.objects.all()  # Obtén todas las opciones de tags disponibles
+        self.fields['name'].widget.attrs.update(input_style)
+        self.fields['artist'].widget.attrs.update(input_style)
+        self.fields['game'].widget.attrs.update(input_style)
+        self.fields['user'].widget.attrs.update(input_style)
         
-class ComicPageForm(forms.ModelForm):
-    class Meta:
-        model = ComicPage
-        fields = ['image', 'order']
-
-class uploadFileForm(forms.ModelForm):
-    tags = forms.ModelMultipleChoiceField(
-        queryset=Tags.objects.all(),
-        required=False,
-        widget=forms.SelectMultiple(attrs={
-            'class': 'form-control d-none',
-            'id': 'id_tags_real'
-        })
-    )
-
-    class Meta:
-        model = MediaFile
-        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image', 'hide', 'user', 'nsfw']
-        widgets = {
-            'file': forms.ClearableFileInput(attrs={'accept': 'video/*'}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super(uploadFileForm, self).__init__(*args, **kwargs)
-        control_style = 'form-control rounded-3 border-secondary-subtle shadow-sm px-3 py-2'
-        select_style = 'form-select rounded-3 border-secondary-subtle shadow-sm px-3 py-2'
-        check_style = 'form-check-input border-secondary-subtle'
-
-        self.fields['name'].required = True
-        self.fields['name'].widget.attrs.update({'class': control_style, 'placeholder': 'Ej. Mi Video Increíble'})
-
-        self.fields['artist'].required = False
-        self.fields['artist'].widget.attrs.update({'class': select_style})
-
-        self.fields['game'].required = False
-        self.fields['game'].widget.attrs.update({'class': select_style, 'id': 'id_game'})
+        self.fields['hide'].widget.attrs.update(checkbox_style)
+        self.fields['nsfw'].widget.attrs.update(checkbox_style)
 
         self.fields['character'].required = False
-        self.fields['character'].widget.attrs.update({'class': select_style, 'id': 'id_character'})
-
-        self.fields['file'].required = True
-        self.fields['file'].widget.attrs.update({'class': control_style, 'accept': 'video/*'})
-
-        self.fields['image'].required = False
-        self.fields['image'].widget.attrs.update({'class': control_style})
-
-        self.fields['user'].widget = forms.HiddenInput()
-        
-        self.fields['hide'].widget.attrs.update({'class': check_style})
-        self.fields['nsfw'].widget.attrs.update({'class': check_style})
+        self.fields['character'].widget = forms.CheckboxSelectMultiple()
+        self.fields['character'].queryset = Character.objects.none()
 
         self.fields['tags'].required = False
         self.fields['tags'].widget = forms.CheckboxSelectMultiple()
         self.fields['tags'].queryset = Tags.objects.all()
 
+
+class uploadFileForm(forms.ModelForm):
+    class Meta:
+        model = MediaFile
+        fields = ['name', 'artist', 'tags', 'game', 'character', 'file', 'image', 'hide', 'user', 'nsfw']
+
+    def __init__(self, *args, **kwargs):
+        super(uploadFileForm, self).__init__(*args, **kwargs)
+        control_style = 'form-control rounded-3 border-secondary-subtle shadow-sm px-3 py-2'
+        select_style = 'form-select rounded-3 border-secondary-subtle shadow-sm px-3 py-2'
+        check_style = 'form-check-input'
+
+        self.fields['name'].widget.attrs.update({'class': control_style, 'placeholder': 'Ej. Mi Video Increíble'})
+        self.fields['artist'].widget.attrs.update({'class': select_style})
+        self.fields['game'].widget.attrs.update({'class': select_style})
+        self.fields['file'].widget.attrs.update({'class': control_style, 'accept': 'video/*'})
+        self.fields['image'].widget.attrs.update({'class': control_style})
         
+        self.fields['user'].widget = forms.HiddenInput()
+        self.fields['hide'].widget.attrs.update({'class': check_style})
+        self.fields['nsfw'].widget.attrs.update({'class': check_style})
+
+        self.fields['character'].required = False
+        self.fields['character'].widget = forms.CheckboxSelectMultiple()
+        self.fields['character'].queryset = Character.objects.none()
+
+        self.fields['tags'].required = False
+        self.fields['tags'].widget = forms.CheckboxSelectMultiple()
+        self.fields['tags'].queryset = Tags.objects.all()
+class ComicPageForm(forms.ModelForm):
+    class Meta:
+        model = ComicPage
+        fields = ['image', 'order']
+
 class addComentariosForm(forms.ModelForm):
     class Meta:
         model = Comentario

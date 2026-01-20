@@ -1,131 +1,163 @@
-<!-- Formulario para Comics -->
 {% block body %}
-
-<form action="{% url 'index:uploadFile' %}" method="post" enctype="multipart/form-data" id="comicForm"
-    style="display:none">
+<form action="{% url 'index:uploadFile' %}" method="post" enctype="multipart/form-data" id="comicForm" class="bg-light p-4 rounded-4 shadow-sm" style="display:none">
     {% csrf_token %}
     <input type="hidden" name="form_type" id="formType" value="comic">
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
+    
+    <div class="row mb-3">
+        <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
             Nombre del Comic *
         </div>
-        <div class="col-md-9 col-12  my-auto">
-            {{ formComic.name }}</div>
+        <div class="col-md-9 col-12 my-auto">
+            {{ formComic.name }}
+        </div>
     </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
-            Artista</div>
-        <div class="col-md-9 col-12  my-auto">
-            {{ formComic.artist }}</div>
+    
+    <div class="row mb-3">
+        <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
+            Artista
+        </div>
+        <div class="col-md-9 col-12 my-auto">
+            {{ formComic.artist }}
+        </div>
     </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
-            Etiquetas</div>
-        <div class="col-9 my-auto position-relative">
-            <input type="text" id="tagInputComic" class="rounded-4 border-3 px-4 w-100 py-2"
-                placeholder="Escribe una etiqueta y presiona Enter o Tab para autocompletar">
-            <div id="tagSuggestionsComic" class="border bg-white rounded-2 mt-1 d-none position-absolute z-3 w-100">
-            </div>
+    
+    <div class="row mb-3">
+        <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
+            Etiquetas
+        </div>
+        <div class="col-md-9 col-12 my-auto position-relative">
+            <input type="text" id="tagInputComic" class="form-control rounded-3 border-secondary-subtle px-3 py-2" placeholder="Escribe una etiqueta y presiona Enter">
+            <div id="tagSuggestionsComic" class="list-group position-absolute z-3 w-100 shadow-sm d-none"></div>
             <div id="tagContainerComic" class="mt-2 d-flex flex-wrap gap-2"></div>
         </div>
     </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
-            Juego</div>
-        <div class="col-md-9 col-12  my-auto">
-            {{ formComic.game }}</div>
-    </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
-            Personajes</div>
-        <div class="col-md-9 col-12  my-auto">
-            {{ formComic.character }}</div>
-    </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
-            Ocultar</div>
-        <div class="col-md-9 col-12  my-auto">
-            {{ formComic.hide }}</div>
-    </div>
-    <div class="row p-2">
-        <div class="col-md-3 col-12  my-auto">
-            NSFW?
+    
+    <div class="row mb-3">
+        <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
+            Juego/Anime
         </div>
-        <div class="col-md-9 col-12  my-auto">
-            {{ form.nsfw }}
+        <div class="col-md-9 col-12 my-auto">
+            {{ formComic.game }}
         </div>
     </div>
-    <!-- Subida de imágenes -->
-    <div class="row p-2">
-        Agregar páginas:
-
-        <input type="file" id="comicImageInput" accept="image/*" style="display:none" name="comicImages" multiple>
-        <div id="comicPagesPreview" class="d-flex flex-wrap gap-2 my-2">
-            <div id="uploadBox" class="border border-primary text-center py-5 col-md-2 col-12" style="cursor:pointer;">
-                <strong>+</strong><br>Agregar imagen
+    
+<div class="row mb-3">
+    <div class="col-md-3 col-12 my-auto fw-bold text-secondary">
+        Personajes
+    </div>
+    <div class="col-md-9 col-12">
+        <div id="character-container-comic" class="border rounded-3 p-3 bg-white" style="max-height: 200px; overflow-y: auto;">
+            {{ formComic.character }}
+        </div>
+    </div>
+</div>
+    
+    <div class="row mb-3 border-top pt-3">
+        <div class="col-md-3 col-6 my-auto">
+            <div class="form-check form-switch">
+                {{ formComic.hide }}
+                <label class="form-check-label ms-2 fw-bold text-secondary">Ocultar</label>
             </div>
-
         </div>
-
-
+        <div class="col-md-3 col-6 my-auto">
+            <div class="form-check form-switch">
+                {{ formComic.nsfw }}
+                <label class="form-check-label ms-2 fw-bold text-danger">NSFW?</label>
+            </div>
+        </div>
     </div>
 
-    <div class="row p-2 justify-content-end">
-        <div class="col-4 text-center">
-            <button type="submit" id="submitComicBtn" class="btn btn-secondary py-2 px-4 w-100 fw-bold text-white">
+    <div class="row mb-4">
+        <div class="col-12 fw-bold text-secondary mb-2">
+            Páginas del Comic / Galería
+        </div>
+        <div class="col-12">
+            <input type="file" id="comicImageInput" accept="image/*" style="display:none" name="comicImages" multiple>
+            <div id="comicPagesPreview" class="d-flex flex-wrap gap-3 p-3 border border-dashed rounded-4 bg-white min-vh-10">
+                <div id="uploadBox" class="d-flex flex-column align-items-center justify-content-center border border-primary border-2 rounded-3 text-primary" style="cursor:pointer; width: 120px; height: 120px; border-style: dashed !important;">
+                    <i class="fas fa-plus mb-1" style="font-size: 1.5rem;">+</i>
+                    <small class="fw-bold">Agregar</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-end">
+        <div class="col-md-4 col-12">
+            <button type="submit" id="submitComicBtn" class="btn btn-secondary btn-lg w-100 fw-bold shadow-sm py-2">
                 Subir galería/comic
             </button>
         </div>
     </div>
     <input type="hidden" name="tags_selectedComic" id="tagsSelectedComic">
-
 </form>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const gameSelectComic = document.getElementById('id_comic-game');
+    const characterSelectComic = document.getElementById('id_comic-character');
+
+    if (gameSelectComic && characterSelectComic) {
+        gameSelectComic.addEventListener('change', function() {
+            const gameId = this.value;
+            characterSelectComic.innerHTML = '<option value="">Cargando personajes...</option>';
+
+            if (!gameId) {
+                characterSelectComic.innerHTML = '<option value="">---------</option>';
+                return;
+            }
+
+            fetch(`/get_characters_by_game/?game_id=${gameId}`)
+                .then(response => response.json())
+                .then(data => {
+                    characterSelectComic.innerHTML = '<option value="">Selecciona un personaje</option>';
+                    data.forEach(char => {
+                        const option = document.createElement('option');
+                        option.value = char.id;
+                        option.textContent = char.name;
+                        characterSelectComic.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    characterSelectComic.innerHTML = '<option value="">Error al cargar</option>';
+                });
+        });
+    }
+
     const uploadBox = document.getElementById("uploadBox");
     const imageInput = document.getElementById("comicImageInput");
     const previewContainer = document.getElementById("comicPagesPreview");
-
     let selectedImages = [];
 
-    uploadBox.addEventListener("click", () => {
-        imageInput.click();
-    });
+    uploadBox.addEventListener("click", () => imageInput.click());
 
     imageInput.addEventListener("change", function () {
         for (let file of this.files) {
-            // Verificamos que no esté repetido (opcional)
             if (selectedImages.some(f => f.name === file.name && f.size === file.size)) continue;
-
             selectedImages.push(file);
 
             const reader = new FileReader();
             reader.onload = function (e) {
                 const wrapper = document.createElement("div");
-                wrapper.classList.add("text-center");
-                wrapper.style.position = "relative";
+                wrapper.classList.add("position-relative", "text-center");
+                wrapper.style.width = "120px";
 
                 const img = document.createElement("img");
                 img.src = e.target.result;
-                img.style.width = "100px";
-                img.style.height = "100px";
-                img.classList.add("border", "rounded", "col-2");
+                img.style.width = "120px";
+                img.style.height = "120px";
+                img.style.objectFit = "cover";
+                img.classList.add("border", "rounded-3", "shadow-sm");
 
                 const removeBtn = document.createElement("button");
-                removeBtn.textContent = "Eliminar";
+                removeBtn.innerHTML = "×";
                 removeBtn.type = "button";
-                removeBtn.classList.add("btn", "btn-sm", "btn-danger", "mt-1", "border", "border-3", "border-primary");
-                removeBtn.style.display = "block";
-                removeBtn.style.margin = "0 auto";
+                removeBtn.classList.add("btn", "btn-danger", "btn-sm", "position-absolute", "top-0", "end-0", "rounded-circle");
+                removeBtn.style.transform = "translate(30%, -30%)";
 
                 removeBtn.addEventListener("click", () => {
-                    // Eliminar del array de selectedImages
                     selectedImages = selectedImages.filter(f => f !== file);
-
-                    // Eliminar del DOM
                     wrapper.remove();
-
-                    console.log('Imagen eliminada. Lista de imágenes:', selectedImages); // Para depuración
                 });
 
                 wrapper.appendChild(img);
@@ -135,6 +167,6 @@
             reader.readAsDataURL(file);
         }
     });
+});
 </script>
-
 {% endblock %}

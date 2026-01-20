@@ -87,7 +87,7 @@
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add("animate");
-          observer.unobserve(entry.target); // Solo una vez
+          observer.unobserve(entry.target); 
         }
       });
     }, {
