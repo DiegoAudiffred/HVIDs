@@ -3,7 +3,6 @@ from django import forms
 from db.models import *
 
 
-    
 class UploadComicForm(forms.ModelForm):
     class Meta:
         model = Comic
@@ -24,7 +23,15 @@ class UploadComicForm(forms.ModelForm):
 
         self.fields['character'].required = False
         self.fields['character'].widget = forms.CheckboxSelectMultiple()
-        self.fields['character'].queryset = Character.objects.none()
+        
+        if self.data.get('comic-game'):
+            try:
+                game_id = int(self.data.get('comic-game'))
+                self.fields['character'].queryset = Character.objects.filter(game_id=game_id)
+            except (ValueError, TypeError):
+                self.fields['character'].queryset = Character.objects.none()
+        else:
+            self.fields['character'].queryset = Character.objects.none()
 
         self.fields['tags'].required = False
         self.fields['tags'].widget = forms.CheckboxSelectMultiple()
@@ -54,7 +61,15 @@ class uploadFileForm(forms.ModelForm):
 
         self.fields['character'].required = False
         self.fields['character'].widget = forms.CheckboxSelectMultiple()
-        self.fields['character'].queryset = Character.objects.none()
+        
+        if self.data.get('video-game'):
+            try:
+                game_id = int(self.data.get('video-game'))
+                self.fields['character'].queryset = Character.objects.filter(game_id=game_id)
+            except (ValueError, TypeError):
+                self.fields['character'].queryset = Character.objects.none()
+        else:
+            self.fields['character'].queryset = Character.objects.none()
 
         self.fields['tags'].required = False
         self.fields['tags'].widget = forms.CheckboxSelectMultiple()

@@ -88,7 +88,7 @@
                                     {% if mediafile.image %}
                                     <img src="{{ mediafile.image.url }}" alt="{{ mediafile.name }} Thumbnail"
                                         class="card-img-top w-100 h-100 object-fit-cover " {% if mediafile.nsfw %}
-                                        style="filter: blur(0.3rem);" {% endif%}>
+                                        style="filter: blur(1.5rem);" {% endif%}>
                                     {% else %}
                                     <img src="{% static 'img/noImage.jpg' %}" alt="Sin imagen"
                                         class="card-img-top w-100 h-100 object-fit-cover">

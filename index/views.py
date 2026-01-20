@@ -909,6 +909,8 @@ def get_characters_by_game(request):
     characters = Character.objects.filter(game_id=game_id).values('id', 'name')
     return JsonResponse(list(characters), safe=False)
 
+from django.contrib import messages
+
 @login_required(login_url='/login/')
 def uploadFile(request):
     if request.method == 'POST':
@@ -920,29 +922,22 @@ def uploadFile(request):
                 media = form.save(commit=False)
                 media.user = request.user
 
-                uploaded_file = request.FILES['video-file']
-                base_name, ext = os.path.splitext(uploaded_file.name)
-                ext = ext.lower()
-                is_audio = ext in AUDIO_FORMATS
+                uploaded_file = request.FILES.get('video-file')
+                if uploaded_file:
+                    base_name, ext = os.path.splitext(uploaded_file.name)
+                    ext = ext.lower()
+                    is_audio = ext in AUDIO_FORMATS
+                    upload_dir = datetime.datetime.now().strftime("media_files/%Y%m%d/")
+                    os.makedirs(os.path.join(settings.MEDIA_ROOT, upload_dir), exist_ok=True)
+                    final_name = f"{base_name}{ext}" if is_audio else f"{base_name}.mp4"
+                    
+                    count = 1
+                    while default_storage.exists(os.path.join(upload_dir, final_name)):
+                        final_name = f"{base_name}_{count}{ext}" if is_audio else f"{base_name}_{count}.mp4"
+                        count += 1
 
-                upload_dir = datetime.datetime.now().strftime("media_files/%Y%m%d/")
-                os.makedirs(os.path.join(settings.MEDIA_ROOT, upload_dir), exist_ok=True)
-
-                if is_audio:
-                    final_name = f"{base_name}{ext}"
-                else:
-                    final_name = f"{base_name}.mp4"
-
-                count = 1
-                while default_storage.exists(os.path.join(upload_dir, final_name)):
-                    if is_audio:
-                        final_name = f"{base_name}_{count}{ext}"
-                    else:
-                        final_name = f"{base_name}_{count}.mp4"
-                    count += 1
-
-                uploaded_file.name = final_name
-                media.file = uploaded_file
+                    uploaded_file.name = final_name
+                    media.file = uploaded_file
 
                 if 'video-image' in request.FILES:
                     media.image = request.FILES['video-image']
@@ -950,12 +945,15 @@ def uploadFile(request):
                 media.save()
                 form.save_m2m()
 
-                for tag in request.POST.get('tags_selectedVideo', '').split(','):
-                    if tag.strip():
-                        obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
-                        media.tags.add(obj)
+                tags_data = request.POST.get('tags_selectedVideo', '')
+                if tags_data:
+                    for tag in tags_data.split(','):
+                        if tag.strip():
+                            obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
+                            media.tags.add(obj)
 
                 file_url = request.build_absolute_uri(reverse('index:watchVideo', args=[media.id]))
+                
                 texto = (
                     f"🎬 <b>¡Nuevo video subido!</b>\n"
                     f"📤 <i>Cortesía de</i> <b>{media.user}</b>\n\n"
@@ -968,10 +966,8 @@ def uploadFile(request):
                 if media.image and hasattr(media.image, 'path') and os.path.exists(media.image.path):
                     try:
                         with Image.open(media.image.path) as img:
-                            if img.mode != 'RGB':
-                                img = img.convert('RGB')
-                            max_size = (1280, 1280)
-                            img.thumbnail(max_size)
+                            if img.mode != 'RGB': img = img.convert('RGB')
+                            img.thumbnail((1280, 1280))
                             with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as temp_img:
                                 img.save(temp_img.name, format='JPEG', quality=85)
                                 image_path = temp_img.name
@@ -980,26 +976,33 @@ def uploadFile(request):
 
                 enviar_telegram_mensaje(texto, image_path)
                 return redirect('index:index')
+            else:
+                for field, errors in form.errors.items():
+                    messages.add_message(request, messages.ERROR, f"Error en Video ({field}): {errors.as_text()}")
 
         elif form_type == 'comic':
             formComic = UploadComicForm(request.POST, prefix='comic')
             if formComic.is_valid():
                 comic = formComic.save(commit=False)
-                images = request.FILES.getlist('comicImages')
-                comic.image = images[0]
                 comic.user = request.user
+                images = request.FILES.getlist('comicImages')
+                if images:
+                    comic.image = images[0]
                 comic.save()
                 formComic.save_m2m()
             
-                for index, image in enumerate(request.FILES.getlist('comicImages')):
+                for index, image in enumerate(images):
                     ComicPage.objects.create(comic=comic, image=image, order=index)
             
-                for tag in request.POST.get('tags_selectedComic', '').split(','):
-                    if tag.strip():
-                        obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
-                        comic.tags.add(obj)
+                tags_data = request.POST.get('tags_selectedComic', '')
+                if tags_data:
+                    for tag in tags_data.split(','):
+                        if tag.strip():
+                            obj, _ = Tags.objects.get_or_create(name=tag.strip().upper())
+                            comic.tags.add(obj)
             
                 file_url = request.build_absolute_uri(reverse('index:watchComic', args=[comic.id]))
+                
                 texto = (
                     f"🎬 <b>¡Nuevo imagén subida!</b>\n"
                     f"📤 <i>Cortesía de</i> <b>{comic.user}</b>\n\n"
@@ -1009,11 +1012,10 @@ def uploadFile(request):
                 )
             
                 image_path = None
-                if comic.image:
+                if comic.image and hasattr(comic.image, 'path') and os.path.exists(comic.image.path):
                     try:
                         with Image.open(comic.image.path) as img:
-                            if img.mode != "RGB":
-                                img = img.convert("RGB")
+                            if img.mode != "RGB": img = img.convert("RGB")
                             temp_file = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
                             img.save(temp_file.name, format="JPEG")
                             image_path = temp_file.name
@@ -1022,12 +1024,14 @@ def uploadFile(request):
             
                 enviar_telegram_mensaje(texto, image_path)
                 return redirect('index:index')
+            else:
+                for field, errors in formComic.errors.items():
+                    messages.add_message(request, messages.ERROR, f"Error en Comic ({field}): {errors.as_text()}")
 
     form = uploadFileForm(prefix='video')
     formComic = UploadComicForm(prefix='comic')
     media_files = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
-    user = request.user
-    sidebar_context = get_sidebar_context(user)
+    sidebar_context = get_sidebar_context(request.user)
     context = {
         'form': form,
         'formComic': formComic,
@@ -1039,17 +1043,7 @@ def enviar_telegram_mensaje(texto, image_path=None):
     token = settings.TELEGRAM_BOT_TOKEN
     chat_id = settings.TELEGRAM_GROUP_CHAT_ID
 
-    # ⚙️ CAMBIO AQUÍ (Usa esto si estás en LOCAL + NGROK)
-    # Ejemplo: ngrok_url = "https://d3f4-189-204-123-123.ngrok-free.app"
-    # ⚠️ Este valor debería idealmente venir de settings o una variable de entorno
-    ngrok_url = "https://d3f4-189-204-123-123.ngrok-free.app"
 
-    # 🏠 Modo LOCAL (sin ngrok, puede fallar si image_path no es accesible desde fuera)
-    is_localhost = "127.0.0.1" in texto or "localhost" in texto
-
-    # ☝️ Si usas image_url generado desde Django (media.image.url), reemplaza 127.0.0.1 por tu ngrok
-    if is_localhost:
-        texto = texto.replace("http://127.0.0.1:8000", ngrok_url)
 
     if image_path and os.path.exists(image_path):
         # 🖼️ Enviar imagen + texto juntos usando sendPhoto
@@ -1198,13 +1192,10 @@ def delete_item(request, type, id):
     return JsonResponse({'error': 'Solicitud inválida'}, status=400)
 
 
-
-
 def safe_filename(name):
     name = re.sub(r'[^\w\s-]', '', name)
     name = re.sub(r'[\s]+', '_', name)
     return name.strip('_')
-
 
 @login_required(login_url='/login/')
 def videoDownloader(request):
@@ -1315,6 +1306,7 @@ def videoDownloader(request):
 
     context.update(sidebar_context)
     return render(request, 'index/videoDownloader.html', context)
+
 @login_required(login_url='/login/')
 def recentPosts(request):
     posts_list = Post.objects.select_related('user').prefetch_related('likes', 'images').filter(hide=False).order_by('-uploaded_at')
@@ -1349,8 +1341,6 @@ def editar_post(request, post_id):
         if form.is_valid():
             form.save()
     return redirect('index:recentPosts')
-
-
 
 @login_required(login_url='/login/')  
 def eliminar_post(request,id):
