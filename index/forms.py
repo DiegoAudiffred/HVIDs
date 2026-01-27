@@ -11,9 +11,12 @@ class UploadComicForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(UploadComicForm, self).__init__(*args, **kwargs)
         checkbox_style = {'class': 'form-check-input fs-2 my-0'}
-        input_style = {'class': 'rounded-4 border-3 px-4 w-100 py-2'}
+        input_style = {'class': 'form-control rounded-3 border-secondary-subtle shadow-sm px-3 py-2'}
+        select_style = 'form-select rounded-3 border-secondary-subtle shadow-sm px-3 py-2'
 
-        self.fields['name'].widget.attrs.update(input_style)
+        control_style = 'form-control rounded-3 border-secondary-subtle shadow-sm px-3 py-2'
+
+        self.fields['name'].widget.attrs.update({'class': control_style, 'placeholder': 'Nombre del comic'})
         self.fields['artist'].widget.attrs.update(input_style)
         self.fields['game'].widget.attrs.update(input_style)
         self.fields['user'].widget.attrs.update(input_style)
@@ -52,9 +55,10 @@ class uploadFileForm(forms.ModelForm):
         super(uploadFileForm, self).__init__(*args, **kwargs)
         control_style = 'form-control rounded-3 border-secondary-subtle shadow-sm px-3 py-2'
         select_style = 'form-select rounded-3 border-secondary-subtle shadow-sm px-3 py-2'
-        check_style = 'form-check-input'
+        check_style = 'form-check-input fs-2 my-0'
+        control_style = 'form-control rounded-3 border-secondary-subtle shadow-sm px-3 py-2'
 
-        self.fields['name'].widget.attrs.update({'class': control_style, 'placeholder': 'Ej. Mi Video Increíble'})
+        self.fields['name'].widget.attrs.update({'class': control_style, 'placeholder': 'Nombre del video'})
         self.fields['artist'].widget.attrs.update({'class': select_style})
         self.fields['game'].widget.attrs.update({'class': select_style})
         self.fields['file'].widget.attrs.update({'class': control_style, 'accept': 'video/*'})

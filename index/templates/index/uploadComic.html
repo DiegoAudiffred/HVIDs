@@ -54,13 +54,13 @@
     
     <div class="row mb-3 border-top pt-3">
         <div class="col-md-3 col-6 my-auto">
-            <div class="form-check form-switch">
+            <div class="form-check form-switch ms-5">
                 {{ formComic.hide }}
                 <label class="form-check-label ms-2 fw-bold text-secondary">Ocultar</label>
             </div>
         </div>
         <div class="col-md-3 col-6 my-auto">
-            <div class="form-check form-switch">
+            <div class="form-check form-switch ms-5">
                 {{ formComic.nsfw }}
                 <label class="form-check-label ms-2 fw-bold text-danger">NSFW?</label>
             </div>
@@ -75,7 +75,6 @@
             <input type="file" id="comicImageInput" accept="image/*" style="display:none" name="comicImages" multiple>
             <div id="comicPagesPreview" class="d-flex flex-wrap gap-3 p-3 border border-dashed rounded-4 bg-white min-vh-10">
                 <div id="uploadBox" class="d-flex flex-column align-items-center justify-content-center border border-primary border-2 rounded-3 text-primary" style="cursor:pointer; width: 100px; height: 120px; border-style: dashed !important;">
-                    <i class="fas fa-plus mb-1" style="font-size: 1.5rem;">+</i>
                     <small class="fw-bold">Agregar</small>
                 </div>
             </div>

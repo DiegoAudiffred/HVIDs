@@ -625,11 +625,14 @@ def viewDownloadedVideos(request):
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    sidebar_context = get_sidebar_context(request.user)
 
     return render(request, 'index/viewDownloadedVideos.html', {
         'archivos': page_obj,
         'MEDIA_URL': settings.MEDIA_URL,
+        **sidebar_context
     })
+
 
 @login_required(login_url='/login/')
 def deleteDownloadedVideo(request, filename):
@@ -1187,6 +1190,7 @@ def delete_item(request, type, id):
     return JsonResponse({'error': 'Solicitud inválida'}, status=400)
 
 
+
 def safe_filename(name):
     name = re.sub(r'[^\w\s-]', '', name)
     name = re.sub(r'[\s]+', '_', name)
@@ -1215,79 +1219,55 @@ def videoDownloader(request):
 
                 if is_direct_link and download_type == 'video':
                     clean_title = safe_filename(url.split('/')[-1].split('?')[0])
-                    if not clean_title:
-                        clean_title = "descarga_directa"
+                    if not clean_title: clean_title = "descarga_directa"
                     
                     final_filename = f"{clean_title}"
                     full_path = os.path.join(output_dir, final_filename)
 
                     if os.path.exists(full_path):
-                        context['title'] = clean_title
-                        context['filename'] = final_filename
-                        context['already_downloaded'] = True
+                        context.update({'title': clean_title, 'filename': final_filename, 'already_downloaded': True})
                     else:
                         with requests.get(url, stream=True) as r:
                             r.raise_for_status()
                             with open(full_path, 'wb') as f:
                                 for chunk in r.iter_content(chunk_size=8192):
                                     f.write(chunk)
-                        context['title'] = clean_title
-                        context['filename'] = final_filename
+                        context.update({'title': clean_title, 'filename': final_filename})
                 else:
-                    base_opts = {
-                        'quiet': True,
-                        'cookiefile': cookie_path if os.path.exists(cookie_path) else None,
+                    ydl_opts = {
+                        'ffmpeg_location': ffmpeg_path,
+                       # 'cookiefile': cookie_path if os.path.exists(cookie_path) else None,
+                        'noplaylist': True,
+                        'quiet': False,
+                        'outtmpl': os.path.join(output_dir, '%(title).80s.%(ext)s'),
+                        'merge_output_format': 'mp4',
                     }
-                    
-                    with YoutubeDL(base_opts) as ydl:
-                        info = ydl.extract_info(url, download=False)
-                        title = info.get('title', 'video')
-                        ext = 'mp3' if download_type == 'audio' else info.get('ext', 'mp4')
-                        clean_title = safe_filename(title)
-                        final_filename = f"{clean_title}_{download_type}.{ext}"
-                        full_path = os.path.join(output_dir, final_filename)
 
-                    if os.path.exists(full_path):
-                        context['title'] = title
-                        context['filename'] = final_filename
-                        context['already_downloaded'] = True
+                    if download_type == 'audio':
+                        ydl_opts.update({
+                            'format': 'bestaudio/best',
+                            'postprocessors': [{
+                                'key': 'FFmpegExtractAudio',
+                                'preferredcodec': 'mp3',
+                                'preferredquality': '192',
+                            }]
+                        })
                     else:
-                        ydl_opts = {
-                            'ffmpeg_location': ffmpeg_path,
-                            'cookiefile': cookie_path if os.path.exists(cookie_path) else None,
-                            'noplaylist': True,
-                            'quiet': True,
-                            'nooverwrites': True,
-                            'nopart': True,
-                            'outtmpl': os.path.join(output_dir, '%(title).100s.%(ext)s'),
-                        }
-                        if download_type == 'audio':
-                            ydl_opts.update({
-                                'format': 'bestaudio/best',
-                                'postprocessors': [{
-                                    'key': 'FFmpegExtractAudio',
-                                    'preferredcodec': 'mp3',
-                                    'preferredquality': '192',
-                                }]
-                            })
-                        else:
-                            ydl_opts.update({
-                                'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best',
-                            })
+                        ydl_opts.update({
+                            'format': 'bestvideo+bestaudio/best',
+                        })
 
-                        with YoutubeDL(ydl_opts) as ydl:
-                            info = ydl.extract_info(url, download=True)
-                            downloaded = ydl.prepare_filename(info)
-                            if download_type == 'audio':
-                                downloaded = os.path.splitext(downloaded)[0] + '.mp3'
-                            
-                            if os.path.exists(downloaded) and downloaded != full_path:
-                                if os.path.exists(full_path):
-                                    os.remove(full_path)
-                                os.rename(downloaded, full_path)
-
-                            context['title'] = title
-                            context['filename'] = final_filename
+                    with YoutubeDL(ydl_opts) as ydl:
+                        info = ydl.extract_info(url, download=True)
+                        temp_file = ydl.prepare_filename(info)
+                        
+                        ext = '.mp3' if download_type == 'audio' else '.mp4'
+                        final_filename = os.path.splitext(os.path.basename(temp_file))[0] + ext
+                        
+                        context.update({
+                            'title': info.get('title', 'video'),
+                            'filename': final_filename
+                        })
 
             except Exception as e:
                 context['error'] = f"Error al descargar: {str(e)}"
@@ -1301,6 +1281,7 @@ def videoDownloader(request):
 
     context.update(sidebar_context)
     return render(request, 'index/videoDownloader.html', context)
+
 
 @login_required(login_url='/login/')
 def recentPosts(request):
