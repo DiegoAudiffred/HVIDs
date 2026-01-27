@@ -56,39 +56,44 @@
 
 
 <div class="container-fluid  mt-4">
-    <div class="row">
-        <div class="">
-            <h1>Sección de administrador </h1>
+        <div class="row align-items-center border-bottom border-3 border-primary mb-3"> <!-- Titulo -->
+        <div class="col-12 col-lg-8 align-self-end">
+            <h1 class="fw-bold text-dark m-0 pb-2 text-truncate">Administración</h1>
         </div>
+                </div>
+
+    <div class="row">
+
         <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
             <button href=""
-                class="btn adminLink border border-3 dynamicQuery border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
+                class="btn btn-secondary adminLink border border-3 dynamicQuery border-tercero px-2 py-2 text-center text-white fw-bold w-100 mb-2"
                 data-type="tags" id="tags">Tags</button>
 
         </div>
         <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
             <button href=""
-                class="btn adminLink border border-3 dynamicQuery border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
+                class="btn btn-secondary adminLink border border-3 dynamicQuery border-tercero px-2 py-2 text-center text-white fw-bold w-100 mb-2"
                 data-type="artists" id="artists">Artistas</button>
 
         </div>
-        <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
+                <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
             <button href=""
-                class="btn adminLink border border-3 dynamicQuery border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
-                data-type="chars" id="chars">Personajes</button>
-
-        </div>
-        <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
-            <button href=""
-                class="btn adminLink dynamicQuery border border-3 border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
+                class="btn btn-secondary adminLink dynamicQuery border border-3 border-tercero px-2 py-2 text-white text-primary fw-bold w-100 mb-2"
                 data-type="games" id="games">Juegos</button>
 
         </div>
+        <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
+            <button href=""
+                class="btn btn-secondary adminLink border border-3 dynamicQuery border-tercero px-2 py-2 text-center text-white fw-bold w-100 mb-2"
+                data-type="chars" id="chars">Personajes</button>
+
+        </div>
+
         {% if user.is_superuser and user.is_staff %}
 
         <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
             <button href=""
-                class="btn adminLink dynamicQuery border border-3  border-tercero px-2 py-2 text-center text-primary fw-bold w-100"
+                class="btn btn-secondary adminLink dynamicQuery border border-3  border-tercero px-2 py-2 text-center text-white fw-bold w-100 mb-2"
                 data-type="users" id="users">Usuarios</button>
 
         </div>
@@ -96,15 +101,15 @@
 
         {% if user.is_superuser and user.is_staff %}
 
-        <div class="col-xl-1 my-3 col-12 col-md-6 my-xl-0 text-center ">
+        <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
             <a href="{% url 'admin:index' %}"
-                class="btn adminLink  border border-3 border-tercero px-2 py-2 text-center text-primary fw-bold w-100">
-                Admin</a>
+                class="btn btn-secondary adminLink border border-3 border-tercero px-2 py-2 text-center text-white fw-bold w-100 mb-2">
+                Administración</a>
 
         </div>
-        <div class="col-xl-1 my-3 col-12 col-md-6 my-xl-0 text-center ">
+             <div class="col-xl-2 my-3 col-12 col-md-6 my-xl-0 text-center ">
             <a href="{% url 'index:allVideosHide' %}"
-                class="btn adminLink  border border-3 border-tercero px-2 py-2 text-center text-primary fw-bold w-100">
+                class="btn btn-secondary adminLink border border-3 border-tercero px-2 py-2 text-center text-white fw-bold w-100 mb-2">
                 Videos</a>
 
         </div>
