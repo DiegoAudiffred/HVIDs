@@ -1196,6 +1196,7 @@ def safe_filename(name):
     name = re.sub(r'[\s]+', '_', name)
     return name.strip('_')
 
+
 @login_required(login_url='/login/')
 def videoDownloader(request):
     context = {}
@@ -1213,7 +1214,8 @@ def videoDownloader(request):
                     os.makedirs(output_dir)
 
                 ffmpeg_path = r'C:\ffmpeg\bin\ffmpeg.exe'
-                cookie_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'cookies.txt')
+                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                cookie_path = os.path.join(base_dir, 'cookies.txt')
                 
                 is_direct_link = any(url.lower().endswith(ext) or ext + "?" in url.lower() for ext in ['.mp4', '.mkv', '.avi', '.mov', '.mp3'])
 
@@ -1227,7 +1229,10 @@ def videoDownloader(request):
                     if os.path.exists(full_path):
                         context.update({'title': clean_title, 'filename': final_filename, 'already_downloaded': True})
                     else:
-                        with requests.get(url, stream=True) as r:
+                        headers = {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+                        }
+                        with requests.get(url, stream=True, headers=headers) as r:
                             r.raise_for_status()
                             with open(full_path, 'wb') as f:
                                 for chunk in r.iter_content(chunk_size=8192):
@@ -1235,13 +1240,22 @@ def videoDownloader(request):
                         context.update({'title': clean_title, 'filename': final_filename})
                 else:
                     ydl_opts = {
-                        'ffmpeg_location': ffmpeg_path,
-                       # 'cookiefile': cookie_path if os.path.exists(cookie_path) else None,
-                        'noplaylist': True,
-                        'quiet': False,
-                        'outtmpl': os.path.join(output_dir, '%(title).80s.%(ext)s'),
-                        'merge_output_format': 'mp4',
-                    }
+    'ffmpeg_location': ffmpeg_path,
+    'cookiefile': cookie_path if os.path.exists(cookie_path) else None,
+    'noplaylist': True,
+    'quiet': False,
+    'outtmpl': os.path.join(output_dir, '%(title).80s.%(ext)s'),
+    'nocheckcertificate': True,
+    'no_warnings': True,
+    'extractor_args': {
+        'twitter': {
+            'api': ['graphql'],
+        },
+    },
+    'http_headers': {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+    }
+}
 
                     if download_type == 'audio':
                         ydl_opts.update({
@@ -1254,15 +1268,17 @@ def videoDownloader(request):
                         })
                     else:
                         ydl_opts.update({
-                            'format': 'bestvideo+bestaudio/best',
+                            'format': 'bestvideo[vcodec^=avc1]+bestaudio[acodec^=mp4a]/best[ext=mp4]/best',
+                            'merge_output_format': 'mp4',
                         })
 
                     with YoutubeDL(ydl_opts) as ydl:
                         info = ydl.extract_info(url, download=True)
                         temp_file = ydl.prepare_filename(info)
                         
+                        file_base, _ = os.path.splitext(temp_file)
                         ext = '.mp3' if download_type == 'audio' else '.mp4'
-                        final_filename = os.path.splitext(os.path.basename(temp_file))[0] + ext
+                        final_filename = os.path.basename(file_base) + ext
                         
                         context.update({
                             'title': info.get('title', 'video'),
@@ -1281,8 +1297,6 @@ def videoDownloader(request):
 
     context.update(sidebar_context)
     return render(request, 'index/videoDownloader.html', context)
-
-
 @login_required(login_url='/login/')
 def recentPosts(request):
     posts_list = Post.objects.select_related('user').prefetch_related('likes', 'images').filter(hide=False).order_by('-uploaded_at')
