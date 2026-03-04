@@ -1,0 +1,35 @@
+{% extends 'layout/layout.html' %}
+
+{% load static %}
+
+{% block body %}
+
+
+<div class="container-fluid mt-4 ">
+    <div class="row align-items-center">
+        <div class="col-12 ">
+
+
+            <h1 class="fw-bold text-dark border-bottom border-3 border-primary">Subidos el dia de {{my_date}} </h1>
+        </div>
+
+    </div>
+
+
+    <div class="row ">
+        {% if not media_files%}
+
+        <h3>Empieza por subir algo UwU</h3>
+        {% endif %}
+        {% for mediafile in media_files %}
+        {% include 'index/cardsTemplate.html' %}
+
+        {% endfor %}
+
+
+
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,234 @@
+{% extends 'layout/layout.html' %}
+
+{% load static %}
+
+{% block body %}
+
+<style>
+  .calendar {
+    width: 350px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    color: white;
+  }
+
+  #prev-month,
+  #next-month {
+    font-size: 1.5em;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  #month-year {
+    font-size: 1.2em;
+    font-weight: 600;
+  }
+
+  .calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f8f9fa;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .calendar-weekdays div {
+    text-align: center;
+    font-weight: 600;
+    color: #555;
+  }
+
+  .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    padding: 12px;
+  }
+
+  .calendar-days div {
+    height: 60px;
+    padding: 5px;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .calendar-days div:hover {
+    background: #e0e0e0;
+  }
+
+  .calendar-days .current-date {
+    background: #8b0000;
+    color: white;
+    font-weight: 600;
+  }
+</style>
+<div class="container-fluid mt-4 ">
+  <div class="row align-items-center">
+    <div class="col-12 ">
+
+
+      <h1 class="fw-bold text-dark border-bottom border-3 border-primary">Calendario</h1>
+    </div>
+
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="calendar w-100">
+        <div class="calendar-header bg-primary">
+          <span id="prev-month">&lt;</span>
+          <h2 id="month-year">January 2024</h2>
+          <span id="next-month">&gt;</span>
+        </div>
+        <div class="calendar-weekdays">
+          <div>Domingo</div>
+          <div>Lunes</div>
+          <div>Martes</div>
+          <div>Miercoles</div>
+          <div>Jueves</div>
+          <div>Viernes</div>
+          <div>Sabado</div>
+        </div>
+        <div class="calendar-days" id="calendar-days"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  const months = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+  ];
+
+  const calendarDays = document.getElementById("calendar-days");
+  const monthYear = document.getElementById("month-year");
+  const prevMonthBtn = document.getElementById("prev-month");
+  const nextMonthBtn = document.getElementById("next-month");
+
+  let currentDate = new Date();
+  let currentMonth = currentDate.getMonth();
+  let currentYear = currentDate.getFullYear();
+
+  function renderCalendar(month, year) {
+    calendarDays.innerHTML = '';
+
+    monthYear.textContent = `${months[month]} ${year}`;
+
+    const firstDay = new Date(year, month, 1).getDay();
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+      const blank = document.createElement("div");
+      calendarDays.appendChild(blank);
+    }
+
+    const today = new Date();
+    for (let i = 1; i <= daysInMonth; i++) {
+      const day = document.createElement("div");
+      day.textContent = i;
+
+      if (
+        i === today.getDate() &&
+        month === today.getMonth() &&
+        year === today.getFullYear()
+      ) {
+        day.classList.add("current-date");
+
+      } else {
+        //day.classList.add("bg-quinto");
+
+      }
+      day.classList.add("text-end");
+
+      fetch(`/updateCalendar/${i}/${month + 1}/${year}`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.count > 0) {
+            const link = document.createElement("a");
+            link.href = `/uploadedDate/${i}/${month + 1}/${year}`;
+            link.textContent = data.count;
+            link.classList.add(
+
+              "btn", "btn-sm", "btn-secondary", "rounded-circle", "fw-bold", "text-white"
+            );
+            link.style.width = "30px";
+            link.style.height = "30px";
+            link.style.display = "flex";
+            link.style.alignItems = "center";
+            link.style.justifyContent = "center";
+
+            day.appendChild(link);
+          }
+        });
+
+      calendarDays.appendChild(day);
+    }
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  prevMonthBtn.addEventListener("click", () => {
+    currentMonth--;
+    if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear--;
+    }
+    renderCalendar(currentMonth, currentYear);
+  });
+
+  nextMonthBtn.addEventListener("click", () => {
+    currentMonth++;
+    if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear++;
+    }
+    renderCalendar(currentMonth, currentYear);
+  });
+
+  // Initial render
+  renderCalendar(currentMonth, currentYear);
+
+
+
+
+
+</script>
+
+
+{% endblock %}

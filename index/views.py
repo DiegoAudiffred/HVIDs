@@ -21,7 +21,7 @@ from .forms import *
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
-import json
+from datetime import date
 from django.db.models import Q
 import os
 from django.contrib.contenttypes.models import ContentType
@@ -1510,3 +1510,63 @@ def allVideosHide(request):
     }
 
     return render(request, 'index/hideVids.html', context)
+
+def uploadCalendar(request):
+
+
+    user=request.user
+
+    sidebar_context = get_sidebar_context(user)
+
+    context = {
+
+        **sidebar_context
+    }
+    return render(request, 'index/uploadCalendar.html', context)
+
+
+def updateCalendar(request, dia, mes, ano):
+    try:
+        dia = int(dia)
+        mes = int(mes)
+        ano = int(ano)
+        
+        my_date = date(ano, mes, dia)
+        
+        files = MediaFile.objects.filter(uploaded_at__date=my_date)
+        files2 = Comic.objects.filter(uploaded_at__date=my_date)
+    
+        
+        return JsonResponse({
+            'status': 'success',
+            'count': files.count() + files2.count(),
+            'date': str(my_date)
+        })
+    except ValueError:
+        return JsonResponse({'status': 'error', 'message': 'Fecha inválida'}, status=400)
+    
+def uploadedDate(request,dia, mes, ano):
+  
+        dia = int(dia)
+        mes = int(mes)
+        ano = int(ano)
+        
+        my_date = date(ano, mes, dia)
+        
+        files = MediaFile.objects.filter(uploaded_at__date=my_date)
+        files2 = Comic.objects.filter(uploaded_at__date=my_date)
+        combined_media = sorted(
+        chain(files, files2),
+        key=lambda x: x.uploaded_at,
+        reverse=True
+    )
+        user=request.user
+
+        sidebar_context = get_sidebar_context(user)
+        context = {
+            'media_files': combined_media,
+            "my_date": my_date,
+
+            **sidebar_context
+        }
+        return render(request, 'index/uploadedDate.html', context)

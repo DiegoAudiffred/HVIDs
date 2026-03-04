@@ -18,6 +18,12 @@ urlpatterns = [
     path('videoDownloader/', views.videoDownloader, name='videoDownloader'),
     path('userProfile/<str:username>',views.userProfile, name='userProfile'),
     path("navbarFilterHeader/", views.navbarFilterHeader, name='navbarFilterHeader'),
+    
+    path("uploadCalendar/", views.uploadCalendar, name='uploadCalendar'),
+    path("updateCalendar/<int:dia>/<int:mes>/<int:ano>", views.updateCalendar, name='updateCalendar'),
+    path("uploadedDate/<int:dia>/<int:mes>/<int:ano>", views.uploadedDate, name='uploadedDate'),
+
+
 
     path('downloadedVideos/', views.viewDownloadedVideos, name='viewDownloadedVideos'),
     path('downloadedVideos/delete/<str:filename>/', views.deleteDownloadedVideo, name='deleteDownloadedVideo'),
@@ -31,7 +37,7 @@ urlpatterns = [
     path('media_stream/<int:id>/', views.stream_video, name='media_stream'),
     path('tags-suggest/', views.tags_suggest, name='tags_suggest'),
     path('get-items/<str:type>/', views.get_items, name='get_items'),
-path('load-audio/<int:media_id>/', views.load_audio, name='load_audio'),
+    path('load-audio/<int:media_id>/', views.load_audio, name='load_audio'),
 
     path("uploadFile/", views.uploadFile, name='uploadFile'),
 
@@ -45,7 +51,7 @@ path('load-audio/<int:media_id>/', views.load_audio, name='load_audio'),
     path('eliminar_post/<int:id>', views.eliminar_post,name='eliminar_post'),
 
     path('notificaciones/marcar_leida/', views.marcar_leida, name='marcar_leida'),
-path('editar-post/<int:post_id>/', views.editar_post, name='editar_post'),
+    path('editar-post/<int:post_id>/', views.editar_post, name='editar_post'),
         path("allVideosHide/", views.allVideosHide, name='allVideosHide'),
 
     path('autocomplete/', views.autocomplete, name='autocomplete'),
