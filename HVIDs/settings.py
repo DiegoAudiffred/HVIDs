@@ -30,7 +30,7 @@ TELEGRAM_GROUP_CHAT_ID = '-1002634693432'
 SECRET_KEY = 'django-insecure-#k_%n4op@_(7eeqy_vuj=42mf)j(@xsxmz2f7-)qld+de$fj7='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 

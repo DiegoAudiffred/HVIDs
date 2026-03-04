@@ -68,4 +68,6 @@ urlpatterns = [
     path('profile/<str:username>/verLikes<str:filter>/',views.userProfileLikes, name='userProfileLikes'),
     path('pastNotifications/',views.pastNotifications, name='pastNotifications'),
 
+    
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
