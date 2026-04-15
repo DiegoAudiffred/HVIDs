@@ -75,10 +75,14 @@ def get_top_items(model, related_fields,user):
     ).order_by('-num_mediafiles')[:limit]
     return queryset
 
-def random_recommendations():
-    media_queryset = MediaFile.objects.all()
-    comic_queryset = Comic.objects.all()
+def random_recommendations(user):
     
+    if user.can_nsfw:
+        media_queryset = MediaFile.objects.all()
+        comic_queryset = Comic.objects.all()
+    else:
+        media_queryset = MediaFile.objects.filter(nsfw=False)
+        comic_queryset = Comic.objects.filter(nsfw=False)
     combined_list = []
     
     for m in media_queryset:
@@ -91,7 +95,6 @@ def random_recommendations():
         queryset = random.sample(combined_list, 5)
     else:
         queryset = random.sample(combined_list, len(combined_list))
-    print(queryset)
     return queryset
 
 def get_sidebar_context(user):
@@ -100,7 +103,7 @@ def get_sidebar_context(user):
         'popular_artists': get_top_items(Artist, ['mediafile', 'comic'],user),
         'popular_characters': get_top_items(Character, ['mediafile', 'comic'],user),
         'popular_games': get_top_items(Game, ['mediafile', 'comic'],user),
-        'recommendations': random_recommendations(),
+        'recommendations': random_recommendations(user),
     }
 
 @login_required(login_url='/login/')
