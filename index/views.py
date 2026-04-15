@@ -25,6 +25,7 @@ from datetime import date
 from django.db.models import Q
 import os
 from django.contrib.contenttypes.models import ContentType
+import random
 
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
@@ -74,12 +75,32 @@ def get_top_items(model, related_fields,user):
     ).order_by('-num_mediafiles')[:limit]
     return queryset
 
+def random_recommendations():
+    media_queryset = MediaFile.objects.all()
+    comic_queryset = Comic.objects.all()
+    
+    combined_list = []
+    
+    for m in media_queryset:
+        combined_list.append({'objeto': m, 'tipo': 'mediafile'})
+        
+    for c in comic_queryset:
+        combined_list.append({'objeto': c, 'tipo': 'comic'})
+    
+    if len(combined_list) >= 5:
+        queryset = random.sample(combined_list, 5)
+    else:
+        queryset = random.sample(combined_list, len(combined_list))
+    print(queryset)
+    return queryset
+
 def get_sidebar_context(user):
     return {
         'popular_tags': get_top_items(Tags, ['mediafile', 'comic'],user),
         'popular_artists': get_top_items(Artist, ['mediafile', 'comic'],user),
         'popular_characters': get_top_items(Character, ['mediafile', 'comic'],user),
         'popular_games': get_top_items(Game, ['mediafile', 'comic'],user),
+        'recommendations': random_recommendations(),
     }
 
 @login_required(login_url='/login/')
@@ -1240,22 +1261,22 @@ def videoDownloader(request):
                         context.update({'title': clean_title, 'filename': final_filename})
                 else:
                     ydl_opts = {
-    'ffmpeg_location': ffmpeg_path,
-    'cookiefile': cookie_path if os.path.exists(cookie_path) else None,
-    'noplaylist': True,
-    'quiet': False,
-    'outtmpl': os.path.join(output_dir, '%(title).80s.%(ext)s'),
-    'nocheckcertificate': True,
-    'no_warnings': True,
-    'extractor_args': {
-        'twitter': {
-            'api': ['graphql'],
-        },
-    },
-    'http_headers': {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-    }
-}
+                        'ffmpeg_location': ffmpeg_path,
+                        'cookiefile': cookie_path if os.path.exists(cookie_path) else None,
+                        'noplaylist': True,
+                        'quiet': False,
+                        'outtmpl': os.path.join(output_dir, '%(title).80s.%(ext)s'),
+                        'nocheckcertificate': True,
+                        'no_warnings': True,
+                        'extractor_args': {
+                            'twitter': {
+                                'api': ['graphql'],
+                            },
+                        },
+                        'http_headers': {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+                        }
+                    }
 
                     if download_type == 'audio':
                         ydl_opts.update({
@@ -1268,7 +1289,8 @@ def videoDownloader(request):
                         })
                     else:
                         ydl_opts.update({
-                            'format': 'bestvideo[vcodec^=avc1]+bestaudio[acodec^=mp4a]/best[ext=mp4]/best',
+                            #'format': 'bestvideo+bestaudio/best',
+'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
                             'merge_output_format': 'mp4',
                         })
 
@@ -1277,8 +1299,11 @@ def videoDownloader(request):
                         temp_file = ydl.prepare_filename(info)
                         
                         file_base, _ = os.path.splitext(temp_file)
-                        ext = '.mp3' if download_type == 'audio' else '.mp4'
-                        final_filename = os.path.basename(file_base) + ext
+                        
+                        if download_type == 'audio':
+                            final_filename = os.path.basename(file_base) + '.mp3'
+                        else:
+                            final_filename = os.path.basename(file_base) + '.mp4'
                         
                         context.update({
                             'title': info.get('title', 'video'),
@@ -1570,3 +1595,34 @@ def uploadedDate(request,dia, mes, ano):
             **sidebar_context
         }
         return render(request, 'index/uploadedDate.html', context)
+@login_required(login_url='/login/')
+def allLikedContent(request, content, userid):
+    usuario = get_object_or_404(User, id=userid)
+    sidebar_context = get_sidebar_context(request.user)
+
+    filtros_validos = {
+        'mediafiles': usuario.liked_mediafiles.all(),
+        'artists': usuario.liked_artist.all(),
+        'comics': usuario.liked_comic.all(),
+        'characters': usuario.liked_character.all(),
+        'games': usuario.liked_game.all(),
+        'all': list(chain(MediaFile.objects.filter(user = usuario),Comic.objects.filter(user=usuario)))    
+        }
+
+    media_files = filtros_validos.get(content, usuario.liked_mediafiles.all())
+    
+    paginator = Paginator(media_files, 16)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.get_page(page_number)
+    except Exception:
+        page_obj = paginator.get_page(1)
+    context = {
+        'media_files': page_obj.object_list, 
+        'page_obj': page_obj,        
+        'filtro': content,
+        'usuario': usuario,
+        **sidebar_context
+    }
+
+    return render(request, 'index/allLikedContent.html', context)

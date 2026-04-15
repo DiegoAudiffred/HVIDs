@@ -179,70 +179,72 @@
             <h3 class="fw-bold text-dark">Recientes subidos por {{user}}</h3>
         </div>
 
-            {% for mediafile in combined_media %}
-<div class="col-12 col-lg-6 col-xl-4 col-xxl-3 my-3 perspective-container">
-      <div class="card h-100 shadow-sm rounded-4 overflow-hidden hover-shadow rainbow-hover border-primary">
+        {% for mediafile in combined_media %}
+        <div class="col-12 col-lg-6 col-xl-4 col-xxl-3 my-3 perspective-container">
+            <div class="card h-100 shadow-sm rounded-4 overflow-hidden hover-shadow rainbow-hover border-primary">
 
-        {% if mediafile.tipo_objeto == 'comic' %}
-        <a href="{% url 'index:watchComic' mediafile.id %}">
-          {% else %}
-          <a href="{% url 'index:watchVideo' mediafile.id %}">
-            {% endif %}
+                {% if mediafile.tipo_objeto == 'comic' %}
+                <a href="{% url 'index:watchComic' mediafile.id %}">
+                    {% else %}
+                    <a href="{% url 'index:watchVideo' mediafile.id %}">
+                        {% endif %}
 
-            <div class="position-relative" style="aspect-ratio: 1 / 1; overflow: hidden;">
-              {% if mediafile.image %}
-              <img src="{{ mediafile.image.url }}" alt="{{ mediafile.name }} Thumbnail"
-                class="card-img-top w-100 h-100 object-fit-cover" {% if mediafile.nsfw %} style="filter: blur(0.6rem);" {% endif%}>
-              {% else %}
-              <img src="{% static 'img/noImage.jpg' %}" alt="Sin imagen"
-                class="card-img-top w-100 h-100 object-fit-cover">
-              {% endif %}
+                        <div class="position-relative" style="aspect-ratio: 1 / 1; overflow: hidden;">
+                            {% if mediafile.image %}
+                            <img src="{{ mediafile.image.url }}" alt="{{ mediafile.name }} Thumbnail"
+                                class="card-img-top w-100 h-100 object-fit-cover" {% if mediafile.nsfw %}
+                                style="filter: blur(0.6rem);" {% endif%}>
+                            {% else %}
+                            <img src="{% static 'img/noImage.jpg' %}" alt="Sin imagen"
+                                class="card-img-top w-100 h-100 object-fit-cover">
+                            {% endif %}
 
 
-              <div
-                class="position-absolute top-50 start-50 translate-middle fs-1 text-white bg-dark bg-opacity-50 rounded-circle p-2 d-none hover-icon">
-                <i class="bi bi-play-fill"></i>
-              </div>
+                            <div
+                                class="position-absolute top-50 start-50 translate-middle fs-1 text-white bg-dark bg-opacity-50 rounded-circle p-2 d-none hover-icon">
+                                <i class="bi bi-play-fill"></i>
+                            </div>
+                        </div>
+
+                    </a>
+                    <div class="card-body d-flex flex-column bg-quinto text-primary py-1 px-1">
+
+                        {% if mediafile.tipo_objeto == 'comic' or mediafile.tipo_objeto == 'mediafile' %}
+                        <div class="row justify-content-between align-items-center g-0">
+
+                            <div class="col-2 d-flex align-items-center">
+                                {% if mediafile.file %}
+                                <img src="{% static 'img/videopng.png' %}" alt="Video" width="36px" height="36px">
+                                {% else %}
+                                <img src="{% static 'img/comicpng.png' %}" alt="Comic" width="36px" height="36px">
+                                {% endif %}
+                            </div>
+
+                            <div class="col-8 p-0 d-flex align-items-center">
+                                <h5 class="card-title fw-bold text-truncate mb-0 text-white w-100">{{ mediafile.name }}
+                                </h5>
+                            </div>
+
+
+
+                            <div class="col-2 p-0 d-flex align-items-center justify-content-center">
+                                <div class="d-flex align-items-center text-white">
+                                    <img src="{% static 'img/Liked.png' %}" width="20px" height="20px" class="me-1">
+                                    <span>{{ mediafile.total_likes }}</span>
+                                </div>
+                            </div>
+
+                        </div>
+                        {% endif %}
+
+                    </div>
+
             </div>
+        </div>
+        {% endfor %}
 
-          </a>
-          <div class="card-body d-flex flex-column bg-quinto text-primary py-1 px-1">
-
-            {% if mediafile.tipo_objeto == 'comic' or mediafile.tipo_objeto == 'mediafile' %}
-            <div class="row justify-content-between align-items-center g-0">
-
-              <div class="col-2 d-flex align-items-center">
-                {% if mediafile.file %}
-                <img src="{% static 'img/videopng.png' %}" alt="Video" width="36px" height="36px">
-                {% else %}
-                <img src="{% static 'img/comicpng.png' %}" alt="Comic" width="36px" height="36px">
-                {% endif %}
-              </div>
-
-              <div class="col-8 p-0 d-flex align-items-center">
-                <h5 class="card-title fw-bold text-truncate mb-0 text-white w-100">{{ mediafile.name }}</h5>
-              </div>
-
-           
-
-              <div class="col-2 p-0 d-flex align-items-center justify-content-center">
-                <div class="d-flex align-items-center text-white">
-                  <img src="{% static 'img/Liked.png' %}" width="20px" height="20px" class="me-1">
-                  <span>{{ mediafile.total_likes }}</span>
-                </div>
-              </div>
-
-            </div>
-            {% endif %}
-
-          </div>
-
-      </div>
-    </div>
-    {% endfor %}
-        
         <div class="col-12">
-            <a href="">Ver todos los subidos</a>
+            <a href="{% url 'index:allLikedContent' 'all' user.id %}">Ver todos los subidos</a>
 
         </div>
     </div>
@@ -274,7 +276,7 @@
         {% endfor %}
 
         <div class="col-12">
-            <a href="">Ver todos los likes de videos</a>
+            <a href="{% url 'index:allLikedContent' 'mediafiles' user.id %}">Ver todos los likes de videos</a>
 
         </div>
     </div>
@@ -321,7 +323,7 @@
         {% endfor %}
 
         <div class="col-12">
-            <a href="">Ver todos los likes de artistas</a>
+            <a href="{% url 'index:allLikedContent' 'artists' user.id %}">Ver todos los likes de artistas</a>
 
         </div>
     </div>
@@ -348,7 +350,7 @@
         {% endfor %}
     </div>
     <div class="col-12">
-        <a href="">Ver todos los likes de imagenes</a>
+        <a href="{% url 'index:allLikedContent' 'comics' user.id %}">Ver todos los likes de imagenes</a>
 
     </div>
     {% else %}
@@ -393,7 +395,7 @@
         {% endfor %}
 
         <div class="col-12">
-            <a href="">Ver todos los likes de personajes</a>
+            <a href="{% url 'index:allLikedContent' 'characters' user.id %}">Ver todos los likes de personajes</a>
 
         </div>
     </div>
@@ -439,7 +441,7 @@
         {% endfor %}
 
         <div class="col-12">
-            <a href="">Ver todos los likes de juegos</a>
+            <a href="{% url 'index:allLikedContent' 'games' user.id %}">Ver todos los likes de juegos</a>
 
         </div>
     </div>

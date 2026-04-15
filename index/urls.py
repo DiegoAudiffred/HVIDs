@@ -52,7 +52,9 @@ urlpatterns = [
 
     path('notificaciones/marcar_leida/', views.marcar_leida, name='marcar_leida'),
     path('editar-post/<int:post_id>/', views.editar_post, name='editar_post'),
-        path("allVideosHide/", views.allVideosHide, name='allVideosHide'),
+    path("allVideosHide/", views.allVideosHide, name='allVideosHide'),
+    
+    path("allLikedContent/<str:content>/<int:userid>", views.allLikedContent, name='allLikedContent'),
 
     path('autocomplete/', views.autocomplete, name='autocomplete'),
     path('buscar/', views.multi_search_results, name='multi_search_results'),
