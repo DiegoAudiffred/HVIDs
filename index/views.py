@@ -1642,59 +1642,117 @@ from django.apps import apps
 from django.contrib.auth.decorators import login_required
 from PIL import Image
 
+from django.shortcuts import render
+from django.apps import apps
+from django.contrib.auth.decorators import login_required
+from PIL import Image
+
 @login_required(login_url='/login/')
 def IATEST(request):
-    sidebar_context = get_sidebar_context(request.user)
+    user = request.user
+    sidebar_context = get_sidebar_context(user)
     resultado = None
     
     if request.method == 'POST':
-        print("\n--- DEBUG: Petición POST recibida en IATEST ---")
+        print("\n" + "="*50)
+        print("--- INICIANDO ESCANEO DE IMAGEN ---")
         
         if request.FILES.get('imagen'):
-            print("DEBUG: Archivo detectado en request.FILES")
             try:
+                # 1. Preparación de la imagen
                 imagen_file = request.FILES['imagen']
-                print(f"DEBUG: Nombre del archivo: {imagen_file.name}")
-                
                 img = Image.open(imagen_file).convert("RGB")
-                print("DEBUG: Imagen abierta y convertida a RGB exitosamente.")
+                print(f"DEBUG: Procesando archivo: {imagen_file.name}")
                 
                 config = apps.get_app_config('index')
                 
                 if config.char_detector and config.nsfw_detector:
+                    # 2. Inferencia de los modelos
                     raw_tags = config.char_detector(img)
                     raw_nsfw = config.nsfw_detector(img)
                     
-                    # Filtramos los tags por un umbral de confianza (ej: > 0.15 para ver más)
+                    # 3. Listas para organizar la información
                     tags_info = []
+                    candidatos_personaje = []
+                    # Tags prohibidos para el filtro de baneo
+                    tags_prohibidos = ['ntr', 'netorare', 'futanari', 'dickgirl', 'intersex', 'gore', 'rape']
+                    
+                    print("DEBUG: Analizando etiquetas detectadas...")
+                    
                     for r in raw_tags:
-                        if r['score'] > 0.01: 
-                            label_limpia = r['label'].replace('character:', '').replace('_', ' ')
+                        label_low = r['label'].lower()
+                        score_pct = round(r['score'] * 100, 1)
+                        
+                        # Guardamos todos los tags con score mayor a 1% para la lista completa
+                        if r['score'] > 0.01:
                             tags_info.append({
-                                'label': label_limpia,
-                                'score': round(r['score'] * 100, 1)
+                                'label': label_low.replace('_', ' '),
+                                'score': score_pct
+                            })
+                        
+                        # PRIORIDAD 1: Buscar etiquetas de tipo 'character:'
+                        # Bajamos el umbral a 0.05 para captar personajes en imágenes difíciles/IA
+                        if 'character:' in label_low and r['score'] > 0.05:
+                            candidatos_personaje.append({
+                                'name': label_low.replace('character:', '').replace('_', ' ').title(),
+                                'score': score_pct
                             })
 
-                    prob_nsfw = next((r['score'] for r in raw_nsfw if r['label'] == 'nsfw'), 0)
-                    es_peligroso = prob_nsfw > 0.6 # Tú decides el límite
+                    # 4. Lógica de Identificación del Personaje Principal
+                    nombre_final = "Desconocido"
+                    confianza_final = 0
                     
+                    if candidatos_personaje:
+                        # Si hay candidatos, el de mayor score es el principal
+                        nombre_final = candidatos_personaje[0]['name']
+                        confianza_final = candidatos_personaje[0]['score']
+                    else:
+                        # PRIORIDAD 2: Si no hay 'character:', buscar nombres clave en los tags generales
+                        # Esto ayuda con Mococo o personajes que el modelo no categorizó bien
+                        for t in tags_info:
+                            if any(x in t['label'].lower() for x in ['mococo', 'abyssgard', 'fuwawa']):
+                                nombre_final = t['label'].title()
+                                confianza_final = t['score']
+                                break
+                        
+                        # PRIORIDAD 3: Si nada funciona, usar el tag con más puntaje
+                        if nombre_final == "Desconocido" and tags_info:
+                            nombre_final = tags_info[0]['label'].title()
+                            confianza_final = tags_info[0]['score']
+
+                    # 5. Lógica de Seguridad (NSFW + Filtro por Concepto)
+                    encontrados_alerta = [t['label'] for t in tags_info if any(p in t['label'] for p in tags_prohibidos)]
+                    
+                    prob_nsfw = next((r['score'] for r in raw_nsfw if r['label'] == 'nsfw'), 0)
+                    # Bloqueamos si la imagen es explícita O si detectamos un fetiche prohibido
+                    es_peligroso = prob_nsfw > 0.60 or len(encontrados_alerta) > 0
+                    
+                    # 6. Construcción del resultado para el HTML
                     resultado = {
-                        'personaje': tags_info[0]['label'] if tags_info else "Desconocido",
-                        'confianza_top': tags_info[0]['score'] if tags_info else 0,
-                        'seguro': "BLOQUEADO" if es_peligroso else "SFW",
+                        'personaje': nombre_final,
+                        'confianza_top': confianza_final,
+                        'seguro': "BLOQUEADO (Contenido no permitido)" if es_peligroso else "SFW (Imagen Segura)",
                         'is_danger': es_peligroso,
+                        'motivos_bloqueo': encontrados_alerta if encontrados_alerta else ["Contenido Explícito"],
                         'prob_seguridad': round((1 - prob_nsfw) * 100, 1),
-                        'todos_los_tags': tags_info # Mandamos la lista completa
+                        'todos_los_tags': tags_info
                     }
-                   # print(f"DEBUG: Procesamiento finalizado. Resultado: {resultado['personaje']} | Bloqueado: {bloqueado}")
+                    
+                    print(f"DEBUG FINAL: {nombre_final} detectado con {confianza_final}%")
+                    if encontrados_alerta:
+                        print(f"DEBUG ALERTA: Tags de baneo detectados: {encontrados_alerta}")
+                
                 else:
-                    print("DEBUG ERROR: Los detectores en AppConfig están como None.")
+                    print("DEBUG ERROR: Los modelos no están cargados en AppConfig.")
+                    resultado = {'error': 'Los motores de IA no están disponibles.'}
                     
             except Exception as e:
-                print(f"DEBUG ERROR EN PROCESAMIENTO: {e}")
-                resultado = {'error': str(e)}
+                print(f"DEBUG ERROR CRÍTICO: {e}")
+                resultado = {'error': f'Error al procesar la imagen: {str(e)}'}
         else:
-            print("DEBUG ERROR: No se recibió ninguna imagen con el name='imagen'.")
+            print("DEBUG ERROR: No se recibió ningún archivo en el campo 'imagen'.")
+            
+        print("="*50 + "\n")
 
     context = {
         'resultado': resultado,
