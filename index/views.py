@@ -3,6 +3,7 @@ from io import BytesIO
 from pyexpat.errors import messages
 import subprocess
 from typing import Counter
+from django.apps import apps
 from django.utils.formats import date_format
 from django.contrib.auth import authenticate, login
 from django.core.files import File
@@ -30,7 +31,8 @@ import random
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
 from django.core.paginator import Paginator
-
+import torch
+import transformers
 from django.http import FileResponse, HttpResponse, HttpResponseNotFound
 from django.conf import settings
 from itertools import chain
@@ -1629,3 +1631,74 @@ def allLikedContent(request, content, userid):
     }
 
     return render(request, 'index/allLikedContent.html', context)
+
+from django.shortcuts import render
+from django.apps import apps
+from django.contrib.auth.decorators import login_required
+from PIL import Image
+
+from django.shortcuts import render
+from django.apps import apps
+from django.contrib.auth.decorators import login_required
+from PIL import Image
+
+@login_required(login_url='/login/')
+def IATEST(request):
+    sidebar_context = get_sidebar_context(request.user)
+    resultado = None
+    
+    if request.method == 'POST':
+        print("\n--- DEBUG: Petición POST recibida en IATEST ---")
+        
+        if request.FILES.get('imagen'):
+            print("DEBUG: Archivo detectado en request.FILES")
+            try:
+                imagen_file = request.FILES['imagen']
+                print(f"DEBUG: Nombre del archivo: {imagen_file.name}")
+                
+                img = Image.open(imagen_file).convert("RGB")
+                print("DEBUG: Imagen abierta y convertida a RGB exitosamente.")
+                
+                config = apps.get_app_config('index')
+                
+                if config.char_detector and config.nsfw_detector:
+                    raw_tags = config.char_detector(img)
+                    raw_nsfw = config.nsfw_detector(img)
+                    
+                    # Filtramos los tags por un umbral de confianza (ej: > 0.15 para ver más)
+                    tags_info = []
+                    for r in raw_tags:
+                        if r['score'] > 0.01: 
+                            label_limpia = r['label'].replace('character:', '').replace('_', ' ')
+                            tags_info.append({
+                                'label': label_limpia,
+                                'score': round(r['score'] * 100, 1)
+                            })
+
+                    prob_nsfw = next((r['score'] for r in raw_nsfw if r['label'] == 'nsfw'), 0)
+                    es_peligroso = prob_nsfw > 0.6 # Tú decides el límite
+                    
+                    resultado = {
+                        'personaje': tags_info[0]['label'] if tags_info else "Desconocido",
+                        'confianza_top': tags_info[0]['score'] if tags_info else 0,
+                        'seguro': "BLOQUEADO" if es_peligroso else "SFW",
+                        'is_danger': es_peligroso,
+                        'prob_seguridad': round((1 - prob_nsfw) * 100, 1),
+                        'todos_los_tags': tags_info # Mandamos la lista completa
+                    }
+                   # print(f"DEBUG: Procesamiento finalizado. Resultado: {resultado['personaje']} | Bloqueado: {bloqueado}")
+                else:
+                    print("DEBUG ERROR: Los detectores en AppConfig están como None.")
+                    
+            except Exception as e:
+                print(f"DEBUG ERROR EN PROCESAMIENTO: {e}")
+                resultado = {'error': str(e)}
+        else:
+            print("DEBUG ERROR: No se recibió ninguna imagen con el name='imagen'.")
+
+    context = {
+        'resultado': resultado,
+        **sidebar_context
+    }
+    return render(request, 'index/HTMLTest.html', context)
+

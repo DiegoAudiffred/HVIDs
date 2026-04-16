@@ -1,0 +1,68 @@
+{% extends 'layout/layout.html' %}
+{% load static %}
+
+{% block body %}
+<title>Detector de Personajes e IA</title>
+<style>
+    .container {
+        max-width: 600px;
+        margin: 50px auto;
+        font-family: sans-serif;
+    }
+
+    .result-card {
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 8px;
+    }
+
+    .danger {
+        color: red;
+        font-weight: bold;
+    }
+
+    .success {
+        color: green;
+        font-weight: bold;
+    }
+</style>
+<div class="ia-container">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="imagen" accept="image/*" required>
+        <button type="submit">Escanear</button>
+    </form>
+
+    <hr>
+
+    {% if resultado %}
+    <div class="ia-results" style="margin-top: 20px; font-family: sans-serif;">
+
+        <div
+            style="padding: 20px; border-radius: 10px; background: {% if resultado.is_danger %}#ffebee{% else %}#e8f5e9{% endif %};">
+            <h2 style="margin: 0;">Detección: {{ resultado.personaje }}</h2>
+            <p>Confianza: <strong>{{ resultado.confianza_top }}%</strong></p>
+            <p>Estado del Filtro: <span
+                    style="color: {% if resultado.is_danger %}red{% else %}green{% endif %}; font-weight: bold;">
+                    {{ resultado.seguro }} ({{ resultado.prob_seguridad }}% Seguro)
+                </span></p>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h3>Etiquetas detectadas por la IA:</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                {% for item in resultado.todos_los_tags %}
+                <span
+                    style="background: #eee; padding: 5px 12px; border-radius: 15px; font-size: 0.9em; border: 1px solid #ccc;">
+                    {{ item.label }} <small style="color: #666;">{{ item.score }}%</small>
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -53,7 +53,7 @@ urlpatterns = [
     path('notificaciones/marcar_leida/', views.marcar_leida, name='marcar_leida'),
     path('editar-post/<int:post_id>/', views.editar_post, name='editar_post'),
     path("allVideosHide/", views.allVideosHide, name='allVideosHide'),
-    
+
     path("allLikedContent/<str:content>/<int:userid>", views.allLikedContent, name='allLikedContent'),
 
     path('autocomplete/', views.autocomplete, name='autocomplete'),
@@ -70,6 +70,6 @@ urlpatterns = [
     path('profile/<str:username>/verLikes<str:filter>/',views.userProfileLikes, name='userProfileLikes'),
     path('pastNotifications/',views.pastNotifications, name='pastNotifications'),
 
-    
+    path('IATest/',views.IATEST, name='IATEST')
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

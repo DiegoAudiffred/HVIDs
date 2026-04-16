@@ -166,9 +166,11 @@
 
 
       {% if rec.tipo == 'comic' %}
-      <a href="{% url 'index:watchComic' rec.objeto.id %}"> {{rec.objeto.name}} </a>
+      <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
+        href="{% url 'index:watchComic' rec.objeto.id %}"> {{rec.objeto.name}} </a>
       {% elif rec.tipo == 'mediafile' %}
-      <a href="{% url 'index:watchVideo' rec.objeto.id %}"> {{rec.objeto.name}} </a>
+      <a class="d-inline-block text-tercero shine-underline text-truncate w-100"
+        href="{% url 'index:watchVideo' rec.objeto.id %}"> {{rec.objeto.name}} </a>
       {% endif %}
 
     </h5>
