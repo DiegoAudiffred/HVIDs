@@ -1749,6 +1749,34 @@ def IATEST(request):
         **sidebar_context
     }
     return render(request, 'index/HTMLTest.html', context)
+def obtener_respuesta_local(historial_mensajes):
+    API_URL = "http://localhost:1234/v1/chat/completions"
+    
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "model": "llama-3.1-8b-lexi-uncensored-v2",
+        "messages": historial_mensajes,
+        "temperature": 0.8,
+        "max_tokens": 800,
+        "stream": False
+    }
+
+    try:
+        response = requests.post(API_URL, headers=headers, json=payload, timeout=120)
+        
+        if response.status_code == 200:
+            resultado = response.json()
+            return resultado['choices'][0]['message']['content'].strip()
+        
+        print(f"Error en servidor local: {response.status_code}")
+        return None
+    except Exception as e:
+        print(f"No se pudo conectar con LM Studio: {e}")
+        return None
+
 
 def obtener_respuesta_ia(historial_mensajes):
     url = "https://openrouter.ai/api/v1/chat/completions"
@@ -1778,8 +1806,57 @@ def obtener_respuesta_ia(historial_mensajes):
     except Exception as e:
         print(f"ERROR API: {e}")
         return "Lo siento, tuve un pequeño glitch. ¿Puedes repetir eso?"
-
 def reflexionar_y_actualizar_memoria(personaje, historial_reciente):
+    API_URL = "http://localhost:1234/v1/chat/completions"
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    prompt_extraccion = (
+        "### INSTRUCCIÓN DE PROCESAMIENTO DE DATOS\n"
+        "Eres un sintetizador de memoria. Tu objetivo es actualizar la 'Memoria Permanente' con nuevos datos del 'Historial'.\n"
+        "REGLAS:\n"
+        "1. Extrae hechos: nombres, eventos clave, preferencias del usuario o cambios en la relación.\n"
+        "2. Mantén la memoria concisa y en tercera persona.\n"
+        "3. No repitas información que ya esté en la memoria actual.\n"
+        "4. RESPONDE SOLO CON LA NUEVA LISTA DE HECHOS.\n"
+        "5. PROHIBIDO hablar con el usuario, saludar o analizar tu propio proceso.\n\n"
+        f"MEMORIA ACTUAL: {personaje.permanent_memory or 'Vacía'}"
+    )
+
+    data = {
+        "model": "llama-3.1-8b-lexi-uncensored-v2",
+        "messages": [
+            {"role": "system", "content": prompt_extraccion},
+            {"role": "user", "content": f"HISTORIAL RECIENTE:\n{historial_reciente}"}
+        ],
+        "temperature": 0.1,
+        "max_tokens": 1000
+    }
+
+    try:
+        response = requests.post(API_URL, headers=headers, json=data, timeout=180)
+        
+        if response.status_code == 200:
+            response_data = response.json()
+            nueva_memoria = response_data['choices'][0]['message']['content'].strip()
+
+            palabras_basura = ["Let me", "Entendido", "Aquí está", "As an AI", "Sintetizando"]
+            if any(p.lower() in nueva_memoria.lower() for p in palabras_basura):
+                lineas = nueva_memoria.split('\n')
+                nueva_memoria = "\n".join([l for l in lineas if not any(p.lower() in l.lower() for p in palabras_basura)])
+
+            if len(nueva_memoria) > 5:
+                personaje.permanent_memory = nueva_memoria
+                personaje.save()
+                print(f"DEBUG: Memoria de {personaje.name} actualizada en local.")
+        else:
+            print(f"DEBUG: Fallo en servidor local (Memoria): {response.status_code}")
+
+    except Exception as e:
+        print(f"Error en extracción de memoria local: {e}")
+
+def reflexionar_y_actualizar_memoria2(personaje, historial_reciente):
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {settings.OPENROUTER_API_KEY}",
@@ -1875,8 +1952,14 @@ def chat(request, character_id):
                 historial_para_ia.append({"role": rol, "content": msg.content})
 
             # 5. Obtener respuesta de la IA
-            respuesta_texto = obtener_respuesta_ia(historial_para_ia)
-
+            #respuesta_texto = obtener_respuesta_ia(historial_para_ia)
+            #if "Ruff... algo salió mal" in respuesta_texto or not respuesta_texto:
+            #    print("DEBUG: OpenRouter falló o sin tokens. Intentando Hugging Face...")
+            respuesta_texto = obtener_respuesta_local(historial_para_ia)
+            
+            # Si ambos fallan, ponemos un mensaje final de respaldo
+            if not respuesta_texto:
+                respuesta_texto = "Perdona, me distraje un momento... ¿qué decías?"
            # Dentro de tu función chat, después de obtener respuesta_texto:
             if respuesta_texto:
                 #respuesta_texto = respuesta_texto.encode('ascii', 'ignore').decode('ascii')
@@ -1900,8 +1983,10 @@ def chat(request, character_id):
 
             # 7. Ciclo de Aprendizaje cada 10 mensajes
             total_mensajes = ChatMessage.objects.filter(character=personaje, user=usuario).count()
-            if total_mensajes % 4 == 0:
+            print(total_mensajes)
+            if total_mensajes % 6 == 0:
                 # Construimos un texto más legible para la reflexión
+                print("entro")
                 contexto_texto = ""
                 for m in historial_para_ia[1:]:
                     autor = "Usuario" if m['role'] == "user" else personaje.name
@@ -1947,6 +2032,37 @@ def generar_voz_elevenlabs(texto, voice_id): # ID por defecto (puedes cambiarlo)
     except Exception as e:
         print(f"Error en ElevenLabs: {e}")
     return None
+
+def generar_imagen_anime(prompt_usuario):
+    # La URL por defecto de Forge/Automatic1111 con --api
+    API_URL = "http://127.0.0.1:7860/sdapi/v1/txt2img"
+    
+    payload = {
+        "prompt": f"score_9, score_8_up, score_7_up, (anime style), {prompt_usuario}",
+        "negative_prompt": "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality",
+        "steps": 25,
+        "width": 512,
+        "height": 768, # Formato vertical tipo poster
+        "cfg_scale": 7,
+        "sampler_name": "Euler a"
+    }
+
+    try:
+        # El timeout debe ser alto porque tu PC tardará en procesar
+        response = requests.post(API_URL, json=payload, timeout=600)
+        
+        if response.status_code == 200:
+            r = response.json()
+            # La imagen viene en base64
+            imagen_base64 = r['images'][0]
+            return imagen_base64
+        
+        print(f"Error en generación: {response.status_code}")
+        return None
+    except Exception as e:
+        print(f"Error de conexión con el motor de imágenes: {e}")
+        return None
+
 
 
 def cleanChat(request, character_id):

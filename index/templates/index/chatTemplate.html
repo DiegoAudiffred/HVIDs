@@ -3,71 +3,124 @@
 
 {% block body %}
 <style>
-    /* Esto aplica solo a los fragmentos dentro de los mensajes */
     .texto-resaltado {
         color: #007bff !important;
         font-weight: 500;
         font-style: italic;
     }
 
-    /* Esto aplica a TODO el texto dentro del input mientras escribes */
-    .input-azul {
-        color: #007bff !important;
-    }
-
     .audio-player {
         height: 30px;
         margin-top: 5px;
+    }
+
+    /* Estilos para el input editable */
+    .editable-input {
+        min-height: 45px;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        padding: 10px 20px;
+        outline: none;
+        overflow-x: hidden;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .editable-input:empty:before {
+        content: attr(placeholder);
+        color: #6c757d;
     }
 </style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const chatBox = document.getElementById("chat-box");
-        const inputMensaje = document.querySelector('input[name="mensaje"]');
+        const inputEditable = document.getElementById("input-editable");
+        const hiddenInput = document.getElementById("hidden-mensaje");
+        const chatForm = document.getElementById("chat-form");
 
         chatBox.scrollTop = chatBox.scrollHeight;
 
-        // Auto-reproducir audio
         const audios = document.querySelectorAll('audio');
         if (audios.length > 0) {
             const ultimoAudio = audios[audios.length - 1];
             ultimoAudio.play().catch(e => console.log("Auto-play prevenido."));
         }
 
-        const aplicarFormatoChat = () => {
+        const aplicarFormatoHTML = (texto) => {
+            let contenido = texto;
+            contenido = contenido.replace(/\(([^)]+)\)/g, '<span class="texto-resaltado">($1)</span>');
+            contenido = contenido.replace(/\*([^*]+)\*/g, '<span class="texto-resaltado">*$1*</span>');
+            return contenido;
+        };
+
+        const formatearChat = () => {
             const parrafos = chatBox.querySelectorAll('.msg-content');
             parrafos.forEach(p => {
-                let contenido = p.innerHTML;
-
-                // Reemplaza (texto) por la versión azul, manteniendo el resto normal
-                contenido = contenido.replace(/\(([^)]+)\)/g, '<span class="texto-resaltado">($1)</span>');
-
-                // Reemplaza *texto* por la versión azul, manteniendo el resto normal
-                contenido = contenido.replace(/\*([^*]+)\*/g, '<span class="texto-resaltado">*$1*</span>');
-
-                p.innerHTML = contenido;
+                p.innerHTML = aplicarFormatoHTML(p.innerText);
             });
         };
 
-        aplicarFormatoChat();
+        formatearChat();
 
-        // Control del color del INPUT completo mientras se escribe
-        inputMensaje.addEventListener("input", function () {
-            const texto = this.value;
+        inputEditable.addEventListener("input", function () {
+            let cursorPosition = getCaretPosition(this);
+            let originalText = this.innerText;
 
-            // Verificamos si hay algún paréntesis abierto o asterisco sin cerrar
-            let parentesisAbiertos = (texto.match(/\(/g) || []).length > (texto.match(/\)/g) || []).length;
-            let asteriscosAbiertos = (texto.match(/\*/g) || []).length % 2 !== 0;
+            this.innerHTML = aplicarFormatoHTML(originalText);
+            hiddenInput.value = originalText;
 
-            if (parentesisAbiertos || asteriscosAbiertos) {
-                this.classList.add("input-azul");
-            } else {
-                this.classList.remove("input-azul");
-            }
+            restoreCaretPosition(this, cursorPosition);
         });
+
+        chatForm.addEventListener("submit", function () {
+            hiddenInput.value = inputEditable.innerText;
+        });
+
+        function getCaretPosition(element) {
+            let position = 0;
+            const selection = window.getSelection();
+            if (selection.rangeCount !== 0) {
+                const range = selection.getRangeAt(0);
+                const preCaretRange = range.cloneRange();
+                preCaretRange.selectNodeContents(element);
+                preCaretRange.setEnd(range.endContainer, range.endOffset);
+                position = preCaretRange.toString().length;
+            }
+            return position;
+        }
+
+        function restoreCaretPosition(element, position) {
+            let charCount = 0;
+            let range = document.createRange();
+            range.setStart(element, 0);
+            range.collapse(true);
+            let nodeStack = [element];
+            let node, found = false;
+
+            while (!found && (node = nodeStack.pop())) {
+                if (node.nodeType === 3) {
+                    let nextCharCount = charCount + node.length;
+                    if (position >= charCount && position <= nextCharCount) {
+                        range.setStart(node, position - charCount);
+                        range.collapse(true);
+                        found = true;
+                    }
+                    charCount = nextCharCount;
+                } else {
+                    let i = node.childNodes.length;
+                    while (i--) {
+                        nodeStack.push(node.childNodes[i]);
+                    }
+                }
+            }
+            let selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
     });
 </script>
+
 <div class="container-fluid mt-4">
     <div class="row align-items-center mb-3">
         <div class="col-12 align-self-end d-flex">
@@ -78,7 +131,6 @@
                 <h1 class="fw-bold text-dark m-0 pb-2 text-truncate">{{ personaje.name }}</h1>
                 <p>{{ personaje.ai_personality|default:"Sin personalidad disponible." }}</p>
                 <small class="text-muted">Memoria: {{ personaje.permanent_memory|default:"Sin recuerdos." }}</small>
-
                 <a class="btn bg-secondary" href="{% url 'index:cleanChat' personaje.id %}"> Limpiar memoria </a>
             </div>
         </div>
@@ -102,12 +154,14 @@
                 {% endfor %}
             </div>
 
-            <form method="POST" class="d-flex mt-4">
+            <form method="POST" class="d-flex mt-4" id="chat-form">
                 {% csrf_token %}
-                <input type="text" name="mensaje" placeholder="Habla con {{ personaje.name }}..." class="form-control "
-                    style="border-top-left-radius: 50px;border-bottom-left-radius: 50px;" required autocomplete="off">
+                <input type="hidden" name="mensaje" id="hidden-mensaje">
+                <div id="input-editable" contenteditable="true" class="form-control editable-input"
+                    placeholder="Habla con {{ personaje.name }}..."
+                    style="border-top-left-radius: 50px; border-bottom-left-radius: 50px;"></div>
                 <button class="btn btn-secondary text-white" type="submit"
-                    style="border-top-right-radius: 50px;border-bottom-right-radius: 50px;">
+                    style="border-top-right-radius: 50px; border-bottom-right-radius: 50px;">
                     Enviar
                 </button>
             </form>
