@@ -12,6 +12,7 @@ admin.site.register(ComicPage)
 admin.site.register(Post)
 admin.site.register(PostImage)
 admin.site.register(Notificacion)
+admin.site.register(ChatMessage)
 
 @admin.register(MediaFile)
 class MediaFileAdmin(admin.ModelAdmin):

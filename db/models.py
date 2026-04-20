@@ -127,15 +127,40 @@ class Character(models.Model):
     social_media = models.JSONField(blank=True, null=True)
     birthdate = models.DateField(blank=True, null=True)
     likes = models.ManyToManyField(User, related_name='liked_character', blank=True)
-    
+    ai_personality = models.TextField(
+        blank=True, 
+        null=True, 
+        help_text="Instrucciones para la IA (Ej: Eres Mococo, energética y usas Ruff!)"
+    )
+    permanent_memory = models.TextField(
+        blank=True, 
+        null=True, 
+        help_text="Hechos clave que el personaje siempre recordará."
+    )
+    voice_id = models.CharField(
+        max_length=100, 
+        blank=True, 
+        null=True, 
+        help_text="Copia aquí el ID de ElevenLabs"
+    )
     def total_likes(self):
         return self.likes.count()
     def __str__(self):
         return self.name
     def tipo_objeto(self):
         return "character"
-
     
+class ChatMessage(models.Model):
+    character = models.ForeignKey(Character, on_delete=models.CASCADE, related_name='messages')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    is_from_ai = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    audio_file = models.FileField(upload_to="chat_audios/", blank=True, null=True)
+    class Meta:
+        ordering = ['timestamp']
+    def __str__(self):
+        return f"From {self.character} with {self.user} - {self.is_from_ai}"
     
 class Artist(models.Model):
     GENDER_CHOICES = [

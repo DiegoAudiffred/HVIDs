@@ -70,6 +70,9 @@ urlpatterns = [
     path('profile/<str:username>/verLikes<str:filter>/',views.userProfileLikes, name='userProfileLikes'),
     path('pastNotifications/',views.pastNotifications, name='pastNotifications'),
 
+    path('chat/<int:character_id>',views.chat, name='chat'),
+    path('cleanChat/<int:character_id>',views.cleanChat, name='cleanChat'),
+
     path('IATest/',views.IATEST, name='IATEST')
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

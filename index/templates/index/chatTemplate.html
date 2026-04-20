@@ -1,0 +1,117 @@
+{% extends 'layout/layout.html' %}
+{% load static %}
+
+{% block body %}
+<style>
+    /* Esto aplica solo a los fragmentos dentro de los mensajes */
+    .texto-resaltado {
+        color: #007bff !important;
+        font-weight: 500;
+        font-style: italic;
+    }
+
+    /* Esto aplica a TODO el texto dentro del input mientras escribes */
+    .input-azul {
+        color: #007bff !important;
+    }
+
+    .audio-player {
+        height: 30px;
+        margin-top: 5px;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const chatBox = document.getElementById("chat-box");
+        const inputMensaje = document.querySelector('input[name="mensaje"]');
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Auto-reproducir audio
+        const audios = document.querySelectorAll('audio');
+        if (audios.length > 0) {
+            const ultimoAudio = audios[audios.length - 1];
+            ultimoAudio.play().catch(e => console.log("Auto-play prevenido."));
+        }
+
+        const aplicarFormatoChat = () => {
+            const parrafos = chatBox.querySelectorAll('.msg-content');
+            parrafos.forEach(p => {
+                let contenido = p.innerHTML;
+
+                // Reemplaza (texto) por la versión azul, manteniendo el resto normal
+                contenido = contenido.replace(/\(([^)]+)\)/g, '<span class="texto-resaltado">($1)</span>');
+
+                // Reemplaza *texto* por la versión azul, manteniendo el resto normal
+                contenido = contenido.replace(/\*([^*]+)\*/g, '<span class="texto-resaltado">*$1*</span>');
+
+                p.innerHTML = contenido;
+            });
+        };
+
+        aplicarFormatoChat();
+
+        // Control del color del INPUT completo mientras se escribe
+        inputMensaje.addEventListener("input", function () {
+            const texto = this.value;
+
+            // Verificamos si hay algún paréntesis abierto o asterisco sin cerrar
+            let parentesisAbiertos = (texto.match(/\(/g) || []).length > (texto.match(/\)/g) || []).length;
+            let asteriscosAbiertos = (texto.match(/\*/g) || []).length % 2 !== 0;
+
+            if (parentesisAbiertos || asteriscosAbiertos) {
+                this.classList.add("input-azul");
+            } else {
+                this.classList.remove("input-azul");
+            }
+        });
+    });
+</script>
+<div class="container-fluid mt-4">
+    <div class="row align-items-center mb-3">
+        <div class="col-12 align-self-end d-flex">
+            <img src="{% if personaje.image %}{{ personaje.image.url }}{% else %}{% static 'img/noImage.jpg' %}{% endif %}"
+                alt="{{ personaje.name }}" class="w-100 h-100 rounded-circle"
+                style="max-height: 200px; max-width: fit-content; object-fit: fill;">
+            <div class="px-3 w-100">
+                <h1 class="fw-bold text-dark m-0 pb-2 text-truncate">{{ personaje.name }}</h1>
+                <p>{{ personaje.ai_personality|default:"Sin personalidad disponible." }}</p>
+                <small class="text-muted">Memoria: {{ personaje.permanent_memory|default:"Sin recuerdos." }}</small>
+
+                <a class="btn bg-secondary" href="{% url 'index:cleanChat' personaje.id %}"> Limpiar memoria </a>
+            </div>
+        </div>
+
+        <div class="col-12 mt-3">
+            <div id="chat-box" style="overflow-y: scroll; min-height: 400px; max-height: 600px;"
+                class="bg-white p-3 border rounded">
+                {% for msg in mensajes_chat %}
+                <div class="{% if msg.is_from_ai %}ai-msg{% else %}user-msg text-end{% endif %} mb-3">
+                    <strong>
+                        {% if msg.is_from_ai %}{{ personaje.name }}{% else %}{{ user.username }}{% endif %}
+                    </strong>
+                    <p class="msg-content m-0">{{ msg.content }}</p>
+
+                    {% if msg.audio_file %}
+                    <audio class="audio-player" controls>
+                        <source src="{{ msg.audio_file.url }}" type="audio/mpeg">
+                    </audio>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <form method="POST" class="d-flex mt-4">
+                {% csrf_token %}
+                <input type="text" name="mensaje" placeholder="Habla con {{ personaje.name }}..." class="form-control "
+                    style="border-top-left-radius: 50px;border-bottom-left-radius: 50px;" required autocomplete="off">
+                <button class="btn btn-secondary text-white" type="submit"
+                    style="border-top-right-radius: 50px;border-bottom-right-radius: 50px;">
+                    Enviar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

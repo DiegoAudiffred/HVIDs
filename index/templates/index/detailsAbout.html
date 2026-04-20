@@ -48,6 +48,11 @@
                                 </g>
                             </svg> {{ resultado.birthdate|date:"d M" }}
                         </span>
+                        <span class="badge bg-primary px-3 py-2 rounded-pill text-white">
+                            <a class="text-white text-decoration-none" href="{% url 'index:chat' resultado.id %}">Chatea
+                                con
+                                {{resultado.name}}</a>
+                        </span>
                         {% endif %}
                     </div>
 
@@ -63,7 +68,9 @@
                             {{ resultado.description|default:"Sin descripción disponible." }}
                         </div>
                     </div>
+
                     {% endif %}
+
 
                     <div class="mt-4 pt-2 border-top border-secondary border-opacity-10">
                         <small class="text-secondary">Publicado el {{ resultado.published_at|date:"d/m/Y" }}</small>
