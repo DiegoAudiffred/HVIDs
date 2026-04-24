@@ -1757,7 +1757,7 @@ def obtener_respuesta_local(historial_mensajes):
     }
 
     payload = {
-        "model": "llama-3.1-8b-lexi-uncensored-v2",
+        "model": "supergemma4-26b-uncensored-v2",
         "messages": historial_mensajes,
         "temperature": 0.8,
         "max_tokens": 800,
@@ -1765,7 +1765,7 @@ def obtener_respuesta_local(historial_mensajes):
     }
 
     try:
-        response = requests.post(API_URL, headers=headers, json=payload, timeout=120)
+        response = requests.post(API_URL, headers=headers, json=payload, timeout=999)
         
         if response.status_code == 200:
             resultado = response.json()
@@ -1825,7 +1825,7 @@ def reflexionar_y_actualizar_memoria(personaje, historial_reciente):
     )
 
     data = {
-        "model": "llama-3.1-8b-lexi-uncensored-v2",
+        "model": "supergemma4-26b-uncensored-v2",
         "messages": [
             {"role": "system", "content": prompt_extraccion},
             {"role": "user", "content": f"HISTORIAL RECIENTE:\n{historial_reciente}"}
@@ -1835,7 +1835,7 @@ def reflexionar_y_actualizar_memoria(personaje, historial_reciente):
     }
 
     try:
-        response = requests.post(API_URL, headers=headers, json=data, timeout=180)
+        response = requests.post(API_URL, headers=headers, json=data, timeout=999)
         
         if response.status_code == 200:
             response_data = response.json()
@@ -1886,7 +1886,7 @@ def reflexionar_y_actualizar_memoria2(personaje, historial_reciente):
     }
 
     try:
-        response = requests.post(url, headers=headers, data=json.dumps(data), timeout=15)
+        response = requests.post(url, headers=headers, data=json.dumps(data), timeout=999)
         response_data = response.json()
         
         if 'choices' in response_data:
@@ -2049,7 +2049,7 @@ def generar_imagen_anime(prompt_usuario):
 
     try:
         # El timeout debe ser alto porque tu PC tardará en procesar
-        response = requests.post(API_URL, json=payload, timeout=600)
+        response = requests.post(API_URL, json=payload, timeout=999)
         
         if response.status_code == 200:
             r = response.json()

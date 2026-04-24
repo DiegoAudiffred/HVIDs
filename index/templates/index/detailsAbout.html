@@ -48,12 +48,13 @@
                                 </g>
                             </svg> {{ resultado.birthdate|date:"d M" }}
                         </span>
+
+                        {% endif %}
                         <span class="badge bg-primary px-3 py-2 rounded-pill text-white">
                             <a class="text-white text-decoration-none" href="{% url 'index:chat' resultado.id %}">Chatea
                                 con
                                 {{resultado.name}}</a>
                         </span>
-                        {% endif %}
                     </div>
 
                     <div class="mb-3">

@@ -225,9 +225,13 @@ class addCharsForm(forms.ModelForm):
 
     class Meta:
         model = Character
-        fields = ['name','image','game','description','gender','birthdate','tags']
+        fields = ['name','image','game','description','gender','birthdate','tags','permanent_memory','ai_personality']
         widgets = {
             'description': forms.Textarea(attrs={'rows':4,'class':'form-control'}),
+                        'ai_personality': forms.Textarea(attrs={'rows':4,'class':'form-control'}),
+
+            'permanent_memory': forms.Textarea(attrs={'rows':4,'class':'form-control'}),
+
             'name':        forms.TextInput(attrs={'class':'form-control form-control-lg'}),
             'gender':      forms.RadioSelect(choices=[(True,'Masculino'),(False,'Femenino')]),
             # tags oculto para usar tu tag-picker
@@ -248,7 +252,18 @@ class addCharsForm(forms.ModelForm):
             'placeholder': ' Añade una breve descripción',
             'rows':'4'
         })
-
+            self.fields['permanent_memory'].required = False
+            self.fields['permanent_memory'].widget.attrs.update({
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+            'placeholder': ' Añade una breve descripción',
+            'rows':'4'
+        })            
+            self.fields['ai_personality'].required = False
+            self.fields['ai_personality'].widget.attrs.update({
+            'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
+            'placeholder': ' Añade una breve descripción',
+            'rows':'4'
+        })
             self.fields['tags'].required = False
             self.fields['tags'].widget.attrs.update({
             'class': 'form-control shadow-none bg-white text-tercero border border-2 border-primary px-2 py-2',
