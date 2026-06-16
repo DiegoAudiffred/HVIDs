@@ -112,6 +112,23 @@ def random_recommendations(user):
         queryset = random.sample(combined_list, len(combined_list))
     return queryset
 
+def noTagItems():
+    media_queryset = MediaFile.objects.filter(tags=None)
+    comic_queryset = Comic.objects.filter(tags=None)
+    combined_list = []
+
+    for m in media_queryset:
+        combined_list.append({'objeto': m, 'tipo': 'mediafile'})
+        
+    for c in comic_queryset:
+        combined_list.append({'objeto': c, 'tipo': 'comic'})
+        
+    if len(combined_list) >= 5:
+        queryset = random.sample(combined_list, 5)
+    else:
+        queryset = random.sample(combined_list, len(combined_list))
+    return queryset
+
 def get_sidebar_context(user):
     return {
         'popular_tags': get_top_items(Tags, ['mediafile', 'comic'],user),
@@ -119,6 +136,7 @@ def get_sidebar_context(user):
         'popular_characters': get_top_items(Character, ['mediafile', 'comic'],user),
         'popular_games': get_top_items(Game, ['mediafile', 'comic'],user),
         'recommendations': random_recommendations(user),
+        'noTagItems' : noTagItems()
     }
 
 @login_required(login_url='/login/')
@@ -1984,7 +2002,7 @@ def chat(request, character_id):
             # 7. Ciclo de Aprendizaje cada 10 mensajes
             total_mensajes = ChatMessage.objects.filter(character=personaje, user=usuario).count()
             print(total_mensajes)
-            if total_mensajes % 6 == 0:
+            if total_mensajes % 20 == 0:
                 # Construimos un texto más legible para la reflexión
                 print("entro")
                 contexto_texto = ""

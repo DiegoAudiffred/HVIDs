@@ -18,8 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 CSRF_TRUSTED_ORIGINS = [
     'https://salchiiscontent.org',
-    # Si usas otro dominio o subdominios que sirvan tu app
-    'https://otrodominio.com',
+
 ]
 TELEGRAM_BOT_TOKEN = '8047736753:AAFm6CyvCj5cVaHOn4VSBluJTVqd7vXkRoc'
 TELEGRAM_GROUP_CHAT_ID = '-1002634693432'
@@ -51,9 +50,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'django_user_agents',
 ]
-INSTALLED_APPS += [
-    
-]
+
 
 OPENROUTER_API_KEY = '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'
 ELEVENLABS_API_KEY = 'sk_5c1a0622aa1cc037094f8c730e0ef0cff2b403f021f82441'
