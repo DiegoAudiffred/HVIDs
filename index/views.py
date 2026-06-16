@@ -1667,103 +1667,184 @@ def allLikedContent(request, content, userid):
 
 
 @login_required(login_url='/login/')
+@login_required(login_url='/login/')
 def IATEST(request):
     user = request.user
     sidebar_context = get_sidebar_context(user)
-    resultado = None
+    resultados_lista = []
     
     if request.method == 'POST':
         print("\n" + "="*50)
-        print("--- INICIANDO ESCANEO DE IMAGEN ---")
+        print("--- INICIANDO ESCANEO MULTIPLE DE IMÁGENES ---")
         
-        if request.FILES.get('imagen'):
-            try:
-                imagen_file = request.FILES['imagen']
-                img = Image.open(imagen_file).convert("RGB")
-                print(f"DEBUG: Procesando archivo: {imagen_file.name}")
-                
-                config = apps.get_app_config('index')
-                
-                if config.char_detector and config.nsfw_detector:
-                    # CLAVE: top_k=None le dice a la IA que devuelva TODAS las etiquetas, no solo las mejores 5
-                    raw_tags = config.char_detector(img, top_k=1000)
-                    raw_nsfw = config.nsfw_detector(img)
-                    
-                    tags_info = []
-                    candidatos_personaje = []
-                    tags_prohibidos = ['ntr', 'netorare', 'futanari', 'dickgirl', 'intersex', 'gore', 'rape']
-                    
-                    print("DEBUG: Analizando etiquetas detectadas...")
-                    
-                    for r in raw_tags:
-                        label_low = r['label'].lower()
-                        score_pct = round(r['score'] * 100, 1)
-                        
-                        # Ahora que tenemos cientos de tags, filtramos por un score mínimo
-                        # 0.005 (0.5%) es ideal para ver etiquetas muy sutiles pero reales
-                        if r['score'] > 0.005:
-                            tags_info.append({
-                                'label': label_low.replace('_', ' '),
-                                'score': score_pct
-                            })
-                        
-                        # Capturar personajes con umbral bajo para imágenes de IA
-                        if 'character:' in label_low and r['score'] > 0.03:
-                            candidatos_personaje.append({
-                                'name': label_low.replace('character:', '').replace('_', ' ').title(),
-                                'score': score_pct
-                            })
-
-                    # Identificación del Personaje
-                    nombre_final = "Desconocido"
-                    confianza_final = 0
-                    
-                    if candidatos_personaje:
-                        nombre_final = candidatos_personaje[0]['name']
-                        confianza_final = candidatos_personaje[0]['score']
-                    else:
-                        for t in tags_info:
-                            if any(x in t['label'].lower() for x in ['mococo', 'abyssgard', 'fuwawa']):
-                                nombre_final = t['label'].title()
-                                confianza_final = t['score']
-                                break
-                        
-                        if nombre_final == "Desconocido" and tags_info:
-                            nombre_final = tags_info[0]['label'].title()
-                            confianza_final = tags_info[0]['score']
-
-                    # Lógica de Seguridad
-                    encontrados_alerta = [t['label'] for t in tags_info if any(p in t['label'] for p in tags_prohibidos)]
-                    prob_nsfw = next((r['score'] for r in raw_nsfw if r['label'] == 'nsfw'), 0)
-                    
-                    es_peligroso = prob_nsfw > 0.60 or len(encontrados_alerta) > 0
-                    
-                    resultado = {
-                        'personaje': nombre_final,
-                        'confianza_top': confianza_final,
-                        'seguro': "BLOQUEADO" if es_peligroso else "SFW",
-                        'is_danger': es_peligroso,
-                        'motivos_bloqueo': encontrados_alerta if encontrados_alerta else ["Contenido Explícito"],
-                        'prob_seguridad': round((1 - prob_nsfw) * 100, 1),
-                        'todos_los_tags': tags_info # Esta lista ahora será mucho más larga
-                    }
-                    
-                    print(f"DEBUG FINAL: {nombre_final} detectado. Tags mostrados: {len(tags_info)}")
-                
-                else:
-                    print("DEBUG ERROR: Los modelos no están cargados.")
-                    resultado = {'error': 'IA no disponible.'}
-                    
-            except Exception as e:
-                print(f"DEBUG ERROR CRÍTICO: {e}")
-                resultado = {'error': str(e)}
-        else:
-            print("DEBUG ERROR: No se recibió archivo.")
+        imagenes_files = request.FILES.getlist('imagen')
+        
+        if imagenes_files:
+            config = apps.get_app_config('index')
             
+            for imagen_file in imagenes_files:
+                try:
+                    img = Image.open(imagen_file).convert("RGB")
+                    print(f"DEBUG: Procesando archivo: {imagen_file.name}")
+                    
+                    if config.char_detector and config.nsfw_detector:
+                        raw_tags = config.char_detector(img, top_k=1000)
+                        raw_nsfw = config.nsfw_detector(img)
+                        
+                        tags_info = []
+                        candidatos_personaje = []
+                        tags_prohibidos = []
+                        
+                        # Lista manual limpia y exclusiva para omitir la creación de álbumes/personajes sin filtrar sus etiquetas generales
+                        nombres_prohibidos = ['hilichurl', 'unknown character']
+                        
+                        for r in raw_tags:
+                            label_low = r['label'].lower()
+                            score_pct = round(r['score'] * 100, 1)
+                            
+                            if r['score'] > 0.005:
+                                if not label_low.startswith('character:'):
+                                    tags_info.append({
+                                        'label': label_low.replace('_', ' '),
+                                        'score': score_pct
+                                    })
+                            
+                            if 'character:' in label_low and r['score'] > 0.70:
+                                name_raw = label_low.replace('character:', '').replace('_', ' ').title()
+                                game_extracted = None
+                                
+                                if " (" in name_raw and ")" in name_raw:
+                                    partes = name_raw.split(" (")
+                                    name_clean = partes[0].strip()
+                                    game_extracted = partes[1].split(")")[0].strip()
+                                else:
+                                    name_clean = name_raw.strip()
+                                
+                                if not any(np in name_clean.lower() for np in nombres_prohibidos):
+                                    candidatos_personaje.append({
+                                        'name': name_clean,
+                                        'game': game_extracted,
+                                        'score': score_pct
+                                    })
+
+                        personajes_detectados = []
+                        personajes_pantalla = []
+                        
+                        if candidatos_personaje:
+                            for c in candidatos_personaje:
+                                if c['name'] not in [p['name'] for p in personajes_pantalla]:
+                                    personajes_detectados.append(c)
+                                    personajes_pantalla.append({
+                                        'name': c['name'],
+                                        'score': c['score']
+                                    })
+                        else:
+                            nombre_respaldo = "Desconocido"
+                            score_respaldo = 0
+                            
+                            if tags_info and (tags_info[0]['score'] > 70.0):
+                                label_first = tags_info[0]['label'].lower()
+                                if not any(np in label_first for np in nombres_prohibidos):
+                                    nombre_respaldo = tags_info[0]['label'].title()
+                                    score_respaldo = tags_info[0]['score']
+                                
+                            if nombre_respaldo != "Desconocido" and not any(np in nombre_respaldo.lower() for np in nombres_prohibidos):
+                                game_extracted = None
+                                if " (" in nombre_respaldo and ")" in nombre_respaldo:
+                                    partes = nombre_respaldo.split(" (")
+                                    nombre_respaldo = partes[0].strip()
+                                    game_extracted = partes[1].split(")")[0].strip()
+                                    
+                                personajes_detectados.append({
+                                    'name': nombre_respaldo,
+                                    'game': game_extracted
+                                })
+                                personajes_pantalla.append({
+                                    'name': nombre_respaldo,
+                                    'score': score_respaldo
+                                })
+
+                        encontrados_alerta = [t['label'] for t in tags_info if any(p in t['label'] for p in tags_prohibidos)]
+                        prob_nsfw = next((r['score'] for r in raw_nsfw if r['label'] == 'nsfw'), 0)
+                        es_peligroso = prob_nsfw > 0.60 or len(encontrados_alerta) > 0
+                        
+                        imagen_url_resultado = None
+                        
+                        for p_data in personajes_detectados:
+                            personaje_nombre = p_data['name']
+                            juego_nombre = p_data['game']
+                            
+                            if personaje_nombre == "Desconocido" or any(np in personaje_nombre.lower() for np in nombres_prohibidos):
+                                continue
+                                
+                            nombre_album = f"{personaje_nombre} Album"
+                            comic_album = Comic.objects.filter(name__iexact=nombre_album).first()
+                            
+                            if not comic_album:
+                                comic_album = Comic.objects.create(
+                                    name=nombre_album,
+                                    user=user,
+                                    nsfw=es_peligroso,
+                                    image=imagen_file
+                                )
+                            else:
+                                if es_peligroso and not comic_album.nsfw:
+                                    comic_album.nsfw = True
+                                    comic_album.save()
+                            
+                            if juego_nombre:
+                                juego_obj, _ = Game.objects.get_or_create(name=juego_nombre)
+                                if hasattr(comic_album, 'game'):
+                                    comic_album.game = juego_obj
+                                    comic_album.save()
+                                elif hasattr(comic_album, 'games'):
+                                    comic_album.games.add(juego_obj)
+                            
+                            personaje_obj, _ = Character.objects.get_or_create(name=personaje_nombre)
+                            comic_album.character.add(personaje_obj)
+                            
+                            total_paginas = comic_album.pages.count()
+                            nueva_pagina = ComicPage.objects.create(
+                                comic=comic_album,
+                                image=imagen_file,
+                                order=total_paginas + 1
+                            )
+                            
+                            if not imagen_url_resultado and nueva_pagina.image:
+                                imagen_url_resultado = nueva_pagina.image.url
+                            
+                            conteo_tags = 0
+                            for t in tags_info:
+                                if conteo_tags >= 30:
+                                    break
+                                    
+                                tag_obj, _ = Tags.objects.get_or_create(name=t['label'].title())
+                                comic_album.tags.add(tag_obj)
+                                nueva_pagina.tags.add(tag_obj)
+                                conteo_tags += 1
+
+                            print(f"DEBUG ALBUM: Imagen {imagen_file.name} añadida a '{comic_album.name}' y etiquetada individualmente.")
+
+                        resultados_lista.append({
+                            'nombre_archivo': imagen_file.name,
+                            'imagen_url': imagen_url_resultado,
+                            'personajes': personajes_pantalla if personajes_pantalla else [{'name': 'Ninguno (Filtrado/Baja Confianza)', 'score': 0}],
+                            'seguro': "BLOQUEADO" if es_peligroso else "SFW",
+                            'is_danger': es_peligroso,
+                            'prob_seguridad': round((1 - prob_nsfw) * 100, 1),
+                            'todos_los_tags': tags_info[:30]
+                        })
+                    else:
+                        resultados_lista.append({'nombre_archivo': imagen_file.name, 'error': 'IA no disponible.'})
+                except Exception as e:
+                    print(f"DEBUG ERROR CRÍTICO en {imagen_file.name}: {e}")
+                    resultados_lista.append({'nombre_archivo': imagen_file.name, 'error': str(e)})
+        else:
+            print("DEBUG ERROR: No se recibieron archivos.")
         print("="*50 + "\n")
 
     context = {
-        'resultado': resultado,
+        'resultados_lista': resultados_lista,
         **sidebar_context
     }
     return render(request, 'index/HTMLTest.html', context)

@@ -106,6 +106,9 @@
     animation-delay: 1.3s;
   }
 
+  .navbar-nav .nav-item:nth-child(14) {
+    animation-delay: 1.4s;
+  }
 
 
   @keyframes slideDown {
@@ -202,6 +205,14 @@
             <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid icon-navbar mb-1">Subir
           </a>
         </li>
+
+        <li class="nav-item flex-fill text-center">
+          <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
+            style="font-size: 1.2vw;" href="{% url 'index:IATEST' %}">
+            <img src="{% static 'img/uploadNewIcon.png' %}" class="img-fluid icon-navbar mb-1">IA Test
+          </a>
+        </li>
+
         {% endif %}
         <li class="nav-item flex-fill text-center">
           <a class="nav-link active text-sexto fw-bold d-flex flex-column align-items-center fnBadComicRegular"
@@ -381,6 +392,26 @@
             </li>
             {% endif %}
           </div>
+          <div class="col-4 nav-item ">
+            <li class="nav-item">
+              <a class="nav-link text-sexto fw-bold fnBadComicRegular" href="{% url 'index:IATEST' %}">
+                <img src="{% static 'img/settingsLogoNew2.png' %}" class="img-fluid icon-navbar mb-1">IA
+              </a>
+            </li>
+          </div>
+          <div class="col-4 nav-item ">
+            {% if user.is_superuser and user.is_staff %}
+            <li class="nav-item">
+              <a class="nav-link text-sexto fw-bold fnBadComicRegular"
+                href="{% url 'index:allLikedContent' 'mediafiles' user.id %}">
+                <img src="{% static 'img/corazon.png' %}" class="img-fluid icon-navbar mb-1">Favoritos
+              </a>
+            </li>
+            {% endif %}
+          </div>
+
+
+
 
 
           {% if request.user.is_authenticated %}
