@@ -374,11 +374,11 @@ def navbarFilterHeader(request):
     page_number = request.GET.get('page')
 
     if thing_to_filter == "Artistas":
-        queryset = Artist.objects.all() 
+        queryset = Artist.objects.all().order_by('name') 
     elif thing_to_filter == "Juegos":
-        queryset = Game.objects.all()
+        queryset = Game.objects.all().order_by('name') 
     elif thing_to_filter == "Personajes":
-        queryset = Character.objects.all()
+        queryset = Character.objects.all().order_by('name') 
     elif thing_to_filter == "Videos":
         queryset = MediaFile.objects.filter(hide=False).order_by('-uploaded_at')
     elif thing_to_filter == "Comics":
@@ -1667,7 +1667,6 @@ def allLikedContent(request, content, userid):
 
 
 @login_required(login_url='/login/')
-@login_required(login_url='/login/')
 def IATEST(request):
     user = request.user
     sidebar_context = get_sidebar_context(user)
@@ -1695,7 +1694,6 @@ def IATEST(request):
                         candidatos_personaje = []
                         tags_prohibidos = []
                         
-                        # Lista manual limpia y exclusiva para omitir la creación de álbumes/personajes sin filtrar sus etiquetas generales
                         nombres_prohibidos = ['hilichurl', 'unknown character']
                         
                         for r in raw_tags:
@@ -1743,10 +1741,14 @@ def IATEST(request):
                             score_respaldo = 0
                             
                             if tags_info and (tags_info[0]['score'] > 70.0):
-                                label_first = tags_info[0]['label'].lower()
-                                if not any(np in label_first for np in nombres_prohibidos):
-                                    nombre_respaldo = tags_info[0]['label'].title()
-                                    score_respaldo = tags_info[0]['score']
+                                for original_r in raw_tags:
+                                    if original_r['label'].lower().replace('_', ' ') == tags_info[0]['label']:
+                                        if original_r['label'].lower().startswith('character:'):
+                                            label_first = tags_info[0]['label'].lower()
+                                            if not any(np in label_first for np in nombres_prohibidos):
+                                                nombre_respaldo = tags_info[0]['label'].title()
+                                                score_respaldo = tags_info[0]['score']
+                                        break
                                 
                             if nombre_respaldo != "Desconocido" and not any(np in nombre_respaldo.lower() for np in nombres_prohibidos):
                                 game_extracted = None
@@ -1770,60 +1772,72 @@ def IATEST(request):
                         
                         imagen_url_resultado = None
                         
-                        for p_data in personajes_detectados:
-                            personaje_nombre = p_data['name']
-                            juego_nombre = p_data['game']
-                            
-                            if personaje_nombre == "Desconocido" or any(np in personaje_nombre.lower() for np in nombres_prohibidos):
-                                continue
+                        if personajes_detectados:
+                            for p_data in personajes_detectados:
+                                personaje_nombre = p_data['name']
+                                juego_nombre = p_data['game']
                                 
-                            nombre_album = f"{personaje_nombre} Album"
-                            comic_album = Comic.objects.filter(name__iexact=nombre_album).first()
-                            
-                            if not comic_album:
-                                comic_album = Comic.objects.create(
-                                    name=nombre_album,
-                                    user=user,
-                                    nsfw=es_peligroso,
-                                    image=imagen_file
-                                )
-                            else:
-                                if es_peligroso and not comic_album.nsfw:
-                                    comic_album.nsfw = True
-                                    comic_album.save()
-                            
-                            if juego_nombre:
-                                juego_obj, _ = Game.objects.get_or_create(name=juego_nombre)
-                                if hasattr(comic_album, 'game'):
-                                    comic_album.game = juego_obj
-                                    comic_album.save()
-                                elif hasattr(comic_album, 'games'):
-                                    comic_album.games.add(juego_obj)
-                            
-                            personaje_obj, _ = Character.objects.get_or_create(name=personaje_nombre)
-                            comic_album.character.add(personaje_obj)
-                            
-                            total_paginas = comic_album.pages.count()
-                            nueva_pagina = ComicPage.objects.create(
-                                comic=comic_album,
-                                image=imagen_file,
-                                order=total_paginas + 1
-                            )
-                            
-                            if not imagen_url_resultado and nueva_pagina.image:
-                                imagen_url_resultado = nueva_pagina.image.url
-                            
-                            conteo_tags = 0
-                            for t in tags_info:
-                                if conteo_tags >= 30:
-                                    break
+                                if personaje_nombre == "Desconocido" or any(np in personaje_nombre.lower() for np in nombres_prohibidos):
+                                    continue
                                     
-                                tag_obj, _ = Tags.objects.get_or_create(name=t['label'].title())
-                                comic_album.tags.add(tag_obj)
-                                nueva_pagina.tags.add(tag_obj)
-                                conteo_tags += 1
+                                nombre_album = f"{personaje_nombre} Album"
+                                comic_album = Comic.objects.filter(name__iexact=nombre_album).first()
+                                
+                                if not comic_album:
+                                    comic_album = Comic.objects.create(
+                                        name=nombre_album,
+                                        user=user,
+                                        nsfw=es_peligroso,
+                                        image=imagen_file
+                                    )
+                                else:
+                                    if es_peligroso and not comic_album.nsfw:
+                                        comic_album.nsfw = True
+                                        comic_album.save()
+                                
+                                if juego_nombre:
+                                    juego_obj, _ = Game.objects.get_or_create(name=juego_nombre)
+                                    if hasattr(comic_album, 'game'):
+                                        comic_album.game = juego_obj
+                                        comic_album.save()
+                                    elif hasattr(comic_album, 'games'):
+                                        comic_album.games.add(juego_obj)
+                                
+                                personaje_obj, _ = Character.objects.get_or_create(name=personaje_nombre)
+                                comic_album.character.add(personaje_obj)
+                                
+                                total_paginas = comic_album.pages.count()
+                                nueva_pagina = ComicPage.objects.create(
+                                    comic=comic_album,
+                                    image=imagen_file,
+                                    order=total_paginas + 1
+                                )
+                                
+                                if not imagen_url_resultado and nueva_pagina.image:
+                                    imagen_url_resultado = nueva_pagina.image.url
+                                
+                                conteo_tags = 0
+                                for t in tags_info:
+                                    if conteo_tags >= 20:
+                                        break
+                                        
+                                    tag_obj, _ = Tags.objects.get_or_create(name=t['label'].title())
+                                    comic_album.tags.add(tag_obj)
+                                    nueva_pagina.tags.add(tag_obj)
+                                    conteo_tags += 1
 
-                            print(f"DEBUG ALBUM: Imagen {imagen_file.name} añadida a '{comic_album.name}' y etiquetada individualmente.")
+                                print(f"DEBUG ALBUM: Imagen {imagen_file.name} añadida a '{comic_album.name}' y etiquetada individualmente.")
+                        else:
+                            import base64
+                            try:
+                                imagen_file.seek(0)
+                                data_url = base64.b64encode(imagen_file.read()).decode('utf-8')
+                                extension = imagen_file.name.split('.')[-1].lower()
+                                if extension not in ['jpg', 'jpeg', 'png', 'webp']:
+                                    extension = 'png'
+                                imagen_url_resultado = f"data:image/{extension};base64,{data_url}"
+                            except Exception as b64_err:
+                                print(f"DEBUG ERROR AL PROCESAR DATA URL: {b64_err}")
 
                         resultados_lista.append({
                             'nombre_archivo': imagen_file.name,
@@ -2004,6 +2018,7 @@ def reflexionar_y_actualizar_memoria2(personaje, historial_reciente):
                 print(f"DEBUG: Memoria de {personaje.name} actualizada correctamente.")
     except Exception as e:
         print(f"Error en extracción de memoria: {e}")
+
 @login_required(login_url='/login/')
 def chat(request, character_id):
     personaje = get_object_or_404(Character, id=character_id)
@@ -2174,3 +2189,98 @@ def cleanChat(request, character_id):
     mensajes_chat.delete()
 
     return redirect('index:chat', character_id)
+
+@login_required(login_url='/login/')
+def scanVideoMedia(request, id):
+    mediaFile = get_object_or_404(MediaFile, id=id)
+    
+    if request.method == 'POST' and mediaFile.file:
+        from decord import VideoReader, cpu
+        from PIL import Image
+        from django.apps import apps
+        
+        config = apps.get_app_config('index')
+        if not config.charDetector or not config.nsfwDetector:
+            return redirect('algunaRutaExito')
+            
+        videoPath = mediaFile.file.path
+        vr = VideoReader(videoPath, ctx=cpu(0))
+        fps = vr.get_avg_fps()
+        totalFrames = len(vr)
+        duration = totalFrames / fps
+        
+        intervalSeconds = 3
+        frameInterval = int(fps * intervalSeconds)
+        frameIndices = list(range(0, totalFrames, frameInterval))
+        
+        if not frameIndices:
+            frameIndices = [0]
+            
+        accumulatedTags = {}
+        accumulatedCharacters = {}
+        nsfwScores = []
+        forbiddenNames = ['hilichurl', 'unknown character']
+        
+        for idx in frameIndices:
+            try:
+                frame = vr[idx].asnumpy()
+                img = Image.fromarray(frame).convert("RGB")
+                
+                rawTags = config.charDetector(img, top_k=50)
+                rawNsfw = config.nsfw_detector(img)
+                
+                probNsfw = next((r['score'] for r in rawNsfw if r['label'] == 'nsfw'), 0)
+                nsfwScores.append(probNsfw)
+                
+                for r in rawTags:
+                    labelLow = r['label'].lower()
+                    score = r['score']
+                    
+                    if 'character:' in labelLow and score > 0.70:
+                        nameRaw = labelLow.replace('character:', '').replace('_', ' ').title()
+                        gameExtracted = None
+                        
+                        if " (" in nameRaw and ")" in nameRaw:
+                            partes = nameRaw.split(" (")
+                            nameClean = partes[0].strip()
+                            gameExtracted = partes[1].split(")")[0].strip()
+                        else:
+                            nameClean = nameRaw.strip()
+                            
+                        if not any(np in nameClean.lower() for np in forbiddenNames):
+                            if nameClean not in accumulatedCharacters or score > accumulatedCharacters[nameClean]['score']:
+                                accumulatedCharacters[nameClean] = {
+                                    'game': gameExtracted,
+                                    'score': score
+                                }
+                                
+                    elif score > 0.15 and not labelLow.startswith('character:'):
+                        labelClean = labelLow.replace('_', ' ').title()
+                        if labelClean not in accumulatedTags or score > accumulatedTags[labelClean]:
+                            accumulatedTags[labelClean] = score
+                            
+            except Exception as frameErr:
+                print(f"Error procesando frame {idx}: {frameErr}")
+                
+        if nsfwScores:
+            maxNsfwScore = max(nsfwScores)
+            if maxNsfwScore > 0.60:
+                mediaFile.nsfw = True
+                
+        for charName, charData in accumulatedCharacters.items():
+            characterObj, _ = Character.objects.get_or_create(name=charName)
+            mediaFile.character.add(characterObj)
+            
+            if charData['game']:
+                gameObj, _ = Game.objects.get_or_create(name=charData['game'])
+                mediaFile.game = gameObj
+                
+        sortedTags = sorted(accumulatedTags.items(), key=lambda x: x[1], reverse=True)[:20]
+        for tagName, _ in sortedTags:
+            tagObj, _ = Tags.objects.get_or_create(name=tagName)
+            mediaFile.tags.add(tagObj)
+            
+        mediaFile.save()
+        
+    return redirect('algunaRutaExito')
+    

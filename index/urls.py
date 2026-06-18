@@ -64,7 +64,7 @@ urlpatterns = [
     path('deleteVideo/<int:id>',views.deleteVideo,name="deleteVideo"),
     path('toggle-like/<str:model>/<int:pk>/', views.toggle_like, name='toggle_like'),
     path('comic/page/deleteComicImage/<int:id>', views.deleteComicImage, name='deleteComicImage'),
-
+    path('scanVideoMedia/<int:id>',views.scanVideoMedia,name = 'scanVideoMedia'),
 
     
     path('profile/<str:username>/verLikes<str:filter>/',views.userProfileLikes, name='userProfileLikes'),
